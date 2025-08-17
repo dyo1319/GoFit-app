@@ -31,10 +31,14 @@ npm i -D concurrently
 
 cd client
 npm create vite@latest . -- --template react
-npm i
+npm i @mui/material @mui/icons-material @emotion/react @emotion/styled
+npm i recharts
+npm i react-router-dom@latest
+
 
 
 cd server
 npm init -y
 npm i express cors morgan dotenv mysql2
 npm i -D nodemon
+npm i mysql2 slashes@2.0.0 md5 jsonwebtoken cookie-parser

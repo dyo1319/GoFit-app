@@ -15,6 +15,12 @@ app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(express.json());
 app.use(morgan('dev'));
 
+
+
+const usr_R = require('./routers/users_R');
+app.use('/U',usr_R);
+
+
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, ts: new Date().toISOString() });
 });
