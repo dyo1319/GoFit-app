@@ -1,39 +1,47 @@
 const express = require('express');
 const router = express.Router();
+const user_Mid = require('../middleware/user_Mid');
+
+router.post('/Add', user_Mid.AddUser);
+
+router.get("/list", user_Mid.GetAllUsers, (req, res) => {
+  res.json({
+    success: true,
+    page: req.page,
+    total_rows: req.total_rows,
+    total_pages: req.total_pages,
+    data: req.users_data,
+  });
+});
+
+router.get('/users/:id', user_Mid.GetOneUser, (req, res) => {
+  if (req.one_user_error) {
+    return res.status(req.one_user_error.status).json({ 
+      success: false, 
+      message: req.one_user_error.message 
+    });
+  }
+  
+  const payload = { 
+    user: req.one_user_data 
+  };
+  
+  if (req.one_user_body !== undefined) {
+    payload.bodydetails = req.one_user_body;
+  }
+  
+  if (req.one_user_subscription !== undefined) {
+    payload.subscription = req.one_user_subscription;
+  }
+  
+  return res.json({ 
+    success: true, 
+    data: payload 
+  });
+});
+
+router.put('/users/:id', user_Mid.UpdateUser);
+
+router.delete('/users/:id', user_Mid.DeleteUser);
+
 module.exports = router;
-
-const user_Mid = require("../middleware/user_Mid");
-
-router.get("/Add",(req,res)=>{
-    res.render("user_add",{
-        page_title  : "הוספת משתמש",
-        data:{},
-    });
-});
-router.post("/Add",[user_Mid.AddUser],(req, res) => {
-    res.redirect("/U/List");
-});
-router.get("/Edit/:id",[user_Mid.GetOneUser],(req,res)=>{
-    if(req.GoodOne) {
-        res.render("user_add", {
-            page_title  : "עריכת משתמש"     ,
-            data        :  req.one_user_data ,
-        });
-    } else{
-        res.redirect("/cat/List");/// will be updated in future to missions list
-    }
-});
-router.post("/Edit/:id", [user_Mid.UpdateUser], (req, res) => {
-    res.redirect("/U/List");
-});
-router.get("/List",[user_Mid.GetAllUsers],(req,res)=>{
-    res.render("user_list",{
-        page_title    : "רשימת משתמשים"  ,
-        users         : req.users_data    ,
-        page          : req.page          ,
-        total_pages   : req.total_pages   ,
-    });
-});
-router.post("/Delete",[user_Mid.DeleteUser],(req,res)=>{
-    res.redirect("/U/List");
-})

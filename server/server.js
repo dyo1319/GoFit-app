@@ -15,6 +15,8 @@ app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(express.json());
 app.use(morgan('dev'));
 
+global.addSlashes    = require('slashes').addSlashes;
+global.stripSlashes  = require('slashes').stripSlashes;
 
 
 const usr_R = require('./routers/users_R');

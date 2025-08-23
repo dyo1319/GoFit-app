@@ -1,58 +1,123 @@
-import "./userList.css";
-import { DataGrid } from "@mui/x-data-grid";
-import { DeleteOutline } from "@mui/icons-material";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import * as React from 'react';
+import { DataGrid } from '@mui/x-data-grid';
+import { useNavigate } from 'react-router-dom';
+import { Paper, Box, Typography, Button } from '@mui/material';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import './userList.css';
 
-const initialRows = [
-  { id: 1, username: "Anna Becker", email: "anna@mail.com", status: "active", transaction: "$120.00",
-    avatar: "https://i.pravatar.cc/40?img=1" },
-  { id: 2, username: "John Smith",  email: "john@mail.com", status: "inactive", transaction: "$80.00",
-    avatar: "https://i.pravatar.cc/40?img=2" },
-];
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
 
-export default function UserList() {
-  const [data, setData] = useState(initialRows);
+export default function DataTable() {
+  const navigate = useNavigate();
 
-  const handleDelete = (id) => setData(prev => prev.filter((row) => row.id !== id));
+  const [rows, setRows] = React.useState([]);
+  const [rowCount, setRowCount] = React.useState(0);
+  const [loading, setLoading] = React.useState(false);
+  const [paginationModel, setPaginationModel] = React.useState({ page: 0, pageSize: 10 });
+
+  const fetchUsers = React.useCallback(async (page = 0) => {
+    setLoading(true);
+    try {
+      const url = `${API_BASE}/U/list?p=${page}`;
+      const res = await fetch(url, { credentials: 'include' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      // שינוי כאן - התאם למבנה החדש של התשובה
+      if (data.success) {
+        setRows(Array.isArray(data.data) ? data.data : []);
+        setRowCount(Number(data.total_rows ?? 0));
+      } else {
+        throw new Error(data.message || 'Failed to fetch users');
+      }
+    } catch (err) {
+      console.error('שגיאה בטעינת המשתמשים:', err);
+      setRows([]);
+      setRowCount(0);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    fetchUsers(paginationModel.page);
+  }, [fetchUsers, paginationModel.page]);
+
+  const handleDelete = async (id) => {
+    const isLastRowOnPage = rows.length === 1 && paginationModel.page > 0;
+
+    setRows(prev => prev.filter(r => r.id !== id));
+    setRowCount(prev => Math.max(0, prev - 1));
+
+    try {
+      const res = await fetch(`${API_BASE}/U/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      // שינוי כאן - בדוק את מבנה התשובה החדש
+      const result = await res.json();
+      
+      if (!res.ok || !result.success) {
+        await fetchUsers(paginationModel.page);
+        return;
+      }
+      
+      if (isLastRowOnPage) {
+        setPaginationModel(p => ({ ...p, page: p.page - 1 }));
+      } else {
+        await fetchUsers(paginationModel.page);
+      }
+    } catch (e) {
+      console.error('מחיקה נכשלה:', e);
+      await fetchUsers(paginationModel.page);
+    }
+  };
 
   const columns = [
-    { field: "id", headerName: "ID", width: 90 },
-    {
-      field: "user", headerName: "User", width: 200,
+    { field: 'id',         headerName: 'מזהה',         flex: 1, headerAlign: 'left',  align: 'right' },
+    { field: 'phone',      headerName: 'טלפון',        flex: 1, headerAlign: 'left',  align: 'right' },
+    { field: 'username',   headerName: 'שם משתמש',     flex: 1, headerAlign: 'left',  align: 'right' },
+    { field: 'birth_date', headerName: 'תאריך לידה',   flex: 1, headerAlign: 'left',  align: 'right' },
+    { field: 'role',       headerName: 'תפקיד',        flex: 1, headerAlign: 'left',  align: 'right' },
+    { field: 'gender',     headerName: 'מגדר',         flex: 1, headerAlign: 'left',  align: 'right' },
+    { field: 'action',     headerName: 'פעולות',       flex: 1, headerAlign: 'left',  align: 'right',sortable: false, filterable: false,
       renderCell: (params) => (
-        <div className="userListUser">
-          <img className="userListImg" src={params.row.avatar} alt={params.row.username} />
-          {params.row.username}
+        <div className="userActions">
+          <Button size="small" variant="outlined"
+            onClick={(e) => { e.stopPropagation(); navigate(`/user/${params.row.id}`);  }}>
+            ערוך
+          </Button>
+          <DeleteOutlineIcon
+            className="userListDelete"
+            onClick={(e) => { e.stopPropagation(); handleDelete(params.row.id); }}
+          />
         </div>
-      ),
-    },
-    { field: "email", headerName: "Email", width: 200 },
-    { field: "status", headerName: "Status", width: 120 },
-    { field: "transaction", headerName: "Transaction Volume", width: 160 },
-    {
-      field: "action", headerName: "Action", width: 150,
-      renderCell: (params) => (
-        <>
-          <Link to={`/user/${params.row.id}`}>
-            <button className="userListEdit">Edit</button>
-          </Link>
-          <DeleteOutline className="userListDelete" onClick={() => handleDelete(params.row.id)} />
-        </>
       ),
     },
   ];
 
   return (
-    <div className="userList">
+    <Paper sx={{ p: 2, height: 600, width: '80%', maxWidth: '100%' }} dir="rtl">
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+        <Typography variant="h6" fontWeight={700}>רשימת משתמשים</Typography>
+        <Button variant="contained" onClick={() => navigate('/newUser')}>הוסף משתמש</Button>
+      </Box>
+
       <DataGrid
-        rows={data}
+        rows={rows}
+        getRowId={(row) => row.id}
         columns={columns}
+        loading={loading}
+        rowCount={rowCount}
+        paginationMode="server"
+        paginationModel={paginationModel}
+        onPaginationModelChange={setPaginationModel}
+        pageSizeOptions={[10]}
         checkboxSelection
         disableRowSelectionOnClick
-        initialState={{ pagination: { paginationModel: { pageSize: 8, page: 0 } } }}
-        pageSizeOptions={[8]}
+        sx={{ border: 0 }}
       />
-    </div>
+    </Paper>
   );
 }

@@ -1,57 +1,105 @@
-.newUser {
-  flex: 4;
+.newUser { flex: 4; }
+
+.pageTitle {
+  font-size: 28px;
+  margin-bottom: 16px;
 }
 
 .newUserForm {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section {
+  border: 1px solid #e5e7eb; 
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 700;
+  padding: 0 8px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 16px 20px;
 }
 
 .newUserItem {
-  width: 400px;
   display: flex;
   flex-direction: column;
-  margin-top: 10px;
-  margin-right: 20px;
 }
 
 .newUserItem > label {
-  margin-bottom: 10px;
+  margin-bottom: 2px;
   font-size: 14px;
   font-weight: 600;
-  color: rgb(151, 150, 150);
+  color: #6b7280; 
 }
 
-.newUserItem > input {
-  height: 20px;
-  padding: 10px;
-  border: 1px solid gray;
-  border-radius: 5px;
+.newUserItem > input,
+.newUserItem > select {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
 }
 
-.newUserGender > input {
-  margin-top: 15px;
+.newUserItem > input:focus,
+.newUserItem > select:focus {
+  border-color: #2563eb; 
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .1);
 }
 
-.newUserGender>label{
-    margin: 10px;
-    font-size: 18px;
-    color: #555;
+.required {
+  color: #dc2626;
+  font-weight: bold;
 }
 
-.newUserSelect{
-    height: 40px;
-    border-radius: 5px;
+.error {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, .1) !important;
 }
 
-.newUserButton{
-    width: 200px;
-    border: none;
-    background-color: darkblue;
-    color: white;
-    padding: 7px 10px;
-    font-weight: 600;
-    border-radius: 10px;
-    margin-top: 30px;
-    cursor: pointer;
+.error-message {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.primary {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.primary:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .formGrid { grid-template-columns: 1fr; }
 }
