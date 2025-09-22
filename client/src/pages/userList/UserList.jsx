@@ -22,8 +22,6 @@ export default function DataTable() {
       const res = await fetch(url, { credentials: 'include' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-
-      // שינוי כאן - התאם למבנה החדש של התשובה
       if (data.success) {
         setRows(Array.isArray(data.data) ? data.data : []);
         setRowCount(Number(data.total_rows ?? 0));
@@ -55,7 +53,6 @@ export default function DataTable() {
         credentials: 'include',
       });
 
-      // שינוי כאן - בדוק את מבנה התשובה החדש
       const result = await res.json();
       
       if (!res.ok || !result.success) {

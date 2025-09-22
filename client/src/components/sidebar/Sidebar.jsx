@@ -4,8 +4,7 @@ import {
   LineStyle, Timeline, TrendingUp, PermIdentity,
   AttachMoney, BarChart, WorkOutline, Report,
   CreditCard, ReceiptLong, CalendarMonth, FitnessCenter,
-  Key, Assessment, Notifications, Logout,
-  DarkMode
+  Assessment, Notifications, Logout, DarkMode
 } from "@mui/icons-material";
 
 const linkCls = ({ isActive }) => `link ${isActive ? "active" : ""}`;
@@ -14,7 +13,6 @@ export default function Sidebar() {
   return (
     <div className="sidebar" dir="rtl">
       <div className="sidebarWrapper">
-
         <div className="sidebarMenu">
           <h3 className="sidebarTitle">לוח בקרה</h3>
           <ul className="sidebarList">
@@ -30,12 +28,7 @@ export default function Sidebar() {
                 ניתוח נתונים
               </NavLink>
             </li>
-            <li className="sidebarListItem">
-              <NavLink to="/subscriptions" className={linkCls}>
-                <TrendingUp className="sidebarIcon" />
-                מנויים
-              </NavLink>
-            </li>
+
             <li className="sidebarListItem">
               <NavLink to="/alerts" className={linkCls}>
                 <Notifications className="sidebarIcon" />
@@ -52,6 +45,12 @@ export default function Sidebar() {
               <NavLink to="/users" className={linkCls}>
                 <PermIdentity className="sidebarIcon" />
                 משתמשים
+              </NavLink>
+            </li>
+            <li className="sidebarListItem">
+              <NavLink to="/subscriptions" className={linkCls}>
+                <TrendingUp className="sidebarIcon" />
+                מנויים
               </NavLink>
             </li>
             <li className="sidebarListItem">
@@ -76,12 +75,6 @@ export default function Sidebar() {
               <NavLink to="/invoices" className={linkCls}>
                 <AttachMoney className="sidebarIcon" />
                 חשבוניות
-              </NavLink>
-            </li>
-            <li className="sidebarListItem">
-              <NavLink to="/reports/monthly" className={linkCls}>
-                <BarChart className="sidebarIcon" />
-                דוח חודשי
               </NavLink>
             </li>
           </ul>
@@ -112,24 +105,6 @@ export default function Sidebar() {
         </div>
 
         <div className="sidebarMenu">
-          <h3 className="sidebarTitle">גישה (RFID)</h3>
-          <ul className="sidebarList">
-            <li className="sidebarListItem">
-              <NavLink to="/rfid" className={linkCls}>
-                <Key className="sidebarIcon" />
-                ניהול תגי גישה
-              </NavLink>
-            </li>
-            <li className="sidebarListItem">
-              <NavLink to="/rfid/log" className={linkCls}>
-                <Assessment className="sidebarIcon" />
-                לוג כניסות
-              </NavLink>
-            </li>
-          </ul>
-        </div>
-
-        <div className="sidebarMenu">
           <h3 className="sidebarTitle">דוחות</h3>
           <ul className="sidebarList">
             <li className="sidebarListItem">
@@ -142,6 +117,12 @@ export default function Sidebar() {
               <NavLink to="/reports/churn" className={linkCls}>
                 <BarChart className="sidebarIcon" />
                 נטישת מנויים
+              </NavLink>
+            </li>
+            <li className="sidebarListItem">
+              <NavLink to="/reports/monthly" className={linkCls}>
+                <BarChart className="sidebarIcon" />
+                דוח חודשי
               </NavLink>
             </li>
           </ul>
@@ -170,7 +151,6 @@ export default function Sidebar() {
             </li>
           </ul>
         </div>
-
       </div>
     </div>
   );

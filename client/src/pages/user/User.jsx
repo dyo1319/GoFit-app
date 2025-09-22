@@ -40,20 +40,17 @@ export default function User() {
     birth_date: "",
     role: "",
     gender: "",
-    // bodydetails
     weight: "",
     height: "",
     body_fat: "",
     muscle_mass: "",
     circumference: "",
     recorded_at: "",
-    // subscriptions
     start_date: "",
     end_date: "",
     payment_status: "pending",
   });
 
-  // ===== LOAD =====
   useEffect(() => {
     let ignore = false;
     async function load() {
@@ -113,7 +110,6 @@ export default function User() {
     setUserForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  // ===== Helpers =====
   const toNullOrNumber = (v) => (v === "" || v === null || v === undefined ? null : Number(v));
   const toNullOrISO = (v) => (v === "" || v === null || v === undefined ? null : v);
 
@@ -139,7 +135,6 @@ export default function User() {
     return statusMap[userForm.payment_status] || "לא ידוע";
   };
 
-  // ===== SAVE (diff-only) =====
   const handleSave = async () => {
     setError("");
     if (!original) return;
@@ -148,29 +143,23 @@ export default function User() {
     const addIfChanged = (key, transform = (v) => v) => {
       const cur = userForm[key];
       const orig = original?.[key] ?? "";
-      // השוואה טקסטואלית כדי למנוע false positives במספרים
       if (String(cur ?? "") !== String(orig ?? "")) {
         const val = transform(cur);
         changed[key] = val;
       }
     };
 
-    // users
     addIfChanged("username");
     addIfChanged("phone");
     addIfChanged("birth_date", toNullOrISO);
     addIfChanged("role", (he) => (he ? (ROLE_HE2EN[he] ?? null) : null));
     addIfChanged("gender", (he) => (he ? (GENDER_HE2EN[he] ?? null) : null));
-
-    // bodydetails (כל שדה שונה -> נשלח; ריק == null)
     addIfChanged("weight", toNullOrNumber);
     addIfChanged("height", toNullOrNumber);
     addIfChanged("body_fat", toNullOrNumber);
     addIfChanged("muscle_mass", toNullOrNumber);
     addIfChanged("circumference", toNullOrNumber);
     addIfChanged("recorded_at", toNullOrISO);
-
-    // subscription
     addIfChanged("start_date", toNullOrISO);
     addIfChanged("end_date", toNullOrISO);
     addIfChanged("payment_status");
@@ -191,7 +180,6 @@ export default function User() {
         throw new Error(j?.message || `עדכון נכשל (${res.status})`);
       }
 
-      // רענון אחרי שמירה
       const afterRes = await fetch(`${API_BASE}/U/users/${id}?expand=1`);
       const after = await afterRes.json().catch(() => ({}));
       if (!afterRes.ok || !after?.success) {
@@ -253,7 +241,6 @@ export default function User() {
       </div>
 
       <div className="userContainer">
-        {/* תצוגה */}
         <div className="userShow">
           <div className="userShowHeader">
             <div className="userShowTop">
@@ -341,8 +328,6 @@ export default function User() {
             </div>
           </div>
         </div>
-
-        {/* טופס עריכה */}
         {isEditing && (
           <div className="userUpdate">
             <div className="userUpdateHeader">
@@ -350,7 +335,6 @@ export default function User() {
             </div>
             <form className="userUpdateForm" onSubmit={(e) => e.preventDefault()}>
               <div className="userUpdateSections">
-                {/* חשבון */}
                 <div className="userUpdateSection">
                   <h4 className="sectionTitle">פרטי חשבון</h4>
                   <div className="userUpdateRow">
@@ -414,8 +398,6 @@ export default function User() {
                     <div className="userUpdateItem" />
                   </div>
                 </div>
-
-                {/* גוף */}
                 <div className="userUpdateSection">
                   <h4 className="sectionTitle">מדדי גוף</h4>
                   <div className="userUpdateRow">
@@ -482,8 +464,6 @@ export default function User() {
                     </div>
                   </div>
                 </div>
-
-                {/* מנוי */}
                 <div className="userUpdateSection">
                   <h4 className="sectionTitle">פרטי מנוי</h4>
                   <div className="userUpdateRow">

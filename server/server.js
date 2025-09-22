@@ -22,6 +22,8 @@ global.stripSlashes  = require('slashes').stripSlashes;
 const usr_R = require('./routers/users_R');
 app.use('/U',usr_R);
 
+const subscription_R = require('./routers/subscription_R.js');
+app.use('/S',subscription_R);
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, ts: new Date().toISOString() });

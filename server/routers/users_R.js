@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const user_Mid = require('../middleware/user_Mid');
 
+router.get('/search', user_Mid.search);
+
 router.post('/Add', user_Mid.AddUser);
 
 router.get("/list", user_Mid.GetAllUsers, (req, res) => {
@@ -43,5 +45,6 @@ router.get('/users/:id', user_Mid.GetOneUser, (req, res) => {
 router.put('/users/:id', user_Mid.UpdateUser);
 
 router.delete('/users/:id', user_Mid.DeleteUser);
+
 
 module.exports = router;

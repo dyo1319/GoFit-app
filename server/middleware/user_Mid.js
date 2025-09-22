@@ -1,4 +1,6 @@
 const md5 = require('md5');
+const toStr = (v) => (typeof v === 'string' ? v : '');
+
 
 const normalizeDate = (dateStr) => {
   if (!dateStr || dateStr === 'null' || dateStr === 'undefined' || dateStr === '') {
@@ -29,8 +31,6 @@ async function AddUser(req, res, next) {
   
   try {
     await conn.beginTransaction();
-
-    // -------- users --------
     const username = (req.body.username !== undefined) ? addSlashes(req.body.username) : "";
     const phone    = (req.body.phone    !== undefined) ? addSlashes(req.body.phone)    : "";
     const password = (req.body.password !== undefined) ?            req.body.password   : "";
@@ -38,7 +38,6 @@ async function AddUser(req, res, next) {
     const gender   = (req.body.gender   !== undefined) ? addSlashes(req.body.gender)   : null;
     const birthISO = normalizeDate(req.body.birth_date);
 
-    // Validation
     if (!username || !phone || !password || !birthISO) {
       await conn.rollback();
       return res.status(400).json({ 
@@ -70,7 +69,6 @@ async function AddUser(req, res, next) {
       return res.status(500).json({ success: false, message: 'שגיאה ביצירת משתמש' });
     }
 
-    // -------- bodydetails (אופציונלי) --------
     const weight        = req.body.weight ? Number(req.body.weight) : null;
     const height        = req.body.height ? Number(req.body.height) : null;
     const body_fat      = req.body.body_fat ? Number(req.body.body_fat) : null;
@@ -89,7 +87,6 @@ async function AddUser(req, res, next) {
       );
     }
 
-    // -------- subscriptions (אופציונלי) --------
     const startISO = normalizeDate(req.body.start_date);
     const endISO   = normalizeDate(req.body.end_date);
     const payStat  = req.body.payment_status ? addSlashes(req.body.payment_status) : null;
@@ -179,11 +176,9 @@ async function DeleteUser(req, res) {
   try {
     await conn.beginTransaction();
     
-    // First delete dependent records
     await conn.query('DELETE FROM bodydetails WHERE user_id = ?', [id]);
     await conn.query('DELETE FROM subscriptions WHERE user_id = ?', [id]);
     
-    // Then delete the user
     const [result] = await conn.query('DELETE FROM users WHERE id = ?', [id]);
 
     if (result.affectedRows === 0) {
@@ -295,7 +290,6 @@ async function UpdateUser(req, res, next) {
   try {
     await conn.beginTransaction();
 
-    // ---- users (partial update) ----
     const fields = {};
     if (req.body.username !== undefined) fields.username = addSlashes(String(req.body.username).trim());
     if (req.body.phone    !== undefined) fields.phone    = addSlashes(String(req.body.phone).trim());
@@ -343,7 +337,6 @@ async function UpdateUser(req, res, next) {
         return res.status(404).json({ success:false, message:'משתמש לא נמצא' });
       }
     } else {
-      // אם לא עדכנו את users, ודא שהמשתמש קיים
       const [chk] = await conn.query(`SELECT id FROM users WHERE id = ?`, [id]);
       if (chk.length === 0) {
         await conn.rollback(); 
@@ -352,11 +345,9 @@ async function UpdateUser(req, res, next) {
       }
     }
 
-    // ---- bodydetails (OVERWRITE latest if exists; partial set) ----
     const bodyKeys = ['weight','height','body_fat','muscle_mass','circumference','recorded_at'];
     const bodyProvided = bodyKeys.some(k => k in req.body);
     if (bodyProvided) {
-      // בצע עדכון רק אם קיימת רשומה קודמת
       const [latest] = await conn.query(
         `SELECT id FROM bodydetails
          WHERE user_id = ?
@@ -397,10 +388,8 @@ async function UpdateUser(req, res, next) {
           );
         }
       }
-      // אם אין רשומה — לא מוסיפים חדשה (לפי ההנחיה שלך)
     }
 
-    // ---- subscriptions (OVERWRITE active/last if exists; partial set) ----
     const subKeys = ['start_date','end_date','payment_status'];
     const subProvided = subKeys.some(k => k in req.body);
     if (subProvided) {
@@ -470,13 +459,11 @@ async function UpdateUser(req, res, next) {
           );
         }
       }
-      // אם אין רשומת מנוי קודמת — לא מוסיפים חדשה (לפי ההנחיה שלך)
     }
 
     await conn.commit();
     conn.release();
 
-    // החזר תשובה מוצלחת
     return res.json({ 
       success: true, 
       message: 'משתמש עודכן בהצלחה',
@@ -495,10 +482,35 @@ async function UpdateUser(req, res, next) {
   }
 }
 
+async function search(req, res) {
+  try {
+    const db = global.db_pool.promise();
+    const q = toStr(req.query.q).trim();
+    if (q.length < 2) return res.json([]); 
+
+    const [rows] = await db.query(
+      `
+      SELECT id, username, phone
+      FROM users
+      WHERE username LIKE ? OR phone LIKE ?
+      ORDER BY username ASC
+      LIMIT 20
+      `,
+      [`%${q}%`, `%${q}%`]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error('users.search error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+}
+
 module.exports = { 
   AddUser,
   GetAllUsers,
   GetOneUser,
   DeleteUser,
+  search,
   UpdateUser
 };

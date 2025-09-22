@@ -1,0 +1,337 @@
+:root {
+  --primary-bg: #f5f5f5;
+  --hover-bg: #f0f0f0;
+  --border-color: #e0e0e0;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --border-radius: 10px;
+  --row-alt-bg: #fafafa;
+}
+
+body {
+  direction: rtl;
+}
+
+.subscriptionList {
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: var(--spacing-md);
+}
+
+.subscriptionListHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.subscriptionFilters {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.subscriptionList .MuiDataGrid-root {
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  border: 0;
+}
+
+.subscriptionList .MuiDataGrid-columnHeader,
+.subscriptionList .MuiDataGrid-cell {
+  text-align: center;
+  padding-inline: var(--spacing-sm);
+  font-weight: 500;
+}
+
+.subscriptionList .MuiDataGrid-columnHeaderTitleContainer {
+  flex-direction: row;
+  justify-content: center;
+}
+
+.subscriptionList .MuiDataGrid-columnHeaderTitle {
+  font-weight: 700;
+}
+
+.subscriptionList .MuiDataGrid-row:nth-of-type(odd) {
+  background: var(--row-alt-bg);
+}
+
+.subscriptionList .MuiDataGrid-row:hover {
+  background: var(--hover-bg);
+  transition: background-color 0.2s ease;
+}
+
+.subscriptionList .MuiDataGrid-columnHeaders {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--primary-bg);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.subscriptionList .MuiDataGrid-virtualScroller {
+  min-height: 400px;
+}
+
+.subscriptionList .MuiDataGrid-footerContainer {
+  direction: ltr;
+  justify-content: flex-start;
+}
+
+.subscriptionList .MuiTablePagination-root {
+  direction: ltr;
+}
+
+.subscriptionList .MuiChip-root {
+  font-weight: 500;
+}
+
+.row-actions .MuiButton-root {
+  min-width: 0;
+  padding: 2px 8px;
+  transition: all 0.2s ease;
+}
+
+.rtlFormControl .MuiFormLabel-root,
+.rtlFormControl .MuiInputLabel-root {
+  right: 24px;
+  left: auto;
+  transform-origin: top right;
+  text-align: right;
+}
+
+.rtlFormControl .MuiInputLabel-shrink {
+  right: 20px;
+  transform: translate(0, -6px) scale(0.75);
+}
+
+.rtlFormControl .MuiInputBase-input {
+  text-align: right;
+  padding-right: 24px;
+  direction: rtl;
+}
+
+.rtlFormControl .MuiSelect-icon {
+  right: auto;
+  left: 7px;
+}
+
+.rtlFormControl .MuiOutlinedInput-input {
+  padding-right: 16px;
+  padding-left: 16px;
+}
+
+.rtlFormControl .MuiSelect-select {
+  padding-left: 40px;
+  padding-right: 16px;
+}
+
+.rtlFormControl .MuiMenuItem-root {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.rtlFormControl .MuiInputBase-root.MuiInputBase-adornedStart {
+  flex-direction: row-reverse; 
+}
+
+.rtlFormControl .MuiInputAdornment-root {
+  direction: rtl;
+}
+
+.rtlFormControl .MuiAutocomplete-input {
+  padding-left: 60px;
+}
+
+.rtlFormControl .MuiOutlinedInput-root {
+  text-align: right;
+}
+
+.rtlFormControl .MuiOutlinedInput-notchedOutline {
+  direction: rtl; 
+}
+
+.rtlFormControl .MuiOutlinedInput-root legend {
+  text-align: right;
+}
+
+.rtlFormControl input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  left: 8px;
+  cursor: pointer;
+}
+
+.rtlFormControl .MuiInputAdornment-positionStart {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+.rtlFormControl .MuiAutocomplete-endAdornment {
+  left: 0;
+  right: auto;
+}
+
+.rtlFormControl .MuiAutocomplete-popupIndicator {
+  left: 7px;
+  right: auto;
+}
+
+.rtlFormControl .MuiAutocomplete-clearIndicator {
+  left: 35px;
+  right: auto;
+}
+
+.rtlDialog .MuiDialogTitle-root {
+  text-align: right;
+}
+
+.rtlDialog .MuiDialogActions-root {
+  justify-content: flex-start;
+}
+
+.rtlDialog .MuiFormControl-root {
+  width: 100%;
+}
+
+.rtlDialog .MuiFormControl-root .MuiInputLabel-root {
+  right: 20px;
+  left: auto;
+  transform-origin: top right;
+}
+
+.rtlDialog .MuiFormControl-root .MuiInputLabel-root.MuiInputLabel-shrink {
+  right: 16px;
+}
+
+.rtlDialog .MuiFormControl-root .MuiOutlinedInput-root {
+  text-align: right;
+}
+
+.rtlDialog .MuiFormControl-root .MuiOutlinedInput-notchedOutline {
+  direction: rtl; 
+}
+
+.rtlDialog .MuiFormControl-root .MuiOutlinedInput-root legend {
+  text-align: right;
+}
+
+.rtlDialog .MuiFormControl-root .MuiSelect-select {
+  padding-left: 40px;
+  padding-right: 16px;
+}
+
+.rtlDialog .MuiFormControl-root .MuiSelect-icon {
+  right: auto;
+  left: 10px;
+}
+
+.rtlDialog .MuiFormControl-root .MuiInputBase-root.MuiInputBase-adornedStart {
+  flex-direction: row-reverse;
+}
+
+.rtlDialog .MuiFormControl-root .MuiInputBase-inputAdornedStart {
+  padding-right: 36px;
+}
+
+.rtlDialog .MuiAutocomplete-endAdornment {
+  left: 0;
+  right: auto;
+}
+
+.rtlDialog .MuiAutocomplete-popupIndicator {
+  left: 7px;
+  right: auto;
+}
+
+.rtlDialog .MuiAutocomplete-clearIndicator {
+  left: 10px;
+  right: auto;
+}
+
+.rtlDialog input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  left: 8px;
+  cursor: pointer;
+}
+
+.rtlDialog .MuiInputAdornment-positionStart {
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+.rtlDialog .MuiInputBase-input[type="date"],
+.rtlDialog .MuiOutlinedInput-input[type="date"],
+.rtlFormControl .MuiInputBase-input[type="date"],
+.rtlFormControl .MuiOutlinedInput-input[type="date"] {
+  direction: rtl;
+  text-align: right;
+  padding-left: 12px;
+}
+
+
+@media (max-width: 768px) {
+  .subscriptionFilters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+
+  .subscriptionFilters > * {
+    width: 100%;
+  }
+  
+  .subscriptionList {
+    padding: var(--spacing-sm);
+  }
+
+  .subscriptionList .MuiDataGrid-columnHeader,
+  .subscriptionList .MuiDataGrid-cell {
+    padding-inline: 4px;
+    font-size: 0.75rem;
+  }
+  
+  .rtlFormControl .MuiAutocomplete-clearIndicator {
+    left: 30px;
+  }
+  
+  .rtlDialog .MuiAutocomplete-clearIndicator {
+    left: 30px;
+  }
+  
+  .rtlFormControl .MuiInputBase-input,
+  .rtlFormControl .MuiOutlinedInput-input {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+  
+  .rtlFormControl .MuiSelect-select {
+    padding-left: 36px;
+    padding-right: 12px;
+  }
+  
+  .rtlFormControl .MuiAutocomplete-input {
+    padding-left: 50px;
+    padding-right: 12px;
+  }
+  
+  .rtlFormControl .MuiInputLabel-root {
+    right: 20px;
+  }
+  
+  .rtlFormControl .MuiInputLabel-shrink {
+    right: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --spacing-md: 12px;
+    --spacing-sm: 6px;
+  }
+}
