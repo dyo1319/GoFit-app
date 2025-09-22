@@ -4,8 +4,6 @@
   flex: 1; 
   min-width: 0;
 }
-
-/* כותרת + כפתור פעולה עליונה */
 .userListHeader {
   display: flex;
   align-items: center;
@@ -30,14 +28,12 @@
 }
 .userAddButton:hover { filter: brightness(1.05); }
 
-/* תא שם משתמש בתא משולב (אם תוסיף תמונה/אוואטר) */
 .userListUser {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-/* פעולות בשורה */
 .userActions {
   display: flex;
   align-items: center;
@@ -58,31 +54,26 @@
   cursor: pointer;
 }
 
-/* ---- DataGrid התאמות RTL וקריאות ---- */
 .userList [class*="MuiDataGrid-root"] {
-  direction: rtl;                /* אם השארת dir="rtl" בעוטף – אפשר למחוק שורה זו */
+  direction: rtl;                
   border-radius: 10px;
   overflow: hidden;
 }
 
-/* יישור טקסט לימין (ליתר ביטחון) */
 .userList .MuiDataGrid-columnHeader,
 .userList .MuiDataGrid-cell {
   text-align: right;
 }
 
-/* הופך את פריסת כותרות העמודות ל־RTL מלא */
 .userList .MuiDataGrid-columnHeaderTitleContainer {
   flex-direction: row-reverse;
 }
 
-/* ריווח תא כללי */
 .userList .MuiDataGrid-columnHeader,
 .userList .MuiDataGrid-cell {
   padding-inline: 8px;
 }
 
-/* זברה + ריחוף */
 .userList .MuiDataGrid-row:nth-of-type(odd) {
   background: #fafafa;
 }
@@ -90,7 +81,6 @@
   background: #f5f5f5;
 }
 
-/* כותרת דביקה (נח בטבלאות גבוהות) */
 .userList .MuiDataGrid-columnHeaders {
   position: sticky;
   top: 0;
@@ -99,12 +89,10 @@
   box-shadow: 0 1px 0 rgba(0,0,0,.06);
 }
 
-/* פג'ינציה – RTL */
 .userList .MuiTablePagination-root {
   direction: rtl;
 }
 
-/* רספונסיביות */
 @media (max-width: 600px) {
   .userListHeader {
     flex-direction: column;
