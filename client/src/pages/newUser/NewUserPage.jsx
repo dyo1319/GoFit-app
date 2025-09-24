@@ -47,7 +47,6 @@ function StepsNav({ step }) {
   );
 }
 
-
 export default function NewUserPage() {
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
@@ -107,7 +106,7 @@ export default function NewUserPage() {
             </Link>
             </div>
 
-            <StepsNav step={step} setStep={setStep} />
+            <StepsNav step={step} />
 
             <NewUserForm
             form={form}

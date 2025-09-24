@@ -5,7 +5,7 @@ import Filters from "./Filters";
 import SubscriptionsTable from "./SubscriptionsTable";
 import AddDialog from "./AddDialog";
 import EditDialog from "./EditDialog";
-import { getSubs } from "./api";
+import { getSubs  } from "../newUser/userApiService";
 import { pauseSub, resumeSub, restoreSub, cancelSub, hardDelete } from "./actions";
 import { useDebouncedValue } from "./hook";
 
@@ -57,7 +57,9 @@ export default function SubscriptionPage() {
 
   React.useEffect(() => { fetchSubs(); return () => ctrlRef.current?.abort(); }, [fetchSubs]);
 
-  React.useEffect(() => { setPaginationModel((p) => ({ ...p, page: 0 })); }, [qDebounced, status, expDebounced]);
+  React.useEffect(() => {
+   setPaginationModel(p => (p.page === 0 ? p : { ...p, page: 0 }));
+ }, [qDebounced, status, expDebounced]);
 
   const snack = (message, severity = "info") => setSnackbar({ open: true, message, severity });
   const closeSnack = () => setSnackbar((s) => ({ ...s, open: false }));
@@ -145,6 +147,21 @@ export default function SubscriptionPage() {
     }
   };
 
+  const samePagination = (a, b) =>
+  (a?.page === b?.page) && (a?.pageSize === b?.pageSize);
+
+  const sameSortModel = (a = [], b = []) =>
+    a.length === b.length && a.every((x, i) => x.field === b[i].field && x.sort === b[i].sort);
+
+  const handlePaginationModelChange = React.useCallback((model) => {
+    setPaginationModel(prev => (samePagination(prev, model) ? prev : model));
+  }, []);
+
+  const handleSortModelChange = React.useCallback((model) => {
+    setSortModel(prev => (sameSortModel(prev, model) ? prev : model));
+  }, []);
+
+
   return (
     <Paper className="subscriptionList" sx={{ p: 2, height: 700, width: "100%", maxWidth: "100%" }} dir="rtl">
       <Box className="subscriptionListHeader">
@@ -159,9 +176,13 @@ export default function SubscriptionPage() {
       </Box>
 
       <SubscriptionsTable
-        rows={rows} rowCount={rowCount} loading={loading}
-        paginationModel={paginationModel} onPaginationModelChange={setPaginationModel}
-        sortModel={sortModel} onSortModelChange={setSortModel}
+        rows={rows}
+        rowCount={rowCount}
+        loading={loading}
+        paginationModel={paginationModel}
+        onPaginationModelChange={handlePaginationModelChange}
+        sortModel={sortModel}
+        onSortModelChange={handleSortModelChange}
         onEdit={openEdit} onDelete={onDelete}
         onPause={onPause} onResume={onResume} onCancel={onCancel} onRestore={onRestore}
         actionBusyId={actionBusyId}

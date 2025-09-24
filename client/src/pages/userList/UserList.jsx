@@ -48,20 +48,19 @@ export default function DataTable() {
     setRowCount(prev => Math.max(0, prev - 1));
 
     try {
-      const res = await fetch(`${API_BASE}/U/${id}`, {
+      const res = await fetch(`${API_BASE}/U/users/${id}`, {
         method: 'DELETE',
         credentials: 'include',
       });
+      const result = await res.json().catch(() => ({}));
 
-      const result = await res.json();
-      
       if (!res.ok || !result.success) {
         await fetchUsers(paginationModel.page);
         return;
       }
-      
+
       if (isLastRowOnPage) {
-        setPaginationModel(p => ({ ...p, page: p.page - 1 }));
+        setPaginationModel(p => ({ ...p, page: Math.max(0, p.page - 1) }));
       } else {
         await fetchUsers(paginationModel.page);
       }
@@ -72,17 +71,27 @@ export default function DataTable() {
   };
 
   const columns = [
-    { field: 'id',         headerName: 'מזהה',         flex: 1, headerAlign: 'left',  align: 'right' },
-    { field: 'phone',      headerName: 'טלפון',        flex: 1, headerAlign: 'left',  align: 'right' },
-    { field: 'username',   headerName: 'שם משתמש',     flex: 1, headerAlign: 'left',  align: 'right' },
-    { field: 'birth_date', headerName: 'תאריך לידה',   flex: 1, headerAlign: 'left',  align: 'right' },
-    { field: 'role',       headerName: 'תפקיד',        flex: 1, headerAlign: 'left',  align: 'right' },
-    { field: 'gender',     headerName: 'מגדר',         flex: 1, headerAlign: 'left',  align: 'right' },
-    { field: 'action',     headerName: 'פעולות',       flex: 1, headerAlign: 'left',  align: 'right',sortable: false, filterable: false,
+    { field: 'id',         headerName: 'מזהה',       flex: 1, headerAlign: 'left', align: 'right' },
+    { field: 'phone',      headerName: 'טלפון',      flex: 1, headerAlign: 'left', align: 'right' },
+    { field: 'username',   headerName: 'שם משתמש',   flex: 1, headerAlign: 'left', align: 'right' },
+    { field: 'birth_date', headerName: 'תאריך לידה', flex: 1, headerAlign: 'left', align: 'right' },
+    { field: 'role',       headerName: 'תפקיד',      flex: 1, headerAlign: 'left', align: 'right' },
+    { field: 'gender',     headerName: 'מגדר',       flex: 1, headerAlign: 'left', align: 'right' },
+    {
+      field: 'action',
+      headerName: 'פעולות',
+      flex: 1,
+      headerAlign: 'left',
+      align: 'right',
+      sortable: false,
+      filterable: false,
       renderCell: (params) => (
         <div className="userActions">
-          <Button size="small" variant="outlined"
-            onClick={(e) => { e.stopPropagation(); navigate(`/user/${params.row.id}`);  }}>
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={(e) => { e.stopPropagation(); navigate(`/user/${params.row.id}`); }}
+          >
             ערוך
           </Button>
           <DeleteOutlineIcon

@@ -1,5 +1,9 @@
 const md5 = require('md5');
 const toStr = (v) => (typeof v === 'string' ? v : '');
+const ALLOWED_PAYMENT = new Set(['pending','paid','failed','refunded']);
+const cleanStr   = (v) => (v ?? "").toString().trim();
+const cleanPhone = (v) => (v ?? "").toString().replace(/\D/g, "").trim();
+const toNull     = (v) => (v === undefined || v === null || v === "" ? null : v);
 
 
 const normalizeDate = (dateStr) => {
@@ -26,39 +30,38 @@ const normalizeDate = (dateStr) => {
 };
 
 async function AddUser(req, res, next) {
-  const promisePool = db_pool.promise();
-  const conn = await promisePool.getConnection();
-  
+  const conn = await db_pool.promise().getConnection();
   try {
     await conn.beginTransaction();
-    const username = (req.body.username !== undefined) ? addSlashes(req.body.username) : "";
-    const phone    = (req.body.phone    !== undefined) ? addSlashes(req.body.phone)    : "";
-    const password = (req.body.password !== undefined) ?            req.body.password   : "";
-    const role     = (req.body.role     !== undefined) ? addSlashes(req.body.role)     : null;
-    const gender   = (req.body.gender   !== undefined) ? addSlashes(req.body.gender)   : null;
+
+    const username = cleanStr(req.body.username);
+    const phone    = cleanPhone(req.body.phone);
+    const password = cleanStr(req.body.password);                
+    const role     = toNull(cleanStr(req.body.role));
+    const gender   = toNull(cleanStr(req.body.gender));
     const birthISO = normalizeDate(req.body.birth_date);
 
     if (!username || !phone || !password || !birthISO) {
       await conn.rollback();
-      return res.status(400).json({ 
-        success: false, 
-        message: 'שם משתמש / טלפון / סיסמה / תאריך לידה — חובה ותאריך חייב להיות תקין' 
+      return res.status(400).json({
+        success: false,
+        message: 'שם משתמש / טלפון / סיסמה / תאריך לידה — חובה ותאריך חייב להיות תקין'
       });
     }
-    
+
     if (role && !['trainee','trainer','admin'].includes(role)) {
       await conn.rollback();
       return res.status(400).json({ success: false, message: 'role לא חוקי' });
     }
-    
     if (gender && !['male','female'].includes(gender)) {
       await conn.rollback();
       return res.status(400).json({ success: false, message: 'gender לא חוקי' });
     }
 
     const enc_pass = md5('A' + password);
+
     const [userResult] = await conn.execute(
-      `INSERT INTO users (username, phone, password, role, gender, birth_date) 
+      `INSERT INTO users (username, phone, password, role, gender, birth_date)
        VALUES (?, ?, ?, ?, ?, ?)`,
       [username, phone, enc_pass, role, gender, birthISO]
     );
@@ -69,14 +72,15 @@ async function AddUser(req, res, next) {
       return res.status(500).json({ success: false, message: 'שגיאה ביצירת משתמש' });
     }
 
-    const weight        = req.body.weight ? Number(req.body.weight) : null;
-    const height        = req.body.height ? Number(req.body.height) : null;
-    const body_fat      = req.body.body_fat ? Number(req.body.body_fat) : null;
-    const muscle_mass   = req.body.muscle_mass ? Number(req.body.muscle_mass) : null;
-    const circumference = req.body.circumference ? Number(req.body.circumference) : null;
+    const weight        = toNull(req.body.weight);
+    const height        = toNull(req.body.height);
+    const body_fat      = toNull(req.body.body_fat);
+    const muscle_mass   = toNull(req.body.muscle_mass);
+    const circumference = toNull(req.body.circumference);
     const recordedISO   = normalizeDate(req.body.recorded_at);
 
-    const hasBody = weight || height || body_fat || muscle_mass || circumference || recordedISO;
+    const hasBody = [weight,height,body_fat,muscle_mass,circumference,recordedISO]
+      .some(v => v !== null);
 
     if (hasBody) {
       await conn.execute(
@@ -87,36 +91,36 @@ async function AddUser(req, res, next) {
       );
     }
 
-    const startISO = normalizeDate(req.body.start_date);
-    const endISO   = normalizeDate(req.body.end_date);
-    const payStat  = req.body.payment_status ? addSlashes(req.body.payment_status) : null;
+    const wantsSub = [req.body.start_date, req.body.end_date, req.body.payment_status]
+      .some(v => v !== undefined && v !== null && String(v).trim() !== "");
 
-    const hasSub = (startISO !== null || endISO !== null || payStat !== null);
+    if (wantsSub) {
+      const startISO = normalizeDate(req.body.start_date);
+      const endISO   = normalizeDate(req.body.end_date);
 
-    if (hasSub) {
+      const rawPay   = req.body.payment_status == null ? 'pending' : String(req.body.payment_status).trim();
+      const payStat  = rawPay || 'pending';
+      if (payStat && !ALLOWED_PAYMENT.has(payStat)) {
+        await conn.rollback();
+        return res.status(400).json({ success:false, message:'payment_status לא תקין' });
+      }
+
       await conn.execute(
-        `INSERT INTO subscriptions
-         (user_id, start_date, end_date, payment_status)
+        `INSERT INTO subscriptions (user_id, start_date, end_date, payment_status)
          VALUES (?, ?, ?, ?)`,
         [newUserId, startISO, endISO, payStat]
       );
     }
 
     await conn.commit();
-    
-    return res.status(201).json({ 
-      success: true, 
+    return res.status(201).json({
+      success: true,
       message: 'משתמש נוצר בהצלחה',
       userId: newUserId
     });
-
   } catch (err) {
-    console.error('Error in AddUser:', err);
     await conn.rollback();
-    return res.status(500).json({ 
-      success: false, 
-      message: 'שגיאה פנימית בשרת' 
-    });
+    return res.status(500).json({ success: false, message: 'שגיאה פנימית בשרת' });
   } finally {
     conn.release();
   }
@@ -136,7 +140,6 @@ async function GetAllUsers(req, res, next) {
     const [countResult] = await promisePool.query('SELECT COUNT(id) AS cnt FROM users');
     total_rows = countResult[0]?.cnt || 0;
   } catch (err) {
-    console.error('Count error:', err);
     return res.status(500).json({ error: 'DB error (count)' });
   }
 
@@ -150,7 +153,7 @@ async function GetAllUsers(req, res, next) {
          id,
          username,
          phone,
-         DATE_FORMAT(birth_date, '%d-%m-%Y') AS birth_date,
+         DATE_FORMAT(birth_date, '%Y-%m-%d') AS birth_date,
          role,
          gender
        FROM users
@@ -161,7 +164,6 @@ async function GetAllUsers(req, res, next) {
     req.users_data = data;
     next();
   } catch (err) {
-    console.error('Select error:', err);
     return res.status(500).json({ error: 'DB error (select)' });
   }
 }
@@ -190,7 +192,6 @@ async function DeleteUser(req, res) {
     return res.json({ success: true, deletedId: id });
   } catch (err) {
     await conn.rollback();
-    console.error('DeleteUser error:', err);
     return res.status(500).json({ success: false, error: 'שגיאת שרת' });
   } finally {
     conn.release();
@@ -272,13 +273,13 @@ async function GetOneUser(req, res, next) {
 
     return next();
   } catch (err) {
-    console.error('GetOneUser middleware error:', err);
     req.one_user_error = { status: 500, message: 'שגיאת שרת' };
     return next();
   }
 }
 
 async function UpdateUser(req, res, next) {
+
   const id = Number(req.params.id || req.query.id);
   if (!Number.isInteger(id) || id <= 0) {
     return res.status(400).json({ success: false, message: 'id לא חוקי' });
@@ -291,31 +292,31 @@ async function UpdateUser(req, res, next) {
     await conn.beginTransaction();
 
     const fields = {};
-    if (req.body.username !== undefined) fields.username = addSlashes(String(req.body.username).trim());
-    if (req.body.phone    !== undefined) fields.phone    = addSlashes(String(req.body.phone).trim());
+    if (req.body.username !== undefined) fields.username = cleanStr(req.body.username);
+    if (req.body.phone    !== undefined) fields.phone    = cleanPhone(req.body.phone);
+
     if (req.body.birth_date !== undefined) {
       const birthISO = normalizeDate(req.body.birth_date);
       if (req.body.birth_date && !birthISO) {
-        await conn.rollback(); 
-        conn.release();
+        await conn.rollback(); conn.release();
         return res.status(400).json({ success:false, message:'birth_date לא תקין (YYYY-MM-DD)' });
       }
       fields.birth_date = birthISO;
     }
+
     if (req.body.role !== undefined) {
-      const role = req.body.role ? addSlashes(String(req.body.role).trim()) : null;
+      const role = toNull(cleanStr(req.body.role));
       if (role && !['trainee','trainer','admin'].includes(role)) {
-        await conn.rollback(); 
-        conn.release();
+        await conn.rollback(); conn.release();
         return res.status(400).json({ success:false, message:'role לא חוקי' });
       }
       fields.role = role;
     }
+
     if (req.body.gender !== undefined) {
-      const gender = req.body.gender ? addSlashes(String(req.body.gender).trim()) : null;
+      const gender = toNull(cleanStr(req.body.gender));
       if (gender && !['male','female'].includes(gender)) {
-        await conn.rollback(); 
-        conn.release();
+        await conn.rollback(); conn.release();
         return res.status(400).json({ success:false, message:'gender לא חוקי' });
       }
       fields.gender = gender;
@@ -332,15 +333,13 @@ async function UpdateUser(req, res, next) {
       const sql = `UPDATE users SET ${setParts.join(', ')} WHERE id = ?`;
       const [upd] = await conn.execute(sql, values);
       if (upd.affectedRows === 0) {
-        await conn.rollback(); 
-        conn.release();
+        await conn.rollback(); conn.release();
         return res.status(404).json({ success:false, message:'משתמש לא נמצא' });
       }
     } else {
       const [chk] = await conn.query(`SELECT id FROM users WHERE id = ?`, [id]);
       if (chk.length === 0) {
-        await conn.rollback(); 
-        conn.release();
+        await conn.rollback(); conn.release();
         return res.status(404).json({ success:false, message:'משתמש לא נמצא' });
       }
     }
@@ -355,6 +354,7 @@ async function UpdateUser(req, res, next) {
          LIMIT 1`,
         [id]
       );
+
       if (latest.length > 0) {
         const bodyFields = {};
         if (req.body.weight        !== undefined) bodyFields.weight        = (req.body.weight === null || req.body.weight === '') ? null : Number(req.body.weight);
@@ -362,13 +362,13 @@ async function UpdateUser(req, res, next) {
         if (req.body.body_fat      !== undefined) bodyFields.body_fat      = (req.body.body_fat === null || req.body.body_fat === '') ? null : Number(req.body.body_fat);
         if (req.body.muscle_mass   !== undefined) bodyFields.muscle_mass   = (req.body.muscle_mass === null || req.body.muscle_mass === '') ? null : Number(req.body.muscle_mass);
         if (req.body.circumference !== undefined) bodyFields.circumference = (req.body.circumference === null || req.body.circumference === '') ? null : Number(req.body.circumference);
-        if (req.body.recorded_at   !== undefined) {
-          const rISO = (req.body.recorded_at === null || req.body.recorded_at === '') 
-            ? null 
+
+        if (req.body.recorded_at !== undefined) {
+          const rISO = (req.body.recorded_at === null || req.body.recorded_at === '')
+            ? null
             : normalizeDate(req.body.recorded_at);
           if (req.body.recorded_at && !rISO) {
-            await conn.rollback(); 
-            conn.release();
+            await conn.rollback(); conn.release();
             return res.status(400).json({ success:false, message:'recorded_at לא תקין (YYYY-MM-DD)' });
           }
           bodyFields.recorded_at = rISO;
@@ -404,6 +404,7 @@ async function UpdateUser(req, res, next) {
          LIMIT 1`,
         [id, todayISO, todayISO]
       );
+
       let targetId = active[0]?.id;
       if (!targetId) {
         const [last] = await conn.query(
@@ -419,30 +420,36 @@ async function UpdateUser(req, res, next) {
 
       if (targetId) {
         const sFields = {};
+
         if (req.body.start_date !== undefined) {
-          const sISO = (req.body.start_date === null || req.body.start_date === '') 
-            ? null 
+          const sISO = (req.body.start_date === null || req.body.start_date === '')
+            ? null
             : normalizeDate(req.body.start_date);
           if (req.body.start_date && !sISO) {
-            await conn.rollback(); 
-            conn.release();
+            await conn.rollback(); conn.release();
             return res.status(400).json({ success:false, message:'start_date לא תקין (YYYY-MM-DD)' });
           }
           sFields.start_date = sISO;
         }
+
         if (req.body.end_date !== undefined) {
-          const eISO = (req.body.end_date === null || req.body.end_date === '') 
-            ? null 
+          const eISO = (req.body.end_date === null || req.body.end_date === '')
+            ? null
             : normalizeDate(req.body.end_date);
           if (req.body.end_date && !eISO) {
-            await conn.rollback(); 
-            conn.release();
+            await conn.rollback(); conn.release();
             return res.status(400).json({ success:false, message:'end_date לא תקין (YYYY-MM-DD)' });
           }
           sFields.end_date = eISO;
         }
+
         if (req.body.payment_status !== undefined) {
-          sFields.payment_status = req.body.payment_status ? addSlashes(String(req.body.payment_status).trim()) : null;
+          const ps = toNull(cleanStr(req.body.payment_status));
+          if (ps && !ALLOWED_PAYMENT.has(ps)) {
+            await conn.rollback(); conn.release();
+            return res.status(400).json({ success:false, message:'payment_status לא תקין' });
+          }
+          sFields.payment_status = ps;
         }
 
         if (Object.keys(sFields).length > 0) {
@@ -464,20 +471,18 @@ async function UpdateUser(req, res, next) {
     await conn.commit();
     conn.release();
 
-    return res.json({ 
-      success: true, 
+    return res.json({
+      success: true,
       message: 'משתמש עודכן בהצלחה',
       userId: id
     });
 
   } catch (err) {
-    console.error('UpdateUser error details:', err.message, err.stack);
-    console.error('Request body:', req.body);
     await conn.rollback();
     conn.release();
-    return res.status(500).json({ 
-      success: false, 
-      message: 'שגיאת שרת: ' + err.message 
+    return res.status(500).json({
+      success: false,
+      message: 'שגיאת שרת: ' + err.message
     });
   }
 }
@@ -501,7 +506,6 @@ async function search(req, res) {
 
     res.json(rows);
   } catch (err) {
-    console.error('users.search error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 }

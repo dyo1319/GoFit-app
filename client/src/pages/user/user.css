@@ -1,4 +1,3 @@
-/* Layout כללי */
 .user {
   flex: 4;
   padding: 20px;
@@ -6,7 +5,6 @@
   min-height: 100vh;
 }
 
-/* כותרת ופעולות */
 .userTitleContainer {
   display: flex;
   align-items: center;
@@ -49,14 +47,12 @@
   box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
-/* קונטיינר ראשי */
 .userContainer {
   display: flex;
   gap: 30px;
   align-items: flex-start;
 }
 
-/* תצוגת פרטי משתמש */
 .userShow {
   flex: 1;
   background: white;
@@ -119,7 +115,6 @@
   color: #495057;
 }
 
-/* חלוקת מידע לקטגוריות */
 .userShowSection {
   margin-bottom: 25px;
 }
@@ -157,7 +152,6 @@
   font-weight: 400;
 }
 
-/* טופס עריכה */
 .userUpdate {
   flex: 2;
   background: white;
@@ -249,7 +243,6 @@
   color: #adb5bd;
 }
 
-/* כפתורי פעולה */
 .userUpdateActions {
   display: flex;
   justify-content: flex-end;
@@ -293,7 +286,6 @@
   color: #495057;
 }
 
-/* Responsive Design */
 @media (max-width: 1200px) {
   .userContainer {
     flex-direction: column;

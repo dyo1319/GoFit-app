@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  Dialog, DialogTitle, DialogContent, DialogActions,
-  Box, TextField, MenuItem, CircularProgress, Button
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions,
+         Box, TextField, MenuItem, CircularProgress, Button} from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
-import { searchUsers } from "./api";
+import { searchUsers  } from "../newUser/userApiService";
+
 
 
 export default function AddDialog({ API_BASE, open, onClose, onCreate }) {

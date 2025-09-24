@@ -408,8 +408,6 @@ async function deletesub(req, res) {
   }
 }
 
-
-
 module.exports = {
   list,
   getOne,

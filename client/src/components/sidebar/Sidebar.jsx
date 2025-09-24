@@ -54,7 +54,7 @@ export default function Sidebar() {
               </NavLink>
             </li>
             <li className="sidebarListItem">
-              <NavLink to="/renewals" className={linkCls}>
+              <NavLink to="/renewals/upcoming" className={linkCls}>
                 <ReceiptLong className="sidebarIcon" />
                 חידושים קרובים
               </NavLink>
@@ -135,12 +135,6 @@ export default function Sidebar() {
               <NavLink to="/team" className={linkCls}>
                 <WorkOutline className="sidebarIcon" />
                 צוות/הרשאות
-              </NavLink>
-            </li>
-            <li className="sidebarListItem">
-              <NavLink to="/settings/theme" className={linkCls}>
-                <DarkMode className="sidebarIcon" />
-                מצב כהה/בהיר
               </NavLink>
             </li>
             <li className="sidebarListItem">
