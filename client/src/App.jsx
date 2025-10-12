@@ -7,28 +7,71 @@ import User from "./pages/user/User";
 import NewUserPage from "./pages/newUser/NewUserPage";
 import Subscriptions from "./pages/subscription/subscription";
 import UpcomingRenewalsPage from "./pages/renewals/upcomingrenewals";
+import PendingPayments from "./pages/payments/PendingPayments";
+import NotificationsPage from "./pages/notifications/NotificationsPage";
+import PermissionsPage from "./pages/permissions/PermissionsPage";
+import SignIn from "./pages/login/SignIn";
+
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation,useNavigate } from "react-router-dom";
 
 
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+
+function AppContent() {
+  const { pathname } = useLocation();
+  const isAdmin = pathname.startsWith("/admin");
+  const nav = useNavigate();
+
+  const handleSignInSuccess = () => {
+    // אחרי התחברות – נווט ישר לאדמין (אפשר להחליף בהמשך לפי role)
+    nav("/admin", { replace: true });
+  };
+
+  return (
+    <>
+      {isAdmin && <Topbar />}
+      <div className="container">
+        {isAdmin && <Sidebar />}
+        <Routes>
+          {/* דף התחברות (ללא טופ/סייד) */}
+          <Route path="/login" element={
+            <SignIn onSignInSuccess={handleSignInSuccess} onSwitchToSignUp={() => {}} />
+          } />
+
+          {/* אזור אדמין */}
+          <Route path="/admin" element={<Home />} />
+          <Route path="/admin/users" element={<UserList />} />
+          <Route path="/admin/user/:id" element={<User />} />
+          <Route path="/admin/newUser" element={<NewUserPage />} />
+          <Route path="/admin/subscriptions" element={<Subscriptions />} />
+          <Route path="/admin/renewals/upcoming" element={<UpcomingRenewalsPage />} />
+          <Route path="/admin/payments/pending" element={<PendingPayments />} />
+          <Route path="/admin/notifications" element={<NotificationsPage />} />
+          <Route path="/admin/permissions" element={<PermissionsPage />} />
+          <Route path="/admin/team" element={<PermissionsPage />} />
+
+          {/* ברירת מחדל: שלח ל /login */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </div>
+    </>
+  );
+}
 
 function App() {
   return (
     <Router>
-      <Topbar />
-      <div className="container">
-        <Sidebar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/users" element={<UserList />} />
-          <Route path="/user/:id" element={<User />} />
-          <Route path="/newUser" element={<NewUserPage />} />
-          <Route path="/subscriptions" element={<Subscriptions />} />
-          <Route path="/renewals/upcoming" element={<UpcomingRenewalsPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </div>
+      <AppContent />
     </Router>
   );
 }
 
 export default App;
+
+
+
+
+
+
+
+
+

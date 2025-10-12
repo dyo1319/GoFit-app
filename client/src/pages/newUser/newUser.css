@@ -67,6 +67,41 @@
   box-shadow: 0 0 0 3px rgba(220, 38, 38, .1) !important;
 }
 
+.permissions-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.permission-item {
+  padding: 4px 0;
+}
+
+.permission-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.perm-key {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12.5px;
+  background: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.perm-description {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.permission-label input[type="checkbox"] {
+  margin: 0;
+}
+
 .error-message {
   color: #dc2626;
   font-size: 12px;
@@ -146,13 +181,10 @@
   font-size:12px; background:#e2e8f0; color:#0f172a;
 }
 
-
 .stepsNav__item.is-active{ background:#e6f0ff; color:#0b57d0; }
 .stepsNav__item.is-active .stepsNav__index{ background:#0b57d0; color:#fff; }
 
-
 .stepsNav__item.is-done .stepsNav__index{ background:#22c55e; color:#fff; }
-
 
 .stepsNav__item.is-active::after{
   content:"▶";
@@ -165,7 +197,59 @@
   inset-inline-end:auto; inset-inline-start:8px;
 }
 
+.loading-indicator {
+  margin-right: 5px;
+  font-size: 12px;
+}
+
+.form-input.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message.submit-error {
+  background: #ffe6e6;
+  border: 1px solid #ffcccc;
+  padding: 12px;
+  border-radius: 4px;
+  margin: 15px 0;
+  text-align: center;
+  font-weight: bold;
+}
 
 @media (max-width: 768px) {
-  .formGrid { grid-template-columns: 1fr; }
+  .formGrid { 
+    grid-template-columns: 1fr; 
+  }
+  
+  .stepsNav {
+    flex-direction: column;
+    gap: 10px;
+  }
 }

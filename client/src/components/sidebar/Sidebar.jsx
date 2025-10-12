@@ -1,10 +1,10 @@
 import "./sidebar.css";
 import { NavLink } from "react-router-dom";
 import {
-  LineStyle, Timeline, TrendingUp, PermIdentity,
-  AttachMoney, BarChart, WorkOutline, Report,
+  LineStyle,  TrendingUp, PermIdentity,
+  AttachMoney, BarChart, WorkOutline, 
   CreditCard, ReceiptLong, CalendarMonth, FitnessCenter,
-  Assessment, Notifications, Logout, DarkMode
+  Assessment,  Logout
 } from "@mui/icons-material";
 
 const linkCls = ({ isActive }) => `link ${isActive ? "active" : ""}`;
@@ -17,22 +17,9 @@ export default function Sidebar() {
           <h3 className="sidebarTitle">לוח בקרה</h3>
           <ul className="sidebarList">
             <li className="sidebarListItem">
-              <NavLink to="/" className={linkCls}>
+              <NavLink to="/admin" className={linkCls}>
                 <LineStyle className="sidebarIcon" />
                 דף הבית
-              </NavLink>
-            </li>
-            <li className="sidebarListItem">
-              <NavLink to="/analytics" className={linkCls}>
-                <Timeline className="sidebarIcon" />
-                ניתוח נתונים
-              </NavLink>
-            </li>
-
-            <li className="sidebarListItem">
-              <NavLink to="/alerts" className={linkCls}>
-                <Notifications className="sidebarIcon" />
-                התראות
               </NavLink>
             </li>
           </ul>
@@ -42,19 +29,19 @@ export default function Sidebar() {
           <h3 className="sidebarTitle">לקוחות ומנויים</h3>
           <ul className="sidebarList">
             <li className="sidebarListItem">
-              <NavLink to="/users" className={linkCls}>
+              <NavLink to="/admin/users" className={linkCls}>
                 <PermIdentity className="sidebarIcon" />
                 משתמשים
               </NavLink>
             </li>
             <li className="sidebarListItem">
-              <NavLink to="/subscriptions" className={linkCls}>
+              <NavLink to="/admin/subscriptions" className={linkCls}>
                 <TrendingUp className="sidebarIcon" />
                 מנויים
               </NavLink>
             </li>
             <li className="sidebarListItem">
-              <NavLink to="/renewals/upcoming" className={linkCls}>
+              <NavLink to="/admin/renewals/upcoming" className={linkCls}>
                 <ReceiptLong className="sidebarIcon" />
                 חידושים קרובים
               </NavLink>
@@ -66,13 +53,13 @@ export default function Sidebar() {
           <h3 className="sidebarTitle">תשלומים וחשבוניות</h3>
           <ul className="sidebarList">
             <li className="sidebarListItem">
-              <NavLink to="/payments/pending" className={linkCls}>
+              <NavLink to="/admin/payments/pending" className={linkCls}>
                 <CreditCard className="sidebarIcon" />
                 תשלומים בהמתנה
               </NavLink>
             </li>
             <li className="sidebarListItem">
-              <NavLink to="/invoices" className={linkCls}>
+              <NavLink to="/admin/invoices" className={linkCls}>
                 <AttachMoney className="sidebarIcon" />
                 חשבוניות
               </NavLink>
@@ -84,21 +71,15 @@ export default function Sidebar() {
           <h3 className="sidebarTitle">אימונים ושיעורים</h3>
           <ul className="sidebarList">
             <li className="sidebarListItem">
-              <NavLink to="/classes" className={linkCls}>
+              <NavLink to="/admin/classes" className={linkCls}>
                 <CalendarMonth className="sidebarIcon" />
                 לו״ז שיעורים
               </NavLink>
             </li>
             <li className="sidebarListItem">
-              <NavLink to="/programs" className={linkCls}>
+              <NavLink to="/admin/programs" className={linkCls}>
                 <FitnessCenter className="sidebarIcon" />
                 תוכניות אימון
-              </NavLink>
-            </li>
-            <li className="sidebarListItem">
-              <NavLink to="/attendance" className={linkCls}>
-                <Report className="sidebarIcon" />
-                נוכחות
               </NavLink>
             </li>
           </ul>
@@ -108,19 +89,19 @@ export default function Sidebar() {
           <h3 className="sidebarTitle">דוחות</h3>
           <ul className="sidebarList">
             <li className="sidebarListItem">
-              <NavLink to="/reports/usage" className={linkCls}>
+              <NavLink to="/admin/reports/usage" className={linkCls}>
                 <Assessment className="sidebarIcon" />
                 שימוש ופעילות
               </NavLink>
             </li>
             <li className="sidebarListItem">
-              <NavLink to="/reports/churn" className={linkCls}>
+              <NavLink to="/admin/reports/churn" className={linkCls}>
                 <BarChart className="sidebarIcon" />
                 נטישת מנויים
               </NavLink>
             </li>
             <li className="sidebarListItem">
-              <NavLink to="/reports/monthly" className={linkCls}>
+              <NavLink to="/admin/reports/monthly" className={linkCls}>
                 <BarChart className="sidebarIcon" />
                 דוח חודשי
               </NavLink>
@@ -132,13 +113,13 @@ export default function Sidebar() {
           <h3 className="sidebarTitle">צוות והגדרות</h3>
           <ul className="sidebarList">
             <li className="sidebarListItem">
-              <NavLink to="/team" className={linkCls}>
+              <NavLink to="/admin/permissions" className={linkCls}>
                 <WorkOutline className="sidebarIcon" />
                 צוות/הרשאות
               </NavLink>
             </li>
             <li className="sidebarListItem">
-              <NavLink to="/logout" className={linkCls}>
+              <NavLink to="/admin/logout" className={linkCls}>
                 <Logout className="sidebarIcon" />
                 התנתקות
               </NavLink>

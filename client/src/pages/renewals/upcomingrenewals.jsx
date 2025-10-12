@@ -1,10 +1,10 @@
 import * as React from "react";
+import "./renewals.css";
 import { Paper, Box, Typography, TextField, InputAdornment, Chip } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
-import { getSubs } from "../../pages/newUser/userApiService";        
-import { useDebouncedValue } from "../../pages/subscription/hook"; 
-import "./renewals.css";
+import { getSubs } from "../../pages/newUser/userApiService";
+import { useDebouncedValue } from "../../pages/subscription/hook";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
 
@@ -24,7 +24,7 @@ export default function UpcomingRenewalsPage() {
     paid: ["שולם", "success"],
     failed: ["נכשל", "error"],
     refunded: ["הוחזר", "info"],
-    pending: ["ממתין", "warning"]
+    pending: ["ממתין", "warning"],
   };
 
   const fetchData = React.useCallback(async () => {
@@ -37,30 +37,28 @@ export default function UpcomingRenewalsPage() {
         paginationModel,
         sortModel,
         query: qDebounced,
-        status: "active",            
-        expiresInDays: expDebounced,  
+        status: "active",
+        expiresInDays: expDebounced,
         signal: ctrl.signal,
       });
       setRows(rows);
       setRowCount(total);
     } catch (error) {
-      if (error.name !== 'AbortError') {
-        console.error('Failed to fetch data:', error);
-      }
-      setRows([]); 
+      if (error.name !== "AbortError") console.error("Failed to fetch data:", error);
+      setRows([]);
       setRowCount(0);
     } finally {
       setLoading(false);
     }
   }, [paginationModel, sortModel, qDebounced, expDebounced]);
 
-  React.useEffect(() => { 
-    fetchData(); 
-    return () => ctrlRef.current?.abort(); 
+  React.useEffect(() => {
+    fetchData();
+    return () => ctrlRef.current?.abort();
   }, [fetchData]);
 
-  React.useEffect(() => { 
-    setPaginationModel((p) => ({ ...p, page: 0 })); 
+  React.useEffect(() => {
+    setPaginationModel((p) => (p.page === 0 ? p : { ...p, page: 0 }));
   }, [qDebounced, expDebounced]);
 
   const handleExpiresInDaysChange = (e) => {
@@ -100,59 +98,64 @@ export default function UpcomingRenewalsPage() {
   ];
 
   return (
-    <Paper className="renewals" dir="rtl">
-      <Box className="renewalsHeader">
-        <Typography variant="h5" fontWeight={700}>חידושים קרובים</Typography>
-        </Box>
-      <Box className="renewalsHeader">
-        <Box className="renewalsFilters">
-          <TextField
-            size="small"
-            label="חיפוש (שם/טלפון)"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="searchField"
-            InputProps={{ 
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search/>
-                </InputAdornment>
-              ) 
-            }}
-          />
-          <TextField
-            size="small"
-            type="number"
-            inputProps={{ min: 0, max: 365 }}
-            label="ב־כמה ימים קדימה"
-            value={expiresInDays}
-            onChange={handleExpiresInDaysChange}
-            className="daysField"
-          />
-          <Chip 
-            label={`מציג חידושים ב־${expDebounced || 0} ימים הקרובים`} 
-            color="info" 
-            variant="outlined" 
-          />
-        </Box>
+    <div className="renewalsPage" dir="rtl">
+      <Typography className="renewalsPage__title" variant="h5">
+        חידושים קרובים
+      </Typography>
+
+      <Box className="renewalsFiltersCard">
+        <TextField
+          size="small"
+          label="חיפוש (שם/טלפון)"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="searchField"
+          id="renewals-search"
+          name="renewals_search"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <TextField
+          size="small"
+          type="number"
+          inputProps={{ min: 0, max: 365 }}
+          label="ב־כמה ימים קדימה"
+          value={expiresInDays}
+          onChange={handleExpiresInDaysChange}
+          className="daysField"
+          id="renewals-expires-days"
+          name="renewals_expires_days"
+        />
+        <Chip
+          label={`מציג חידושים ב־${expDebounced || 0} ימים הקרובים`}
+          color="info"
+          variant="outlined"
+        />
       </Box>
 
-      <DataGrid
-        rows={rows}
-        getRowId={(row) => row.id}
-        columns={columns}
-        loading={loading}
-        rowCount={rowCount}
-        paginationMode="server"
-        paginationModel={paginationModel}
-        onPaginationModelChange={setPaginationModel}
-        sortingMode="server"
-        sortModel={sortModel}
-        onSortModelChange={setSortModel}
-        pageSizeOptions={[10, 25, 50]}
-        disableRowSelectionOnClick
-        className="renewalsGrid"
-      />
-    </Paper>
+      <Paper className="renewalsCard">
+        <DataGrid
+          rows={rows}
+          getRowId={(row) => row.id}
+          columns={columns}
+          loading={loading}
+          rowCount={rowCount}
+          paginationMode="server"
+          paginationModel={paginationModel}
+          onPaginationModelChange={setPaginationModel}
+          sortingMode="server"
+          sortModel={sortModel}
+          onSortModelChange={setSortModel}
+          pageSizeOptions={[10, 25, 50]}
+          disableRowSelectionOnClick
+          className="renewalsGrid"
+        />
+      </Paper>
+    </div>
   );
 }

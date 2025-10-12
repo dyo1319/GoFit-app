@@ -5,7 +5,7 @@ import Filters from "./Filters";
 import SubscriptionsTable from "./SubscriptionsTable";
 import AddDialog from "./AddDialog";
 import EditDialog from "./EditDialog";
-import { getSubs  } from "../newUser/userApiService";
+import { getSubs } from "../newUser/userApiService";
 import { pauseSub, resumeSub, restoreSub, cancelSub, hardDelete } from "./actions";
 import { useDebouncedValue } from "./hook";
 
@@ -58,8 +58,8 @@ export default function SubscriptionPage() {
   React.useEffect(() => { fetchSubs(); return () => ctrlRef.current?.abort(); }, [fetchSubs]);
 
   React.useEffect(() => {
-   setPaginationModel(p => (p.page === 0 ? p : { ...p, page: 0 }));
- }, [qDebounced, status, expDebounced]);
+    setPaginationModel(p => (p.page === 0 ? p : { ...p, page: 0 }));
+  }, [qDebounced, status, expDebounced]);
 
   const snack = (message, severity = "info") => setSnackbar({ open: true, message, severity });
   const closeSnack = () => setSnackbar((s) => ({ ...s, open: false }));
@@ -148,7 +148,7 @@ export default function SubscriptionPage() {
   };
 
   const samePagination = (a, b) =>
-  (a?.page === b?.page) && (a?.pageSize === b?.pageSize);
+    (a?.page === b?.page) && (a?.pageSize === b?.pageSize);
 
   const sameSortModel = (a = [], b = []) =>
     a.length === b.length && a.every((x, i) => x.field === b[i].field && x.sort === b[i].sort);
@@ -161,11 +161,13 @@ export default function SubscriptionPage() {
     setSortModel(prev => (sameSortModel(prev, model) ? prev : model));
   }, []);
 
-
   return (
-    <Paper className="subscriptionList" sx={{ p: 2, height: 700, width: "100%", maxWidth: "100%" }} dir="rtl">
-      <Box className="subscriptionListHeader">
-        <Typography variant="h5" fontWeight={700} gutterBottom>ניהול מנויים</Typography>
+    <div className="subscriptions" dir="rtl">
+      <Typography className="subscriptions__title" variant="h5">
+        ניהול מנויים
+      </Typography>
+
+      <Box className="subscriptions__filters rtlFormControl">
         <Filters
           query={query} onQueryChange={setQuery}
           status={status} onStatusChange={setStatus}
@@ -175,30 +177,42 @@ export default function SubscriptionPage() {
         />
       </Box>
 
-      <SubscriptionsTable
-        rows={rows}
-        rowCount={rowCount}
-        loading={loading}
-        paginationModel={paginationModel}
-        onPaginationModelChange={handlePaginationModelChange}
-        sortModel={sortModel}
-        onSortModelChange={handleSortModelChange}
-        onEdit={openEdit} onDelete={onDelete}
-        onPause={onPause} onResume={onResume} onCancel={onCancel} onRestore={onRestore}
-        actionBusyId={actionBusyId}
-      />
+      <Paper className="subscriptionList">
+        <SubscriptionsTable
+          rows={rows}
+          rowCount={rowCount}
+          loading={loading}
+          paginationModel={paginationModel}
+          onPaginationModelChange={handlePaginationModelChange}
+          sortModel={sortModel}
+          onSortModelChange={handleSortModelChange}
+          onEdit={openEdit} onDelete={onDelete}
+          onPause={onPause} onResume={onResume} onCancel={onCancel} onRestore={onRestore}
+          actionBusyId={actionBusyId}
+        />
+      </Paper>
 
       <AddDialog API_BASE={API_BASE} open={addOpen} onClose={() => setAddOpen(false)} onCreate={createSubscription} />
 
-      <EditDialog open={editOpen} onClose={() => { setEditOpen(false); setEditError(""); }}
-        editing={editing} setEditing={setEditing} onUpdate={updateSubscription} errorMsg={editError} />
+      <EditDialog
+        open={editOpen}
+        onClose={() => { setEditOpen(false); setEditError(""); }}
+        editing={editing}
+        setEditing={setEditing}
+        onUpdate={updateSubscription}
+        errorMsg={editError}
+      />
 
-      <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={closeSnack}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={closeSnack}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }} // RTL נעים יותר
+      >
         <Alert onClose={closeSnack} severity={snackbar.severity} sx={{ width: "100%" }}>
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Paper>
+    </div>
   );
 }

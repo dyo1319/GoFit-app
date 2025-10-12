@@ -9,7 +9,6 @@
 
 ### Front-End
 - **React** (Vite)  פיתוח ממשק משתמש רספונסיבי
-- **HTML5 / CSS3 / JavaScript**
 
 ### Back-End
 - **Node.js** + **Express**
@@ -41,4 +40,4 @@ cd server
 npm init -y
 npm i express cors morgan dotenv mysql2
 npm i -D nodemon
-npm i mysql2 slashes@2.0.0 md5 jsonwebtoken cookie-parser
+npm i mysql2  md5 jsonwebtoken cookie-parser joi

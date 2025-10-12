@@ -1,18 +1,76 @@
 import FormField from "./FormField";
+import { toSelectOptions, PAYMENT_STATUSES } from "../../utils/enums";
 
-export default function UserFormSubscription({ data, errors, onChange, onBack, onSubmit, loading }) {
+export default function UserFormSubscription({ form, errors, onChange, disabled, onBack, onSubmit, loading }) {
+  const paymentOptions = toSelectOptions(
+    PAYMENT_STATUSES.filter((s) => ["pending", "paid", "failed"].includes(s.value))
+  );
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (onSubmit && typeof onSubmit === 'function') {
+      onSubmit();
+    } else {
+      console.error("onSubmit is not a function:", onSubmit);
+    }
+  };
+
   return (
     <fieldset className="section">
-      <legend className="sectionTitle">פרטי מנוי (אופציונלי)</legend>
+      <legend className="sectionTitle">מנוי (אופציונלי)</legend>
       <div className="formGrid">
-        <FormField name="start_date" label="תאריך התחלה" type="date" value={data.start_date} error={errors.start_date} onChange={onChange}/>
-        <FormField name="end_date" label="תאריך סיום" type="date" value={data.end_date} error={errors.end_date} onChange={onChange}/>
-        <FormField name="payment_status" label="סטטוס תשלום" type="select" value={data.payment_status} error={errors.payment_status} onChange={onChange}
-                   options={[{value:"pending",label:"ממתין"},{value:"paid",label:"שולם"},{value:"failed",label:"נכשל"}]}/>
+        <FormField
+          label="תאריך התחלה"
+          name="start_date"
+          id="user-form-start-date"
+          type="date"
+          value={form?.start_date || ""}
+          onChange={onChange}
+          error={errors?.start_date}
+          disabled={disabled}
+        />
+
+        <FormField
+          label="תאריך סיום"
+          name="end_date"
+          id="user-form-end-date"
+          type="date"
+          value={form?.end_date || ""}
+          onChange={onChange}
+          error={errors?.end_date}
+          disabled={disabled}
+        />
+
+        <FormField
+          label="סטטוס תשלום"
+          name="payment_status"
+          id="user-form-payment-status"
+          type="select"
+          options={paymentOptions}
+          value={form?.payment_status || "pending"}
+          onChange={onChange}
+          error={errors?.payment_status}
+          disabled={disabled}
+        />
       </div>
-      <div className="actions" style={{marginTop:10}}>
-        <button type="button" className="primary" onClick={onBack}>חזרה</button>
-        <button type="button" className="primary" onClick={onSubmit} disabled={loading}>{loading ? "שומר..." : "שמור"}</button>
+      
+      <div className="actions" style={{marginTop: 20}}>
+        <button 
+          type="button" 
+          className="secondary" 
+          onClick={onBack}
+          disabled={disabled || loading}
+        >
+          חזרה
+        </button>
+        <button 
+          type="button" 
+          className="primary" 
+          onClick={handleSubmit}
+          disabled={disabled || loading}
+        >
+          {loading ? "יוצר משתמש..." : "יצירת משתמש"}
+        </button>
       </div>
     </fieldset>
   );

@@ -13,19 +13,21 @@ export default function Filters({
         sx={{ display: "flex", gap: 2, alignItems: "center", flexWrap: "wrap", mb: 2 }}
       >
         <TextField
-        size="small"
-        label="חיפוש (שם/טלפון)"
-        value={query}
-        onChange={(e) => onQueryChange(e.target.value)}
-        sx={{ minWidth: 220 }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <Search />
-            </InputAdornment>
-          ),
-        }}
-      />
+          size="small"
+          label="חיפוש (שם/טלפון)"
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+          sx={{ minWidth: 220 }}
+          id="subscription-filter-search"
+          name="subscription_filter_search"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            ),
+          }}
+        />
 
       <TextField
         size="small"
@@ -34,6 +36,8 @@ export default function Filters({
         value={status}
         onChange={(e) => onStatusChange(e.target.value)}
         sx={{ minWidth: 160 }}
+        id="subscription-filter-status"
+        name="subscription_filter_status"
       >
         <MenuItem value="">הכול</MenuItem>
         <MenuItem value="active">פעיל</MenuItem>
@@ -53,6 +57,8 @@ export default function Filters({
           if (v === "" || /^\d+$/.test(v)) onExpiresChange(v);
         }}
         sx={{ minWidth: 160 }}
+        id="subscription-filter-expires-days"
+        name="subscription_filter_expires_days"
       />
 
       <Button variant="contained" onClick={onAdd} sx={{ minWidth: 120 }}> הוסף מנוי</Button>

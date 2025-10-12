@@ -5,6 +5,7 @@
   position: sticky;
   top: 0;
   z-index: 999;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .topbarWrapper {
@@ -22,22 +23,24 @@
   cursor: pointer;
 }
 
-.topRight{
-    display: flex;
-    align-items: center;
+.topRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.topbarIconContainer {
-  position: relative;
+.topAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   cursor: pointer;
-  margin-right: 10px;
-  color: #555;
+  object-fit: cover;
 }
 
+.MuiBadge-badge {
+  font-size: 10px;
+}
 
-.topAvatar{
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
+.MuiPopover-paper {
+  direction: rtl;
 }

@@ -3,7 +3,6 @@ import {
   Box, TextField, MenuItem, Alert, Button
 } from "@mui/material";
 
-
 export default function EditDialog({ open, onClose, editing, setEditing, onUpdate, errorMsg }) {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth className="rtlDialog">
@@ -13,19 +12,28 @@ export default function EditDialog({ open, onClose, editing, setEditing, onUpdat
         {editing && (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
             <TextField
-              label="תאריך התחלה" type="date"
+              label="תאריך התחלה" 
+              type="date"
+              id="edit-dialog-start-date"
+              name="start_date"
               value={editing.start_date_original}
               onChange={(e) => setEditing({ ...editing, start_date_original: e.target.value })}
               InputLabelProps={{ shrink: true }}
             />
             <TextField
-              label="תאריך סיום" type="date"
+              label="תאריך סיום" 
+              type="date"
+              id="edit-dialog-end-date"
+              name="end_date"
               value={editing.end_date_original}
               onChange={(e) => setEditing({ ...editing, end_date_original: e.target.value })}
               InputLabelProps={{ shrink: true }}
             />
             <TextField
-              label="סטטוס תשלום" select
+              label="סטטוס תשלום" 
+              select
+              id="edit-dialog-payment-status"
+              name="payment_status"
               value={editing.payment_status}
               onChange={(e) => setEditing({ ...editing, payment_status: e.target.value })}
               InputLabelProps={{ shrink: true }}

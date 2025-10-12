@@ -31,6 +31,7 @@ export default function User() {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState(""); 
 
   const [original, setOriginal] = useState(null);
   const [userForm, setUserForm] = useState({
@@ -56,6 +57,7 @@ export default function User() {
     async function load() {
       setLoading(true);
       setError("");
+      setSuccess(""); 
       try {
         const res = await fetch(`${API_BASE}/U/users/${id}?expand=1`);
         const json = await res.json().catch(() => ({}));
@@ -72,7 +74,7 @@ export default function User() {
           id: u.id ?? null,
           username: u.username ?? "",
           phone: u.phone ?? "",
-          birth_date: u.birth_date ?? "",                   // YYYY-MM-DD (input type=date)
+          birth_date: u.birth_date ?? "",
           role: ROLE_EN2HE[u.role || null] ?? "",
           gender: GENDER_EN2HE[u.gender || null] ?? "",
           weight: b?.weight ?? "",
@@ -80,9 +82,9 @@ export default function User() {
           body_fat: b?.body_fat ?? "",
           muscle_mass: b?.muscle_mass ?? "",
           circumference: b?.circumference ?? "",
-          recorded_at: b?.recorded_at ?? "",               // YYYY-MM-DD
-          start_date: s?.start_date ?? "",                 // YYYY-MM-DD
-          end_date: s?.end_date ?? "",                     // YYYY-MM-DD
+          recorded_at: b?.recorded_at ?? "",
+          start_date: s?.start_date ?? "",
+          end_date: s?.end_date ?? "",
           payment_status: s?.payment_status ?? "pending",
         };
 
@@ -137,6 +139,7 @@ export default function User() {
 
   const handleSave = async () => {
     setError("");
+    setSuccess("");
     if (!original) return;
 
     const changed = {};
@@ -180,6 +183,8 @@ export default function User() {
         throw new Error(j?.message || `עדכון נכשל (${res.status})`);
       }
 
+      setSuccess(j.message || "משתמש עודכן בהצלחה");
+
       const afterRes = await fetch(`${API_BASE}/U/users/${id}?expand=1`);
       const after = await afterRes.json().catch(() => ({}));
       if (!afterRes.ok || !after?.success) {
@@ -219,6 +224,7 @@ export default function User() {
   const handleCancel = () => {
     setUserForm(original || userForm);
     setIsEditing(false);
+    setSuccess("");
   };
 
   if (loading) return <div className="user"><p>טוען…</p></div>;
@@ -229,9 +235,9 @@ export default function User() {
       <div className="userTitleContainer">
         <h1 className="userTitle">עריכת משתמש</h1>
         <div className="userActions">
-          <Link to="/newUser">
+          <Link to="/newUser" style={{ textDecoration: 'none' }}>
             <button className="userAddButton">
-              <AccountCircle /> הוספת משתמש
+              <AccountCircle/> הוספת משתמש
             </button>
           </Link>
           <button className="editButton" onClick={() => setIsEditing(!isEditing)}>
@@ -239,6 +245,21 @@ export default function User() {
           </button>
         </div>
       </div>
+
+      {success && (
+        <div className="success-message" style={{
+          background: "#e8f5e8",
+          border: "1px solid #4caf50",
+          padding: "12px",
+          borderRadius: "4px",
+          margin: "15px 0",
+          textAlign: "center",
+          color: "#2e7d32",
+          fontWeight: "bold"
+        }}>
+          {success}
+        </div>
+      )}
 
       <div className="userContainer">
         <div className="userShow">
@@ -345,6 +366,8 @@ export default function User() {
                         value={userForm.username}
                         onChange={(e) => handleInputChange("username", e.target.value)}
                         className="userUpdateInput"
+                        id="username"
+                        name="username"
                       />
                     </div>
                     <div className="userUpdateItem">
@@ -353,8 +376,9 @@ export default function User() {
                         value={userForm.role}
                         onChange={(e) => handleInputChange("role", e.target.value)}
                         className="userUpdateInput"
+                        id="role"
+                        name="role"
                       >
-                        <option value="">בחר תפקיד</option>
                         <option value="מתאמן">מתאמן</option>
                         <option value="מאמן">מאמן</option>
                         <option value="מנהל">מנהל</option>
@@ -370,6 +394,8 @@ export default function User() {
                         onChange={(e) => handleInputChange("phone", e.target.value)}
                         className="userUpdateInput"
                         placeholder="05x-xxx-xxxx"
+                        id="phone"
+                        name="phone"
                       />
                     </div>
                     <div className="userUpdateItem">
@@ -379,6 +405,8 @@ export default function User() {
                         value={userForm.birth_date}
                         onChange={(e) => handleInputChange("birth_date", e.target.value)}
                         className="userUpdateInput"
+                        id="birth_date"
+                        name="birth_date"
                       />
                     </div>
                   </div>
@@ -389,6 +417,8 @@ export default function User() {
                         value={userForm.gender}
                         onChange={(e) => handleInputChange("gender", e.target.value)}
                         className="userUpdateInput"
+                        id="gender"
+                        name="gender"
                       >
                         <option value="">בחר מגדר</option>
                         <option value="זכר">זכר</option>
@@ -409,6 +439,8 @@ export default function User() {
                         onChange={(e) => handleInputChange("weight", e.target.value)}
                         className="userUpdateInput"
                         step="0.1"
+                        id="weight"
+                        name="weight"
                       />
                     </div>
                     <div className="userUpdateItem">
@@ -418,6 +450,8 @@ export default function User() {
                         value={userForm.height}
                         onChange={(e) => handleInputChange("height", e.target.value)}
                         className="userUpdateInput"
+                        id="height"
+                        name="height"
                       />
                     </div>
                   </div>
@@ -430,6 +464,8 @@ export default function User() {
                         onChange={(e) => handleInputChange("body_fat", e.target.value)}
                         className="userUpdateInput"
                         step="0.1"
+                        id="body_fat"
+                        name="body_fat"
                       />
                     </div>
                     <div className="userUpdateItem">
@@ -440,6 +476,8 @@ export default function User() {
                         onChange={(e) => handleInputChange("muscle_mass", e.target.value)}
                         className="userUpdateInput"
                         step="0.1"
+                        id="muscle_mass"
+                        name="muscle_mass"
                       />
                     </div>
                   </div>
@@ -451,6 +489,8 @@ export default function User() {
                         value={userForm.circumference}
                         onChange={(e) => handleInputChange("circumference", e.target.value)}
                         className="userUpdateInput"
+                        id="circumference"
+                        name="circumference"
                       />
                     </div>
                     <div className="userUpdateItem">
@@ -460,6 +500,8 @@ export default function User() {
                         value={userForm.recorded_at}
                         onChange={(e) => handleInputChange("recorded_at", e.target.value)}
                         className="userUpdateInput"
+                        id="recorded_at"
+                        name="recorded_at"
                       />
                     </div>
                   </div>
@@ -474,6 +516,8 @@ export default function User() {
                         value={userForm.start_date}
                         onChange={(e) => handleInputChange("start_date", e.target.value)}
                         className="userUpdateInput"
+                        id="start_date"
+                        name="start_date"
                       />
                     </div>
                     <div className="userUpdateItem">
@@ -483,6 +527,8 @@ export default function User() {
                         value={userForm.end_date}
                         onChange={(e) => handleInputChange("end_date", e.target.value)}
                         className="userUpdateInput"
+                        id="end_date"
+                        name="end_date"
                       />
                     </div>
                   </div>
@@ -493,6 +539,8 @@ export default function User() {
                         value={userForm.payment_status}
                         onChange={(e) => handleInputChange("payment_status", e.target.value)}
                         className="userUpdateInput"
+                        id="payment_status"
+                        name="payment_status"
                       >
                         <option value="pending">ממתין</option>
                         <option value="paid">שולם</option>

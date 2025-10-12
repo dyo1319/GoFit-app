@@ -1,186 +1,156 @@
-:root {
-  --rn-bg: #fff;
-  --rn-header-bg: #f5f5f5;
-  --rn-row-alt: #fafafa;
-  --rn-row-hover: #f9f9f9;
-  --rn-border: #e6e6e6;
-  --rn-shadow: 0 6px 18px rgba(0,0,0,.08);
-  --rn-radius: 12px;
-  --gap-sm: 8px;
-  --gap-md: 16px;
-  --gap-lg: 24px;
+:root{
+  --page-bg:#fafafa;
+  --card-bg:#fff;
+  --card-shadow:0 6px 18px rgba(0,0,0,.06);
+  --card-border:#f0f0f0;
+  --header-bg:#f5f5f5;
+  --row-alt:#fafafa;
+  --row-hover:#f9f9f9;
+  --radius:12px;
+  --gap-sm:8px;
+  --gap-md:16px;
+  --gap-lg:24px;
 }
 
-.renewals {
-  background: var(--rn-bg);
-  border-radius: var(--rn-radius);
-  box-shadow: var(--rn-shadow);
-  padding: var(--gap-md);
-  height: 700px;
-  width: 100%;
-  max-width: 100%;
+.renewalsPage{
   direction: rtl;
-  display: flex;
-  flex-direction: column;
-}
-
-.renewalsHeader {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: var(--gap-md);
-  margin-bottom: var(--gap-md);
-  flex-wrap: wrap;
-}
-
-.renewalsFilters {
-  display: flex;
-  align-items: center;
-  gap: var(--gap-md);
-  flex-wrap: wrap;
-}
-
-.renewalsFilters .searchField {
-  min-width: 240px;
-}
-
-.renewalsFilters .daysField {
-  width: 180px;
-}
-
-.renewalsGrid {
-  border: 0;
-  border-radius: var(--rn-radius);
-  overflow: hidden;
+  padding: 16px;
+  min-height: calc(100vh - 50px);
+  background: var(--page-bg);
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
   flex: 1;
 }
-
-.renewalsGrid .MuiDataGrid-columnHeaders {
-  background: var(--rn-header-bg);
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  border-bottom: 1px solid var(--rn-border);
+.renewalsPage__title{
+  margin: 0 0 12px 0;
+  font-weight: 800;
+  letter-spacing: .2px;
 }
 
-.renewalsGrid .MuiDataGrid-columnHeaderTitle { 
-  font-weight: 700; 
+/* ===== Filters card ===== */
+.renewalsFiltersCard{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  flex-wrap:wrap;
+  margin:0 0 16px 0;
+  padding:16px;
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  box-shadow:0 2px 12px rgba(0,0,0,.08);
+  border:1px solid var(--card-border);
+}
+.renewalsFiltersCard .searchField{ min-width:240px; }
+.renewalsFiltersCard .daysField{ width:180px; }
+
+.renewalsCard{
+  padding:16px;
+  border-radius:var(--radius);
+  background:var(--card-bg);
+  box-shadow:var(--card-shadow);
+  width:100%;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  min-height:540px;
 }
 
-.renewalsGrid .MuiDataGrid-cell { 
-  border-bottom: 1px solid var(--rn-border); 
-  text-align: center; 
+.renewalsGrid{
+  border:0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  flex:1;
+  font-family:'Helvetica Neue', Arial, sans-serif;
 }
-
-.renewalsGrid .MuiDataGrid-row:nth-of-type(odd) { 
-  background: var(--rn-row-alt); 
+.renewalsGrid .MuiDataGrid-columnHeaders{
+  background:var(--header-bg);
+  position:sticky;
+  top:0;
+  z-index:2;
+  border-bottom:1px solid #e6e6e6;
+  box-shadow:0 2px 4px rgba(0,0,0,.08);
 }
-
-.renewalsGrid .MuiDataGrid-row:hover { 
-  background: var(--rn-row-hover); 
+.renewalsGrid .MuiDataGrid-columnHeaderTitle{ font-weight:700; }
+.renewalsGrid .MuiDataGrid-columnHeader,
+.renewalsGrid .MuiDataGrid-cell{
+  text-align:center;
+  padding-inline:8px;
 }
+.renewalsGrid .MuiDataGrid-row:nth-of-type(odd){ background:var(--row-alt); }
+.renewalsGrid .MuiDataGrid-row:hover{ background:var(--row-hover); transition: background-color .2s ease; }
 
 .renewalsGrid .MuiDataGrid-footerContainer,
-.renewalsGrid .MuiTablePagination-root {
-  direction: ltr;
+.renewalsGrid .MuiTablePagination-root{
+  direction: rtl;
   justify-content: flex-start;
 }
 
-
-/* ===== notch ו-Label ב-RTL ===== */
-
-/* מיישר את ה-label לימין ומגדיר shrink נכון */
-.renewals .MuiInputLabel-root,
-.renewals .MuiFormLabel-root {
-  right: 16px;
-  left: auto;
-  transform-origin: top right;
-  text-align: right;
-}
-.renewals .MuiInputLabel-root.MuiInputLabel-shrink {
-  right: 14px;                       /* טיפה פנימה כדי לא לגעת בנוץ' */
-  transform: translate(0, -8px) scale(0.75);
-}
-.renewals .MuiInputLabel-root.MuiInputLabel-sizeSmall.MuiInputLabel-shrink {
-  transform: translate(0, -9px) scale(0.75);
-}
-
-
-.renewals .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline legend {
-  text-align: right;         
-}
-
-.renewals .MuiInputBase-root.MuiInputBase-adornedStart {
-  flex-direction: row-reverse;
-}
-
-.renewals .MuiOutlinedInput-input {
-  padding-right: 36px;
-}
-
-
-
-@media (max-width: 768px) {
-  .renewals {
-    padding: 12px;
-    height: 600px;
-  }
-  
-  .renewalsHeader {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--gap-sm);
-  }
-  
-  .renewalsFilters {
-    gap: var(--gap-sm);
-    width: 100%;
-  }
-  
-  .renewalsFilters .searchField,
-  .renewalsFilters .daysField {
-    min-width: unset;
-    width: 100%;
-  }
-  
-  .renewalsFilters .MuiChip-root {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .renewals {
-    padding: 8px;
-    height: 500px;
-  }
-  
-  .renewalsHeader {
-    margin-bottom: var(--gap-sm);
-  }
-  
-  .renewalsFilters {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
-
-.renewals .MuiFormLabel-root {
+.renewalsFiltersCard .MuiFormLabel-root,
+.renewalsFiltersCard .MuiInputLabel-root{
   right: 0;
   left: auto;
   transform-origin: top right;
-}
-
-.renewals .MuiInputBase-input {
   text-align: right;
+}
+.renewalsFiltersCard .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline legend{ text-align:right; }
+.renewalsFiltersCard .MuiInputBase-root.MuiInputBase-adornedStart{ flex-direction: row-reverse; }
+.renewalsFiltersCard .MuiOutlinedInput-input{ padding-right:36px; }
+.renewalsFiltersCard .MuiInputBase-input{
+  text-align:right;
   direction: rtl;
 }
-
-.renewals .MuiInputAdornment-positionStart {
-  margin-right: 0;
-  margin-left: 8px;
+.renewalsFiltersCard .MuiInputAdornment-positionStart{
+  margin-right:0;
+  margin-left:8px;
 }
 
-.renewalsGrid .MuiDataGrid-overlay {
-  background-color: rgba(255, 255, 255, 0.8);
+@media (min-width:600px){
+  .renewalsPage{ padding:20px; }
+  .renewalsFiltersCard{ padding:20px; }
+}
+@media (min-width:900px){
+  .renewalsFiltersCard{ gap:24px; }
+}
+@media (min-width:1200px){
+  .renewalsPage{ padding:24px; }
+  .renewalsFiltersCard{ gap:28px; padding:24px; }
+}
+@media (min-width:1400px){
+  .renewalsPage{ padding:28px 32px; }
+  .renewalsCard{ padding:20px; }
+  .renewalsFiltersCard{ gap:32px; padding:32px; }
+}
+
+@media (max-width:768px){
+  .renewalsFiltersCard{
+    gap: var(--gap-sm);
+    width:100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .renewalsFiltersCard .searchField,
+  .renewalsFiltersCard .daysField{
+    min-width: unset;
+    width:100%;
+  }
+}
+@media (max-width:480px){
+  .renewalsPage{ padding:8px; }
+  .renewalsCard{ min-height:480px; }
+}
+
+.renewalsGrid .MuiDataGrid-overlay{ background-color: rgba(255,255,255,.8); }
+
+.renewalsPage ::-webkit-scrollbar{ width:6px; height:6px; }
+.renewalsPage ::-webkit-scrollbar-track{ background:#f1f1f1; border-radius:3px; }
+.renewalsPage ::-webkit-scrollbar-thumb{ background:#c1c1c1; border-radius:3px; }
+.renewalsPage ::-webkit-scrollbar-thumb:hover{ background:#a8a8a8; }
+
+@media print{
+  .renewalsCard{
+    box-shadow:none;
+    border:1px solid #e0e0e0;
+    break-inside: avoid;
+  }
 }

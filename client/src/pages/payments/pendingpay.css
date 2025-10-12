@@ -1,0 +1,181 @@
+:root{
+  --page-bg:#fafafa;
+  --card-bg:#fff;
+  --card-shadow:0 6px 18px rgba(0,0,0,.06);
+  --card-border:#f0f0f0;
+  --header-bg:#f5f5f5;
+  --row-alt:#fafafa;
+  --row-hover:#f9f9f9;
+  --radius:12px;
+  --gap-sm:8px;
+  --gap-md:16px;
+  --gap-lg:24px;
+}
+
+/* ===== Page ===== */
+.pendingPage{
+  direction: rtl;
+  padding: 16px;
+  min-height: calc(100vh - 50px);
+  background: var(--page-bg);
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  flex: 1;
+}
+.pendingPage__title{
+  margin: 0 0 12px 0;
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+
+/* ===== Filters card ===== */
+.pendingFiltersCard{
+  display:flex;
+  align-items:center;
+  gap:16px;
+  flex-wrap:wrap;
+  margin:0 0 16px 0;
+  padding:16px;
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  box-shadow:0 2px 12px rgba(0,0,0,.08);
+  border:1px solid var(--card-border);
+}
+.pendingFiltersCard .pendingSearch{
+  min-width: 220px;
+  flex: 0 1 320px;     /* חיפוש לא תופס את כל הרוחב */
+  max-width: 340px;
+}
+
+/* === TextField RTL fix (האייקון משמאל, הטקסט מימין, בלי חפיפה) === */
+.pendingFiltersCard .MuiTextField-root{
+  direction: rtl;
+  text-align: right;
+}
+.pendingFiltersCard .MuiInputBase-root.MuiInputBase-adornedStart{
+  flex-direction: row-reverse;     /* מזיז את האייקון להתחלה (שמאל) בלי לשבור RTL */
+}
+.pendingFiltersCard .MuiInputAdornment-root{ direction: ltr; }
+.pendingFiltersCard .MuiInputAdornment-positionStart{
+  margin-right: 0;
+  margin-left: 8px;                /* ריווח בין האייקון לטקסט */
+}
+/* כאן התיקון העיקרי: הטקסט לא יתנגש באייקון */
+.pendingFiltersCard .MuiOutlinedInput-input{
+  padding-right: 14px !important;  /* הטקסט מתחיל מימין בנוחות */
+  padding-left: 36px !important;   /* מקום לאייקון משמאל */
+  text-align: right;
+  direction: rtl;
+}
+/* לייבל ממוקם נכון ב-RTL (לא חתוך) */
+.pendingFiltersCard .MuiFormLabel-root,
+.pendingFiltersCard .MuiInputLabel-root{
+  right: 12px;
+  left: auto;
+  transform-origin: top right;
+  text-align: right;
+}
+.pendingFiltersCard .MuiInputLabel-root.MuiInputLabel-shrink{
+  right: 10px;
+  transform: translate(0, -7px) scale(0.75);
+}
+
+/* ===== Data card + Grid ===== */
+.pendingCard{
+  padding:16px;
+  border-radius:var(--radius);
+  background:var(--card-bg);
+  box-shadow:var(--card-shadow);
+  width:100%;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  min-height:540px;
+}
+
+.pendingGrid{
+  border:0;
+  border-radius:var(--radius);
+  overflow:hidden;
+  flex:1;
+  direction: rtl;
+  font-family:'Helvetica Neue', Arial, sans-serif;
+}
+.pendingGrid .MuiDataGrid-columnHeaders{
+  background:var(--header-bg);
+  position:sticky;
+  top:0;
+  z-index:2;
+  border-bottom:1px solid #e6e6e6;
+  box-shadow:0 2px 4px rgba(0,0,0,.08);
+}
+.pendingGrid .MuiDataGrid-columnHeaderTitle{ font-weight:700; text-align:center; }
+.pendingGrid .MuiDataGrid-columnHeader,
+.pendingGrid .MuiDataGrid-cell{
+  text-align:center;
+  padding-inline:8px;
+}
+.pendingGrid .MuiDataGrid-row:nth-of-type(odd){ background:var(--row-alt); }
+.pendingGrid .MuiDataGrid-row:hover{
+  background:var(--row-hover);
+  transition: background-color .2s ease;
+}
+.pendingGrid .MuiDataGrid-footerContainer,
+.pendingGrid .MuiTablePagination-root{
+  direction: rtl;
+  justify-content: flex-start;
+}
+.pendingGrid .MuiDataGrid-overlay{ background-color: rgba(255,255,255,.8); }
+
+/* ===== Cells / actions ===== */
+.phone-number{
+  direction:ltr;
+  text-align:center;
+  font-family: monospace;
+  display:block;
+  width:100%;
+}
+.actions-container{
+  display:flex;
+  gap: var(--gap-sm);
+  justify-content:center;
+  align-items:center;
+  direction: rtl;
+  width:100%;
+}
+.pendingPage .MuiButton-startIcon{ margin-right:0; margin-left:8px; }
+
+/* ===== Responsive ===== */
+@media (min-width:600px){
+  .pendingPage{ padding:20px; }
+  .pendingFiltersCard{ padding:20px; }
+}
+@media (min-width:900px){
+  .pendingFiltersCard{ gap:24px; }
+}
+@media (min-width:1200px){
+  .pendingPage{ padding:24px; }
+  .pendingFiltersCard{ gap:28px; padding:24px; }
+}
+@media (min-width:1400px){
+  .pendingPage{ padding:28px 32px; }
+  .pendingCard{ padding:20px; }
+  .pendingFiltersCard{ gap:32px; padding:32px; }
+}
+@media (max-width:768px){
+  .pendingFiltersCard{
+    flex-direction:column;
+    align-items:stretch;
+    gap: var(--gap-sm);
+  }
+  .pendingFiltersCard .pendingSearch{
+    flex: 1 1 auto;
+    min-width: unset;
+    max-width: none;
+  }
+}
+@media (max-width:480px){
+  .pendingPage{ padding:8px; }
+  .pendingCard{ min-height:480px; }
+}

@@ -1,26 +1,152 @@
 import FormField from "./FormField";
+import { toSelectOptions, ROLES, GENDERS } from "../../utils/enums";
+import PermissionsChecklist from "../permissions/PermissionsChecklist";
 
-export default function UserFormPersonal({ data, errors, onChange, onNext }) {
-  const canProceed = () => data.username && data.phone && data.password && data.birth_date;
+const ACCESS_PROFILES = [
+  { value: "default", label: "ברירת מחדל" },
+  { value: "readonly", label: "קריאה בלבד" },
+  { value: "custom", label: "מותאם אישית" }
+];
+
+export default function UserFormPersonal({ 
+  form, 
+  errors, 
+  onChange, 
+  onNext, 
+  disabled,
+  duplicateCheckLoading = false 
+}) {
+  const isStaff = form.role === "trainer" || form.role === "admin";
+
   return (
-    <fieldset className="section">
-      <legend className="sectionTitle">פרטי משתמש</legend>
+    <fieldset className="section" disabled={disabled}>
+      <legend className="sectionTitle">פרטים אישיים</legend>
       <div className="formGrid">
-        <FormField name="username" label="שם משתמש" type="text" value={data.username} error={errors.username}
-                   onChange={onChange} required placeholder="הכנס שם משתמש"/>
-        <FormField name="phone" label="טלפון" type="tel" value={data.phone} error={errors.phone}
-                   onChange={onChange} required placeholder="050-1234567"/>
-        <FormField name="password" label="סיסמה" type="password" value={data.password} error={errors.password}
-                   onChange={onChange} required placeholder="לפחות 6 תווים"/>
-        <FormField name="birth_date" label="תאריך לידה" type="date" value={data.birth_date} error={errors.birth_date}
-                   onChange={onChange} required/>
-        <FormField name="role" label="תפקיד" type="select" value={data.role} error={errors.role} onChange={onChange}
-                   options={[{value:"trainee",label:"מתאמן/ת"},{value:"trainer",label:"מאמן/ת"},{value:"admin",label:"אדמין"}]}/>
-        <FormField name="gender" label="מגדר" type="select" value={data.gender} error={errors.gender} onChange={onChange}
-                   options={[{value:"male",label:"זכר"},{value:"female",label:"נקבה"}]}/>
+        <FormField
+          label="שם משתמש"
+          name="username"
+          id="user-form-username"
+          value={form?.username || ""} 
+          onChange={onChange}
+          error={errors?.username}
+          required
+          disabled={disabled}
+          placeholder="יוסי כהן"
+          autoComplete="name"
+        />
+
+        <FormField
+          label="טלפון"
+          name="phone"
+          id="user-form-phone"
+          value={form?.phone || ""} 
+          onChange={onChange}
+          error={errors?.phone}
+          required
+          disabled={disabled}
+          placeholder="05X-XXXXXXX"
+          autoComplete="tel"
+          loading={duplicateCheckLoading}
+        />
+
+        <FormField
+          label="סיסמה"
+          name="password"
+          id="user-form-password"
+          type="password"
+          value={form?.password || ""} 
+          onChange={onChange}
+          error={errors?.password}
+          required
+          disabled={disabled}
+          placeholder="לפחות 4 תווים"
+          autoComplete="new-password"
+        />
+
+        <FormField
+          label="תאריך לידה"
+          name="birth_date"
+          id="user-form-birth-date"
+          type="date"
+          value={form?.birth_date || ""} 
+          onChange={onChange}
+          error={errors?.birth_date}
+          disabled={disabled}
+          autoComplete="bday"
+        />
+
+        <FormField
+          label="תפקיד"
+          name="role"
+          id="user-form-role"
+          type="select"
+          options={toSelectOptions(ROLES)}
+          value={form?.role || "trainee"} 
+          onChange={onChange}
+          error={errors?.role}
+          disabled={disabled}
+        />
+
+        <FormField
+          label="מגדר"
+          name="gender"
+          id="user-form-gender"
+          type="select"
+          options={toSelectOptions(GENDERS)}
+          value={form?.gender || "male"} 
+          onChange={onChange}
+          error={errors?.gender}
+          disabled={disabled}
+        />
+
+        {isStaff && (
+          <FormField
+            label="פרופיל גישה"
+            name="access_profile"
+            id="user-form-access-profile"
+            type="select"
+            options={ACCESS_PROFILES}
+            value={form?.access_profile || "default"} 
+            onChange={onChange}
+            error={errors?.access_profile}
+            disabled={disabled}
+          />
+        )}
+
+        {isStaff && form.access_profile === "custom" && (
+          <div className="newUserItem" style={{ gridColumn: "1 / -1" }}>
+            <label>הרשאות מותאמות אישית</label>
+            <div style={{ 
+              border: "1px solid #e5e7eb", 
+              borderRadius: "8px", 
+              padding: "12px", 
+              maxHeight: "200px", 
+              overflowY: "auto",
+              backgroundColor: "#fafafa"
+            }}>
+              <PermissionsChecklist
+                selected={form.permissions_json || []}
+                onChange={(permissions) => onChange("permissions_json", permissions)}
+                disabled={disabled}
+                compact={true}
+              />
+            </div>
+            {errors?.permissions_json && (
+              <span className="error-message">{errors.permissions_json}</span>
+            )}
+          </div>
+        )}
       </div>
-      <div className="actions" style={{marginTop:10}}>
-        <button type="button" className="primary" onClick={onNext} disabled={!canProceed()}>הבא</button>
+      
+      <div className="actions" style={{marginTop: 20}}>
+        <button 
+          type="button" 
+          className="primary" 
+          onClick={onNext}
+          disabled={disabled}
+        >
+          הבא
+        </button>
       </div>
     </fieldset>
   );

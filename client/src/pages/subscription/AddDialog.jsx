@@ -4,8 +4,6 @@ import { Dialog, DialogTitle, DialogContent, DialogActions,
 import Autocomplete from "@mui/material/Autocomplete";
 import { searchUsers  } from "../newUser/userApiService";
 
-
-
 export default function AddDialog({ API_BASE, open, onClose, onCreate }) {
   const [userSearch, setUserSearch] = useState("");
   const [userOptions, setUserOptions] = useState([]);
@@ -57,6 +55,8 @@ export default function AddDialog({ API_BASE, open, onClose, onCreate }) {
               <TextField
                 {...params}
                 label="חפש משתמש לפי שם/טלפון"
+                id="add-dialog-user-search"
+                name="user_search"
                 InputLabelProps={{ shrink: true }}
                 InputProps={{
                   ...params.InputProps,
@@ -66,17 +66,29 @@ export default function AddDialog({ API_BASE, open, onClose, onCreate }) {
             )}
           />
 
-          <TextField label="תאריך התחלה" type="date"
+          <TextField 
+            label="תאריך התחלה" 
+            type="date"
+            id="add-dialog-start-date"
+            name="start_date"
             value={form.start_date}
             onChange={(e) => setForm(f => ({ ...f, start_date: e.target.value }))}
             InputLabelProps={{ shrink: true }}
           />
-          <TextField label="תאריך סיום" type="date"
+          <TextField 
+            label="תאריך סיום" 
+            type="date"
+            id="add-dialog-end-date"
+            name="end_date"
             value={form.end_date}
             onChange={(e) => setForm(f => ({ ...f, end_date: e.target.value }))}
             InputLabelProps={{ shrink: true }}
           />
-          <TextField label="סטטוס תשלום" select
+          <TextField 
+            label="סטטוס תשלום" 
+            select
+            id="add-dialog-payment-status"
+            name="payment_status"
             value={form.payment_status}
             onChange={(e) => setForm(f => ({ ...f, payment_status: e.target.value }))}
             InputLabelProps={{ shrink: true }}
