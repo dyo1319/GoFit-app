@@ -1,45 +1,303 @@
-ALTER TABLE users
-  ADD COLUMN access_profile ENUM('default','readonly','custom') NOT NULL DEFAULT 'default',
-  ADD COLUMN permissions_json JSON NULL COMMENT 'רשימת הרשאות אפקטיבית כאשר profile=custom';
+CREATE DATABASE  IF NOT EXISTS `gofit_db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `gofit_db`;
+-- MySQL dump 10.13  Distrib 8.0.41, for Win64 (x86_64)
+--
+-- Host: 127.0.0.1    Database: gofit_db
+-- ------------------------------------------------------
+-- Server version	8.0.41
 
-ALTER TABLE users
-  ADD INDEX idx_users_role (role),
-  ADD INDEX idx_users_access_profile (access_profile);
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-CREATE TABLE permissions_catalog (
-  perm_key VARCHAR(64) PRIMARY KEY,
-  is_readonly_safe TINYINT(1) NOT NULL DEFAULT 0,
-  description VARCHAR(255) NULL
-);
+--
+-- Table structure for table `bodydetails`
+--
 
-INSERT INTO permissions_catalog (perm_key, is_readonly_safe, description) VALUES
-  ('users.view',        1, 'צפייה במשתמשים'),
-  ('users.edit',        0, 'עריכת משתמשים'),
-  ('subs.view',         1, 'צפייה במנויים'),
-  ('subs.edit',         0, 'עריכת מנויים'),
-  ('payments.view',     1, 'צפייה בתשלומים'),
-  ('payments.refund',   0, 'ביצוע החזר תשלום'),
-  ('analytics.view',    1, 'דוחות וניתוחים'),
-  ('staff.manage',      0, 'ניהול צוות והרשאות'),
-  ('notifications.manage', 0, 'ניהול התראות'),
-  ('classes.manage',    0, 'ניהול שיעורים'),
-  ('plans.manage',      0, 'ניהול תוכניות אימון');
+DROP TABLE IF EXISTS `bodydetails`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `bodydetails` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `weight` float DEFAULT NULL,
+  `height` float DEFAULT NULL,
+  `body_fat` float DEFAULT NULL,
+  `muscle_mass` float DEFAULT NULL,
+  `circumference` int DEFAULT NULL,
+  `recorded_at` date DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_bodydetails_user` (`user_id`),
+  CONSTRAINT `fk_bodydetails_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-CREATE TABLE role_presets (
-  role ENUM('trainee','trainer','admin') NOT NULL,
-  perm_key VARCHAR(64) NOT NULL,
-  PRIMARY KEY (role, perm_key),
-  CONSTRAINT fk_preset_perm FOREIGN KEY (perm_key)
-    REFERENCES permissions_catalog(perm_key) ON DELETE CASCADE
-);
+--
+-- Dumping data for table `bodydetails`
+--
 
-INSERT INTO role_presets (role, perm_key)
-  SELECT 'admin', perm_key FROM permissions_catalog;
+LOCK TABLES `bodydetails` WRITE;
+/*!40000 ALTER TABLE `bodydetails` DISABLE KEYS */;
+INSERT INTO `bodydetails` VALUES (2,3,50,165,21,30,86,'2025-09-22'),(4,10,15,15,15,15,1515,'2025-09-23'),(5,11,NULL,NULL,NULL,NULL,NULL,'2025-09-23'),(7,13,22,150,22,22,22,'2025-09-30'),(8,14,99,99,50,99,99,'2025-10-04'),(9,15,88,88,28,88,88,'2025-10-04'),(10,16,45,170,45,45,45,'2025-10-12');
+/*!40000 ALTER TABLE `bodydetails` ENABLE KEYS */;
+UNLOCK TABLES;
 
-INSERT INTO role_presets (role, perm_key) VALUES
-  ('trainer','users.view'),
-  ('trainer','subs.view'),
-  ('trainer','analytics.view'),
-  ('trainer','classes.manage'),
-  ('trainer','plans.manage');
+--
+-- Table structure for table `exercises`
+--
 
+DROP TABLE IF EXISTS `exercises`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `exercises` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `exercise_name` varchar(255) NOT NULL,
+  `category` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `exercises`
+--
+
+LOCK TABLES `exercises` WRITE;
+/*!40000 ALTER TABLE `exercises` DISABLE KEYS */;
+/*!40000 ALTER TABLE `exercises` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `notifications`
+--
+
+DROP TABLE IF EXISTS `notifications`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `notifications` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `audience` enum('admin','user') NOT NULL DEFAULT 'user',
+  `user_id` int DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `type` enum('info','warning','error','success') NOT NULL DEFAULT 'info',
+  `read_at` timestamp NULL DEFAULT NULL,
+  `uniq_key` varchar(64) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_audience` (`audience`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_read_at` (`read_at`),
+  KEY `idx_uniq_key` (`uniq_key`),
+  KEY `idx_created_at` (`created_at`),
+  CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `notifications`
+--
+
+LOCK TABLES `notifications` WRITE;
+/*!40000 ALTER TABLE `notifications` DISABLE KEYS */;
+INSERT INTO `notifications` VALUES (1,'admin',NULL,'חידוש מנוי קרוב','המנוי של test22 (0545398877) יפוג בעוד 1 ימים, בתאריך 15.10.2025','warning',NULL,'a62f4801d9ce6cba5311b7796f549c1feb62a67f','2025-10-14 03:23:23','2025-10-14 03:23:23'),(2,'user',13,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 1 ימים, בתאריך 15.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'908746698c6f01bde8bfcf240889e77b5c3227ea','2025-10-14 03:23:23','2025-10-14 03:23:23'),(3,'admin',NULL,'חידוש מנוי קרוב','המנוי של test22 (0545398877) יפוג בעוד 1 ימים, בתאריך 15.10.2025','warning',NULL,'a62f4801d9ce6cba5311b7796f549c1feb62a67f','2025-10-14 12:25:44','2025-10-14 12:25:44'),(4,'user',13,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 1 ימים, בתאריך 15.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'908746698c6f01bde8bfcf240889e77b5c3227ea','2025-10-14 12:25:44','2025-10-14 12:25:44'),(5,'admin',NULL,'חידוש מנוי קרוב','המנוי של test22 (0545398877) יפוג בעוד 1 ימים, בתאריך 15.10.2025','warning',NULL,'a62f4801d9ce6cba5311b7796f549c1feb62a67f','2025-10-14 12:28:19','2025-10-14 12:28:19'),(6,'user',13,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 1 ימים, בתאריך 15.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'908746698c6f01bde8bfcf240889e77b5c3227ea','2025-10-14 12:28:19','2025-10-14 12:28:19'),(7,'admin',NULL,'חידוש מנוי קרוב','המנוי של test22 (0545398877) יפוג בעוד 1 ימים, בתאריך 15.10.2025','warning',NULL,'a62f4801d9ce6cba5311b7796f549c1feb62a67f','2025-10-14 17:33:06','2025-10-14 17:33:06'),(8,'user',13,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 1 ימים, בתאריך 15.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'908746698c6f01bde8bfcf240889e77b5c3227ea','2025-10-14 17:33:06','2025-10-14 17:33:06'),(9,'admin',NULL,'חידוש מנוי קרוב','המנוי של test22 (0545398877) יפוג בעוד 1 ימים, בתאריך 15.10.2025','warning',NULL,'a62f4801d9ce6cba5311b7796f549c1feb62a67f','2025-10-14 18:19:28','2025-10-14 18:19:28'),(10,'user',13,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 1 ימים, בתאריך 15.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'908746698c6f01bde8bfcf240889e77b5c3227ea','2025-10-14 18:19:28','2025-10-14 18:19:28'),(11,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 7 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-17 12:55:34','2025-10-17 12:55:34'),(12,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 7 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-17 12:55:34','2025-10-17 12:55:34'),(13,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 7 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-17 12:56:48','2025-10-17 12:56:48'),(14,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 7 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-17 12:56:48','2025-10-17 12:56:48'),(15,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 7 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-17 13:02:58','2025-10-17 13:02:58'),(16,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 7 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-17 13:02:58','2025-10-17 13:02:58'),(17,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 7 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-17 13:16:47','2025-10-17 13:16:47'),(18,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 7 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-17 13:16:47','2025-10-17 13:16:47'),(19,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 7 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-17 13:31:37','2025-10-17 13:31:37'),(20,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 7 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-17 13:31:37','2025-10-17 13:31:37'),(21,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 7 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-17 13:46:37','2025-10-17 13:46:37'),(22,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 7 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-17 13:46:37','2025-10-17 13:46:37'),(23,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 7 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-17 14:01:37','2025-10-17 14:01:37'),(24,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 7 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-17 14:01:37','2025-10-17 14:01:37'),(25,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 7 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-17 14:16:37','2025-10-17 14:16:37'),(26,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 7 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-17 14:16:37','2025-10-17 14:16:37'),(27,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 6 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-17 23:40:35','2025-10-17 23:40:35'),(28,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 6 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-17 23:40:35','2025-10-17 23:40:35'),(29,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 6 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-17 23:55:25','2025-10-17 23:55:25'),(30,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 6 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-17 23:55:25','2025-10-17 23:55:25'),(31,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 6 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-18 01:47:12','2025-10-18 01:47:12'),(32,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 6 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-18 01:47:12','2025-10-18 01:47:12'),(33,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 6 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-18 02:02:02','2025-10-18 02:02:02'),(34,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 6 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-18 02:02:02','2025-10-18 02:02:02'),(35,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 5 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-18 21:27:39','2025-10-18 21:27:39'),(36,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 5 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-18 21:27:39','2025-10-18 21:27:39'),(37,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 5 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-18 21:42:28','2025-10-18 21:42:28'),(38,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 5 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-18 21:42:28','2025-10-18 21:42:28'),(39,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 5 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-18 21:57:28','2025-10-18 21:57:28'),(40,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 5 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-18 21:57:28','2025-10-18 21:57:28'),(41,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 5 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 16:58:43','2025-10-19 16:58:43'),(42,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 5 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 16:58:43','2025-10-19 16:58:43'),(43,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 5 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 17:13:32','2025-10-19 17:13:32'),(44,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 5 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 17:13:32','2025-10-19 17:13:32'),(45,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 5 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 17:24:39','2025-10-19 17:24:39'),(46,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 5 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 17:24:39','2025-10-19 17:24:39'),(47,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 5 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 17:25:03','2025-10-19 17:25:03'),(48,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 5 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 17:25:03','2025-10-19 17:25:03'),(49,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 5 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 17:32:48','2025-10-19 17:32:48'),(50,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 5 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 17:32:48','2025-10-19 17:32:48'),(51,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 5 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 17:33:57','2025-10-19 17:33:57'),(52,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 5 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 17:33:57','2025-10-19 17:33:57'),(53,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 5 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 17:35:20','2025-10-19 17:35:20'),(54,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 5 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 17:35:20','2025-10-19 17:35:20'),(55,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 5 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 17:35:55','2025-10-19 17:35:55'),(56,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 5 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 17:35:55','2025-10-19 17:35:55'),(57,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 5 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 17:36:24','2025-10-19 17:36:24'),(58,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 5 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 17:36:24','2025-10-19 17:36:24'),(59,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 5 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 17:36:49','2025-10-19 17:36:49'),(60,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 5 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 17:36:49','2025-10-19 17:36:49'),(61,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 5 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 17:49:23','2025-10-19 17:49:23'),(62,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 5 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 17:49:23','2025-10-19 17:49:23'),(63,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 5 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 18:00:42','2025-10-19 18:00:42'),(64,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 5 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 18:00:42','2025-10-19 18:00:42'),(65,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 21:31:19','2025-10-19 21:31:19'),(66,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 21:31:19','2025-10-19 21:31:19'),(67,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 21:46:09','2025-10-19 21:46:09'),(68,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 21:46:09','2025-10-19 21:46:09'),(69,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 22:01:09','2025-10-19 22:01:09'),(70,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 22:01:09','2025-10-19 22:01:09'),(71,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 22:16:09','2025-10-19 22:16:09'),(72,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 22:16:09','2025-10-19 22:16:09'),(73,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 22:31:09','2025-10-19 22:31:09'),(74,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 22:31:09','2025-10-19 22:31:09'),(75,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 22:46:09','2025-10-19 22:46:09'),(76,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 22:46:09','2025-10-19 22:46:09'),(77,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 23:01:09','2025-10-19 23:01:09'),(78,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 23:01:09','2025-10-19 23:01:09'),(79,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 23:16:09','2025-10-19 23:16:09'),(80,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 23:16:09','2025-10-19 23:16:09'),(81,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 23:31:09','2025-10-19 23:31:09'),(82,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 23:31:09','2025-10-19 23:31:09'),(83,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-19 23:46:09','2025-10-19 23:46:09'),(84,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-19 23:46:09','2025-10-19 23:46:09'),(85,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 00:01:09','2025-10-20 00:01:09'),(86,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 00:01:09','2025-10-20 00:01:09'),(87,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 00:16:09','2025-10-20 00:16:09'),(88,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 00:16:09','2025-10-20 00:16:09'),(89,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 00:31:09','2025-10-20 00:31:09'),(90,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 00:31:09','2025-10-20 00:31:09'),(91,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 00:46:09','2025-10-20 00:46:09'),(92,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 00:46:09','2025-10-20 00:46:09'),(93,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 01:01:09','2025-10-20 01:01:09'),(94,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 01:01:09','2025-10-20 01:01:09'),(95,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 01:16:09','2025-10-20 01:16:09'),(96,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 01:16:09','2025-10-20 01:16:09'),(97,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 01:28:34','2025-10-20 01:28:34'),(98,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 01:28:34','2025-10-20 01:28:34'),(99,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 01:43:24','2025-10-20 01:43:24'),(100,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 01:43:24','2025-10-20 01:43:24'),(101,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 01:58:24','2025-10-20 01:58:24'),(102,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 01:58:24','2025-10-20 01:58:24'),(103,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 10:12:50','2025-10-20 10:12:50'),(104,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 10:12:50','2025-10-20 10:12:50'),(105,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 10:15:02','2025-10-20 10:15:02'),(106,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 10:15:02','2025-10-20 10:15:02'),(107,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 10:15:46','2025-10-20 10:15:46'),(108,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 10:15:46','2025-10-20 10:15:46'),(109,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 10:30:35','2025-10-20 10:30:35'),(110,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 10:30:35','2025-10-20 10:30:35'),(111,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 10:45:36','2025-10-20 10:45:36'),(112,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 10:45:36','2025-10-20 10:45:36'),(113,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 11:00:36','2025-10-20 11:00:36'),(114,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 11:00:36','2025-10-20 11:00:36'),(115,'admin',NULL,'חידוש מנוי קרוב','המנוי של faez (0545398877) יפוג בעוד 4 ימים, בתאריך 24.10.2025','warning',NULL,'2d5f35b68300f899f7fd548beb81acd784ef2937','2025-10-20 11:15:36','2025-10-20 11:15:36'),(116,'user',10,'חידוש מנוי קרוב','המנוי שלך יפוג בעוד 4 ימים, בתאריך 24.10.2025. אנא חידשו את המנוי להמשך שירות.','warning',NULL,'8f0a4ea98c4f08e306823c844590420888e1a32f','2025-10-20 11:15:36','2025-10-20 11:15:36');
+/*!40000 ALTER TABLE `notifications` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `permissions_catalog`
+--
+
+DROP TABLE IF EXISTS `permissions_catalog`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `permissions_catalog` (
+  `perm_key` varchar(64) NOT NULL,
+  `is_readonly_safe` tinyint(1) NOT NULL DEFAULT '0',
+  `description` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`perm_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `permissions_catalog`
+--
+
+LOCK TABLES `permissions_catalog` WRITE;
+/*!40000 ALTER TABLE `permissions_catalog` DISABLE KEYS */;
+INSERT INTO `permissions_catalog` VALUES ('create_subscriptions',0,'יכול ליצור מנויים חדשים'),('create_users',0,'יכול ליצור משתמשים חדשים'),('delete_subscriptions',0,'יכול למחוק מנויים'),('delete_users',0,'יכול למחוק משתמשים'),('edit_subscriptions',0,'יכול לערוך מנויים קיימים'),('edit_users',0,'יכול לערוך משתמשים קיימים'),('manage_classes',0,'יכול לנהל שיעורים'),('manage_notifications',0,'יכול לנהל התראות'),('manage_payment_status',0,'יכול לעדכן סטטוס תשלום'),('manage_permissions',0,'יכול להגדיר פרופילי גישה והרשאות'),('manage_plans',0,'יכול לנהל תוכניות אימון'),('manage_staff_roles',0,'יכול להקצות תפקידי צוות (מאמן/מנהל)'),('manage_subscriptions',0,'יכול להקפיא, לשחזר ולבטל מנויים'),('refund_payments',0,'יכול לבצע החזרים'),('view_analytics',1,'יכול לצפות בסטטיסטיקות ואנליטיקה'),('view_dashboard',1,'יכול לצפות בלוח הבקרה הראשי'),('view_subscriptions',1,'יכול לצפות במנויים'),('view_users',1,'יכול לצפות ברשימת משתמשים ופרטים');
+/*!40000 ALTER TABLE `permissions_catalog` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `role_presets`
+--
+
+DROP TABLE IF EXISTS `role_presets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `role_presets` (
+  `role` enum('trainee','trainer','admin') NOT NULL,
+  `perm_key` varchar(64) NOT NULL,
+  PRIMARY KEY (`role`,`perm_key`),
+  KEY `fk_preset_perm` (`perm_key`),
+  CONSTRAINT `fk_preset_perm` FOREIGN KEY (`perm_key`) REFERENCES `permissions_catalog` (`perm_key`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `role_presets`
+--
+
+LOCK TABLES `role_presets` WRITE;
+/*!40000 ALTER TABLE `role_presets` DISABLE KEYS */;
+INSERT INTO `role_presets` VALUES ('admin','create_subscriptions'),('trainer','create_users'),('admin','create_users'),('admin','delete_subscriptions'),('admin','delete_users'),('admin','edit_subscriptions'),('trainer','edit_users'),('admin','edit_users'),('trainer','manage_classes'),('admin','manage_classes'),('admin','manage_notifications'),('trainer','manage_payment_status'),('admin','manage_payment_status'),('admin','manage_permissions'),('trainer','manage_plans'),('admin','manage_plans'),('admin','manage_staff_roles'),('trainer','manage_subscriptions'),('admin','manage_subscriptions'),('admin','refund_payments'),('trainer','view_analytics'),('admin','view_analytics'),('trainer','view_dashboard'),('admin','view_dashboard'),('trainer','view_subscriptions'),('admin','view_subscriptions'),('trainer','view_users'),('admin','view_users');
+/*!40000 ALTER TABLE `role_presets` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `subscriptions`
+--
+
+DROP TABLE IF EXISTS `subscriptions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `subscriptions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `start_date` date DEFAULT NULL,
+  `end_date` date DEFAULT NULL,
+  `cancelled_at` datetime DEFAULT NULL,
+  `paused_at` date DEFAULT NULL,
+  `payment_status` varchar(20) NOT NULL DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_subscriptions_user_id` (`user_id`),
+  KEY `idx_sub_user_end` (`user_id`,`end_date`),
+  CONSTRAINT `fk_subscriptions_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `subscriptions`
+--
+
+LOCK TABLES `subscriptions` WRITE;
+/*!40000 ALTER TABLE `subscriptions` DISABLE KEYS */;
+INSERT INTO `subscriptions` VALUES (7,3,'2025-09-25','2025-10-09',NULL,NULL,'paid','2025-09-22 07:41:15','2025-10-08 16:53:24'),(14,10,'2025-09-23','2025-10-24',NULL,NULL,'refunded','2025-09-23 03:11:03','2025-10-04 08:20:22'),(15,11,'2025-09-23','2025-09-27',NULL,NULL,'pending','2025-09-23 14:55:23','2025-10-08 16:53:53'),(18,13,'2025-09-30','2025-10-15',NULL,NULL,'paid','2025-09-30 13:10:07','2025-10-08 16:53:02'),(19,14,'2025-10-04','2025-10-07',NULL,'2025-10-06','pending','2025-10-04 08:26:14','2025-10-08 17:02:13'),(20,15,'2025-10-04','2025-10-06','2025-10-06 13:05:00',NULL,'paid','2025-10-04 08:27:50','2025-10-06 10:05:00'),(21,16,'2025-10-12','2025-10-13',NULL,NULL,'paid','2025-10-11 23:35:56','2025-10-11 23:35:56');
+/*!40000 ALTER TABLE `subscriptions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `trainingprogram`
+--
+
+DROP TABLE IF EXISTS `trainingprogram`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `trainingprogram` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `program_name` varchar(255) NOT NULL,
+  `created_by` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `created_by` (`created_by`),
+  CONSTRAINT `trainingprogram_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `trainingprogram_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `trainingprogram`
+--
+
+LOCK TABLES `trainingprogram` WRITE;
+/*!40000 ALTER TABLE `trainingprogram` DISABLE KEYS */;
+/*!40000 ALTER TABLE `trainingprogram` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `trainingprogram_exercises`
+--
+
+DROP TABLE IF EXISTS `trainingprogram_exercises`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `trainingprogram_exercises` (
+  `training_program_id` int NOT NULL,
+  `exercise_id` int NOT NULL,
+  `sets` varchar(50) NOT NULL,
+  `reps` varchar(50) NOT NULL,
+  `duration` int NOT NULL,
+  KEY `training_program_id` (`training_program_id`),
+  KEY `exercise_id` (`exercise_id`),
+  CONSTRAINT `trainingprogram_exercises_ibfk_1` FOREIGN KEY (`training_program_id`) REFERENCES `trainingprogram` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `trainingprogram_exercises_ibfk_2` FOREIGN KEY (`exercise_id`) REFERENCES `exercises` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `trainingprogram_exercises`
+--
+
+LOCK TABLES `trainingprogram_exercises` WRITE;
+/*!40000 ALTER TABLE `trainingprogram_exercises` DISABLE KEYS */;
+/*!40000 ALTER TABLE `trainingprogram_exercises` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `phone` varchar(20) NOT NULL,
+  `username` varchar(100) NOT NULL,
+  `birth_date` date NOT NULL,
+  `role` enum('trainee','trainer','admin') NOT NULL DEFAULT 'trainee',
+  `gender` varchar(20) DEFAULT NULL,
+  `password` varchar(100) DEFAULT NULL,
+  `access_profile` enum('default','readonly','custom') NOT NULL DEFAULT 'default',
+  `permissions_json` json DEFAULT NULL COMMENT 'רשימת הרשאות אפקטיבית כאשר profile=custom',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uniq_users_phone` (`phone`),
+  KEY `idx_users_role` (`role`),
+  KEY `idx_users_access_profile` (`access_profile`),
+  CONSTRAINT `chk_users_gender` CHECK ((`gender` in (_utf8mb4'male',_utf8mb4'female'))),
+  CONSTRAINT `chk_users_role` CHECK ((`role` in (_utf8mb4'trainee',_utf8mb4'trainer',_utf8mb4'admin')))
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (3,'0545398871','RAADHENO2','2025-09-06','trainer','male','507f513353702b50c145d5b7d138095c','default','[\"create_users\", \"edit_users\", \"manage_classes\", \"manage_payment_status\", \"manage_plans\", \"view_analytics\", \"view_subscriptions\", \"view_users\"]'),(10,'0545398877','faez','2025-09-23','admin','male','507f513353702b50c145d5b7d138095c','default','[\"create_subscriptions\", \"create_users\", \"delete_subscriptions\", \"delete_users\", \"edit_subscriptions\", \"edit_users\", \"manage_classes\", \"manage_notifications\", \"manage_payment_status\", \"manage_permissions\", \"manage_plans\", \"manage_staff_roles\", \"refund_payments\", \"view_analytics\", \"view_subscriptions\", \"view_users\"]'),(11,'0545398875','ameer','2025-09-23','trainer','male','507f513353702b50c145d5b7d138095c','readonly','[\"view_analytics\", \"view_subscriptions\", \"view_users\"]'),(13,'0545398877','test22','2000-02-29','trainee','male','507f513353702b50c145d5b7d138095c','default','[]'),(14,'0545398872','haha','2007-06-12','admin','female','507f513353702b50c145d5b7d138095c','default','[\"create_subscriptions\", \"create_users\", \"delete_subscriptions\", \"delete_users\", \"edit_subscriptions\", \"edit_users\", \"manage_classes\", \"manage_notifications\", \"manage_payment_status\", \"manage_permissions\", \"manage_plans\", \"manage_staff_roles\", \"refund_payments\", \"view_analytics\", \"view_subscriptions\", \"view_users\"]'),(15,'0545398870','hehe','2024-02-04','admin','female','31ad2f10870bb5e4c517357bf9f95e58','custom','[\"staff.manage\", \"plans.manage\", \"payments.view\", \"payments.refund\", \"notifications.manage\", \"users.view\", \"users.edit\", \"view_dashboard\"]'),(16,'0545398866','yosi','2019-06-12','trainee','male','7367cc4cee061a476290d18978830414','default','[]');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-10-20 18:08:12
+--new 
