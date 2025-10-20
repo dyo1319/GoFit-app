@@ -1,4 +1,6 @@
 import * as React from "react";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from 'react-router-dom';
 import {
   Paper, Box, Typography, CircularProgress, Tooltip,
   IconButton, TextField, Grid, Alert, Tab, Tabs
@@ -14,7 +16,7 @@ import {
 } from "recharts";
 import "./home.css";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 const PAYMENT_COLORS = {
   paid: "#2e7d32",      
@@ -196,6 +198,8 @@ function MonthlyPaymentsBar({ data }) {
 const monthStr = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 
 export default function Home() {
+  const { user, authenticatedFetch, hasPermission } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = React.useState(0);
   const [loading, setLoading] = React.useState(true);
   const [analyticsLoading, setAnalyticsLoading] = React.useState(false);
@@ -224,18 +228,21 @@ export default function Home() {
   const [subsData, setSubsData] = React.useState([]);
   const [payData, setPayData] = React.useState([]);
 
+  React.useEffect(() => {
+    if (user && !hasPermission('view_dashboard')) {
+      navigate('/unauthorized');
+    }
+  }, [user]);
+
   const fetchDashboardData = React.useCallback(async () => {
+    if (!hasPermission('view_dashboard')) return;
+    
     setLoading(true);
     setErr("");
     
     try {
-      const response = await fetch(`${API_BASE}/S/stats/dashboard`, { 
-        credentials: "include" 
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch dashboard stats');
-      }
+      const response = await authenticatedFetch(`/S/stats/dashboard`);
+      if (!response.ok) throw new Error('Failed to fetch dashboard stats');
       
       const data = await response.json();
       const paymentStats = data.paymentStats || {};
@@ -303,29 +310,22 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [authenticatedFetch, hasPermission]);
 
   const fetchAnalyticsData = React.useCallback(async () => {
+    if (!hasPermission('view_analytics')) return;
+    
     setAnalyticsLoading(true);
     setErr("");
     
     try {
       const [subsResponse, paysResponse] = await Promise.all([
-        fetch(`${API_BASE}/analytics/subscriptions/monthly?from=${from}&to=${to}`, { 
-          credentials: "include" 
-        }),
-        fetch(`${API_BASE}/analytics/payments/monthly?from=${from}&to=${to}`, { 
-          credentials: "include" 
-        })
+        authenticatedFetch(`/analytics/subscriptions/monthly?from=${from}&to=${to}`),
+        authenticatedFetch(`/analytics/payments/monthly?from=${from}&to=${to}`)
       ]);
 
-      if (!subsResponse.ok) {
-        throw new Error('Failed to fetch subscriptions analytics');
-      }
-      
-      if (!paysResponse.ok) {
-        throw new Error('Failed to fetch payments analytics');
-      }
+      if (!subsResponse.ok) throw new Error('Failed to fetch subscriptions analytics');
+      if (!paysResponse.ok) throw new Error('Failed to fetch payments analytics');
 
       const subs = await subsResponse.json();
       const pays = await paysResponse.json();
@@ -360,7 +360,7 @@ export default function Home() {
     } finally {
       setAnalyticsLoading(false);
     }
-  }, [from, to]);
+  }, [from, to, authenticatedFetch, hasPermission]);
 
   React.useEffect(() => { 
     fetchDashboardData(); 
@@ -533,6 +533,28 @@ export default function Home() {
       )}
     </Box>
   );
+
+  if (!user) {
+    return (
+      <Box className="home" dir="rtl">
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Typography>טוען...</Typography>
+        </div>
+      </Box>
+    );
+  }
+
+  if (!hasPermission('view_dashboard')) {
+    return (
+      <Box className="home" dir="rtl">
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Alert severity="error" sx={{ maxWidth: 400, margin: '0 auto' }}>
+            אין לך הרשאות לצפות בדף הבית
+          </Alert>
+        </div>
+      </Box>
+    );
+  }
 
   return (
     <Box 

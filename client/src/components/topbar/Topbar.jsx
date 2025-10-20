@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./topbar.css";
-import { Notifications, MarkEmailRead, Delete } from "@mui/icons-material";
+import { Notifications, MarkEmailRead } from "@mui/icons-material";
 import { 
   IconButton, 
   Badge, 
@@ -15,10 +15,10 @@ import {
   Chip,
   Divider
 } from "@mui/material";
-
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Topbar() {
+  const { authenticatedFetch } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -30,11 +30,7 @@ export default function Topbar() {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `${API_BASE}/notifications?page=1&pageSize=5&onlyUnread=0`,
-        { credentials: "include" }
-      );
-      
+      const response = await authenticatedFetch(`/notifications?page=1&pageSize=5&onlyUnread=0`);
       if (response.ok) {
         const data = await response.json();
         const items = data?.data?.items || data?.data || [];
@@ -48,17 +44,12 @@ export default function Topbar() {
       setLoading(false);
     }
   };
-
+  
   const markAsRead = async (notificationId) => {
     try {
-      const response = await fetch(
-        `${API_BASE}/notifications/${notificationId}/read`,
-        { 
-          method: 'POST',
-          credentials: "include"
-        }
-      );
-      
+      const response = await authenticatedFetch(`/notifications/${notificationId}/read`, {
+        method: 'POST'
+      });
       if (response.ok) {
         setNotifications(prev => 
           prev.map(notif => 
@@ -76,16 +67,11 @@ export default function Topbar() {
 
   const markAllAsRead = async () => {
     try {
-      const response = await fetch(
-        `${API_BASE}/notifications/read-all`,
-        { 
-          method: 'POST',
-          credentials: "include"
-        }
-      );
+      const response = await authenticatedFetch(`/notifications/read-all`, {
+        method: 'POST'
+      });
       
       if (response.ok) {
-        // Update all notifications to read
         setNotifications(prev => 
           prev.map(notif => ({ ...notif, read_at: new Date().toISOString() }))
         );

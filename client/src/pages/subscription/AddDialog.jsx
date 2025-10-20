@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions,
-         Box, TextField, MenuItem, CircularProgress, Button} from "@mui/material";
+         Box, TextField, MenuItem, CircularProgress, Button, Alert} from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { searchUsers  } from "../newUser/userApiService";
+import { useAuth } from '../../context/AuthContext';
 
 export default function AddDialog({ API_BASE, open, onClose, onCreate }) {
+  const { hasPermission } = useAuth();
   const [userSearch, setUserSearch] = useState("");
   const [userOptions, setUserOptions] = useState([]);
   const [userLoading, setUserLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-
   const [form, setForm] = useState({ start_date: "", end_date: "", payment_status: "pending" });
 
   const ctrlRef = useRef(null);
@@ -36,12 +37,26 @@ export default function AddDialog({ API_BASE, open, onClose, onCreate }) {
   }, [API_BASE, open, userSearch]);
 
   const canSubmit = !!selectedUser?.id && !!form.start_date && !!form.end_date;
+  const canCreate = hasPermission('create_subscriptions');
+
+  const handleCreate = () => {
+    if (!canCreate) {
+      return;
+    }
+    onCreate({ user_id: selectedUser.id, ...form });
+  };
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth className="rtlDialog">
       <DialogTitle>הוסף מנוי חדש</DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+          {!canCreate && (
+            <Alert severity="warning" sx={{ mb: 1 }}>
+              אין לך הרשאות ליצור מנויים חדשים
+            </Alert>
+          )}
+          
           <Autocomplete
             options={userOptions}
             loading={userLoading}
@@ -51,6 +66,7 @@ export default function AddDialog({ API_BASE, open, onClose, onCreate }) {
             getOptionLabel={(o) => (o?.username ? `${o.username} • ${o.phone ?? ""} • #${o.id}` : "")}
             isOptionEqualToValue={(o, v) => o?.id === v?.id}
             noOptionsText={userSearch.trim().length < 2 ? "הקלד לפחות 2 תווים…" : "לא נמצאו משתמשים"}
+            disabled={!canCreate}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -74,6 +90,7 @@ export default function AddDialog({ API_BASE, open, onClose, onCreate }) {
             value={form.start_date}
             onChange={(e) => setForm(f => ({ ...f, start_date: e.target.value }))}
             InputLabelProps={{ shrink: true }}
+            disabled={!canCreate}
           />
           <TextField 
             label="תאריך סיום" 
@@ -83,6 +100,7 @@ export default function AddDialog({ API_BASE, open, onClose, onCreate }) {
             value={form.end_date}
             onChange={(e) => setForm(f => ({ ...f, end_date: e.target.value }))}
             InputLabelProps={{ shrink: true }}
+            disabled={!canCreate}
           />
           <TextField 
             label="סטטוס תשלום" 
@@ -92,6 +110,7 @@ export default function AddDialog({ API_BASE, open, onClose, onCreate }) {
             value={form.payment_status}
             onChange={(e) => setForm(f => ({ ...f, payment_status: e.target.value }))}
             InputLabelProps={{ shrink: true }}
+            disabled={!canCreate}
           >
             <MenuItem value="pending">ממתין</MenuItem>
             <MenuItem value="paid">שולם</MenuItem>
@@ -101,8 +120,11 @@ export default function AddDialog({ API_BASE, open, onClose, onCreate }) {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button variant="contained" disabled={!canSubmit}
-          onClick={() => onCreate({ user_id: selectedUser.id, ...form })}>
+        <Button 
+          variant="contained" 
+          disabled={!canSubmit || !canCreate}
+          onClick={handleCreate}
+        >
           הוסף
         </Button>
         <Button onClick={onClose}>ביטול</Button>

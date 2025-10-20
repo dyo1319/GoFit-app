@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useAuth } from "../../context/AuthContext";
 import {
   Paper, Box, Typography, IconButton, Button, Dialog, DialogTitle,
   DialogContent, DialogActions, FormControl, Select,
@@ -25,6 +26,7 @@ function safeArray(v) {
 }
 
 export default function PermissionsPage() {
+  const { authenticatedFetch } = useAuth();
   const [rows, setRows] = React.useState([]);
   const [filteredRows, setFilteredRows] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
@@ -64,14 +66,14 @@ export default function PermissionsPage() {
   }, [profile, role, presets, customPerms]);
 
   const fetchCatalog = React.useCallback(async () => {
-    const res = await fetch(`${API_BASE}/rbac/catalog`, { credentials: "include" });
+    const res = await authenticatedFetch(`${API_BASE}/rbac/catalog`);
     if (!res.ok) throw new Error("catalog failed");
     const json = await res.json();
     setCatalog(json.items || []);
-  }, []);
+  }, [authenticatedFetch]);
 
   const fetchPresetForRole = React.useCallback(async (r) => {
-    const res = await fetch(`${API_BASE}/rbac/presets/${r}`, { credentials: "include" });
+    const res = await authenticatedFetch(`${API_BASE}/rbac/presets/${r}`);
     if (!res.ok) throw new Error("preset failed");
     const json = await res.json();
     setPresets((prev) => ({
@@ -81,7 +83,7 @@ export default function PermissionsPage() {
         readonly_subset: json.readonly_subset || [],
       },
     }));
-  }, []);
+  }, [authenticatedFetch]);
 
   const ensurePresetsLoaded = React.useCallback(async (r) => {
     const exists = presets[r] && (presets[r].preset.length || presets[r].readonly_subset.length);
@@ -91,7 +93,7 @@ export default function PermissionsPage() {
   const fetchStaff = React.useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/staff`, { credentials: "include" });
+      const res = await authenticatedFetch(`${API_BASE}/staff`);
       const json = await res.json();
       const staffRows = (json.items || []).map((u) => ({ ...u, id: u.id }));
       setRows(staffRows);
@@ -99,7 +101,7 @@ export default function PermissionsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [authenticatedFetch]);
 
   React.useEffect(() => {
     fetchCatalog();
@@ -143,7 +145,7 @@ export default function PermissionsPage() {
       return;
     }
 
-    const res = await fetch(`${API_BASE}/staff/${selected.id}/access`, {
+    const res = await authenticatedFetch(`${API_BASE}/staff/${selected.id}/access`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

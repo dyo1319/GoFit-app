@@ -1,0 +1,488 @@
+.dashboard {
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  margin: 0;
+  padding: 0;
+}
+
+.dashboard-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0;
+  width: 100%;
+  margin: 0;
+}
+
+.dashboard-nav {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 12px 5%;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.dashboard-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.dashboard-nav h1 {
+  color: #1e293b;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.dashboard-main {
+  padding: 24px 5%;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.dashboard-content {
+  animation: fadeIn 0.6s ease-out;
+  width: 100%;
+  margin: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.welcome-section {
+  margin-bottom: 32px;
+  text-align: center;
+  width: 100%;
+}
+
+.welcome-section h2 {
+  color: #1e293b;
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.welcome-section p {
+  color: #64748b;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.error-message {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  color: #dc2626;
+  font-weight: 500;
+  text-align: center;
+}
+
+.loading-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.loading-spinner {
+  text-align: center;
+  color: #64748b;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top: 3px solid #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner p {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Fitness Data Section */
+.fitness-data-section,
+.workout-stats-section {
+  margin-bottom: 40px;
+  width: 100%;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.section-header svg {
+  color: #6366f1;
+}
+
+.section-header h3 {
+  color: #1e293b;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.fitness-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+  width: 100%;
+}
+
+.fitness-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.fitness-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.card-header svg {
+  color: #6366f1;
+}
+
+.card-header h4 {
+  color: #1e293b;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.metric-item {
+  text-align: center;
+  padding: 16px 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.metric-item:hover {
+  border-color: #6366f1;
+  transform: translateY(-1px);
+}
+
+.metric-value {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Body Fat Display */
+.body-fat-display {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.body-fat-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: conic-gradient(#8b5cf6 0deg, #8b5cf6 calc(var(--body-fat, 20) * 3.6deg), #e2e8f0 calc(var(--body-fat, 20) * 3.6deg));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.body-fat-circle::before {
+  content: '';
+  width: 70px;
+  height: 70px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.body-fat-percentage {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  z-index: 1;
+  position: relative;
+}
+
+.muscle-info {
+  flex: 1;
+}
+
+.muscle-info p {
+  margin: 6px 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.muscle-info strong {
+  color: #1e293b;
+}
+
+/* Visits Display */
+.visits-display {
+  text-align: center;
+  width: 100%;
+}
+
+.visits-count {
+  font-size: 48px;
+  font-weight: 700;
+  color: #6366f1;
+  margin: 0 0 8px 0;
+}
+
+.visits-display p {
+  color: #64748b;
+  font-size: 16px;
+  margin: 0 0 16px 0;
+  font-weight: 500;
+}
+
+.motivation-text {
+  background: #f0f9ff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: #0369a1;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #bae6fd;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .dashboard {
+    padding-bottom: 80px; /* Space for bottom nav */
+  }
+  
+  .dashboard-nav {
+    padding: 10px 4%;
+  }
+  
+  .brand-icon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .dashboard-nav h1 {
+    font-size: 18px;
+  }
+  
+  .dashboard-main {
+    padding: 20px 4%;
+  }
+  
+  .welcome-section h2 {
+    font-size: 24px;
+  }
+  
+  .welcome-section p {
+    font-size: 14px;
+  }
+  
+  .section-header h3 {
+    font-size: 20px;
+  }
+  
+  .fitness-cards {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .fitness-card {
+    padding: 20px;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .body-fat-display {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .visits-count {
+    font-size: 36px;
+  }
+  
+  .body-fat-circle {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .body-fat-circle::before {
+    width: 55px;
+    height: 55px;
+  }
+  
+  .body-fat-percentage {
+    font-size: 14px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .dashboard-main {
+    padding: 24px 4%;
+  }
+  
+  .fitness-cards {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  
+  .dashboard-nav {
+    padding: 12px 4%;
+  }
+}
+
+/* Desktop sidebar layout */
+@media (min-width: 768px) {
+  .dashboard.dashboard-with-sidebar {
+    margin-left: 240px;
+    width: calc(100vw - 240px);
+    min-height: 100vh;
+    position: relative;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    padding: 0;
+  }
+  
+  .dashboard.dashboard-with-sidebar .dashboard-header {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+  }
+  
+  .dashboard.dashboard-with-sidebar .dashboard-nav {
+    margin: 0;
+    padding: 12px 5%;
+  }
+  
+  .dashboard.dashboard-with-sidebar .dashboard-main {
+    margin: 0;
+    padding: 24px 5%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .dashboard.dashboard-with-sidebar {
+    margin-left: 260px;
+    width: calc(100vw - 260px);
+  }
+}
+
+/* Large screens */
+@media (min-width: 1025px) {
+  .dashboard-main {
+    padding: 32px 3%;
+  }
+  
+  .dashboard-nav {
+    padding: 16px 3%;
+  }
+  
+  .fitness-cards {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    max-width: none;
+  }
+}
+
+/* Extra large screens */
+@media (min-width: 1400px) {
+  .dashboard-main {
+    padding: 40px 5%;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .dashboard-nav {
+    padding: 16px 5%;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+}

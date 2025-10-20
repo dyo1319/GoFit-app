@@ -3,7 +3,7 @@ import { useCallback } from "react";
 export default function FormField({
   name, label, type="text", value, error, onChange,
   required=false, placeholder, options=[], min, max, step,
-  disabled=false, autoComplete="on", loading=false
+  disabled=false, autoComplete="on", loading=false, title
 }) {
   const blockInvalidNumberInput = useCallback((e) => {
     if (["e","E","+","-"].includes(e.key)) e.preventDefault();
@@ -29,6 +29,7 @@ export default function FormField({
           className={inputClass}
           required={required}
           disabled={disabled}
+          title={title}
         >
           {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
@@ -44,6 +45,7 @@ export default function FormField({
           disabled={disabled}
           autoComplete={autoComplete}
           rows={4}
+          title={title}
         />
       ) : (
         <input
@@ -62,6 +64,7 @@ export default function FormField({
           required={required}
           disabled={disabled}
           autoComplete={autoComplete}
+          title={title}
         />
       )}
 

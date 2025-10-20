@@ -5,10 +5,14 @@ import { Search } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 import { getSubs } from "../../pages/newUser/userApiService";
 import { useDebouncedValue } from "../../pages/subscription/hook";
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
 
 export default function UpcomingRenewalsPage() {
+  const { user, hasPermission, authenticatedFetch } = useAuth();
+  const navigate = useNavigate();
   const [query, setQuery] = React.useState("");
   const [expiresInDays, setExpiresInDays] = React.useState(7);
   const qDebounced = useDebouncedValue(query, 350);
@@ -20,6 +24,12 @@ export default function UpcomingRenewalsPage() {
   const [sortModel, setSortModel] = React.useState([{ field: "end_date", sort: "asc" }]);
   const ctrlRef = React.useRef(null);
 
+  React.useEffect(() => {
+    if (user && !hasPermission('view_subscriptions')) {
+      navigate('/unauthorized');
+    }
+  }, [user, hasPermission, navigate]);
+
   const PAYMENT_STATUS_MAP = {
     paid: ["שולם", "success"],
     failed: ["נכשל", "error"],
@@ -28,12 +38,18 @@ export default function UpcomingRenewalsPage() {
   };
 
   const fetchData = React.useCallback(async () => {
+    if (!hasPermission('view_subscriptions')) {
+      setRows([]);
+      setRowCount(0);
+      return;
+    }
+
     if (ctrlRef.current) ctrlRef.current.abort();
     const ctrl = new AbortController();
     ctrlRef.current = ctrl;
     setLoading(true);
     try {
-      const { rows, total } = await getSubs(API_BASE, {
+      const { rows, total } = await getSubs(authenticatedFetch, {
         paginationModel,
         sortModel,
         query: qDebounced,
@@ -50,16 +66,20 @@ export default function UpcomingRenewalsPage() {
     } finally {
       setLoading(false);
     }
-  }, [paginationModel, sortModel, qDebounced, expDebounced]);
+  }, [paginationModel, sortModel, qDebounced, expDebounced, hasPermission, authenticatedFetch]);
 
   React.useEffect(() => {
-    fetchData();
+    if (user && hasPermission('view_subscriptions')) {
+      fetchData();
+    }
     return () => ctrlRef.current?.abort();
-  }, [fetchData]);
+  }, [fetchData, user, hasPermission]);
 
   React.useEffect(() => {
-    setPaginationModel((p) => (p.page === 0 ? p : { ...p, page: 0 }));
-  }, [qDebounced, expDebounced]);
+    if (user && hasPermission('view_subscriptions')) {
+      setPaginationModel((p) => (p.page === 0 ? p : { ...p, page: 0 }));
+    }
+  }, [qDebounced, expDebounced, user, hasPermission]);
 
   const handleExpiresInDaysChange = (e) => {
     const v = e.target.value;
@@ -96,6 +116,28 @@ export default function UpcomingRenewalsPage() {
       },
     },
   ];
+
+  if (!user) {
+    return (
+      <div className="renewalsPage" dir="rtl">
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Typography>טוען...</Typography>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasPermission('view_subscriptions')) {
+    return (
+      <div className="renewalsPage" dir="rtl">
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Typography color="error">
+            אין לך הרשאות לצפות בחידושים קרובים
+          </Typography>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="renewalsPage" dir="rtl">

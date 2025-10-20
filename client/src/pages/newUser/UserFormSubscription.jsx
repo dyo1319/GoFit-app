@@ -1,10 +1,15 @@
 import FormField from "./FormField";
 import { toSelectOptions, PAYMENT_STATUSES } from "../../utils/enums";
+import { useAuth } from "../../context/AuthContext";
 
 export default function UserFormSubscription({ form, errors, onChange, disabled, onBack, onSubmit, loading }) {
+  const { hasPermission } = useAuth();
+  
   const paymentOptions = toSelectOptions(
     PAYMENT_STATUSES.filter((s) => ["pending", "paid", "failed"].includes(s.value))
   );
+
+  const canManagePaymentStatus = hasPermission('manage_payment_status');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -50,7 +55,8 @@ export default function UserFormSubscription({ form, errors, onChange, disabled,
           value={form?.payment_status || "pending"}
           onChange={onChange}
           error={errors?.payment_status}
-          disabled={disabled}
+          disabled={disabled || !canManagePaymentStatus}
+          title={!canManagePaymentStatus ? "אין לך הרשאות לשנות סטטוס תשלום" : ""}
         />
       </div>
       

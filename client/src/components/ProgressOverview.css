@@ -1,0 +1,418 @@
+/* Progress Overview Component Styles */
+.progress-overview-container {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.progress-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.progress-title-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-icon {
+  font-size: 24px;
+}
+
+.progress-title-content h4 {
+  color: #1e293b;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.progress-title-content p {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0;
+}
+
+.view-mode-toggle {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 4px;
+  align-self: flex-start;
+}
+
+.view-mode-button {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: none;
+  background: none;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-mode-button.active {
+  background: white;
+  color: #1e293b;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.view-mode-button:hover:not(.active) {
+  color: #1e293b;
+}
+
+/* Metric Selector */
+.metric-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.metric-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.metric-button:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.metric-button.active {
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.metric-button.weight { background-color: #3b82f6; }
+.metric-button.bodyFat { background-color: #8b5cf6; }
+.metric-button.muscleMass { background-color: #10b981; }
+.metric-button.bmi { background-color: #f59e0b; }
+
+.metric-button:not(.active).weight { background: #f8fafc; }
+.metric-button:not(.active).bodyFat { background: #f8fafc; }
+.metric-button:not(.active).muscleMass { background: #f8fafc; }
+.metric-button:not(.active).bmi { background: #f8fafc; }
+
+/* Progress Bars */
+.progress-items {
+  margin-bottom: 24px;
+}
+
+.progress-item {
+  margin-bottom: 16px;
+}
+
+.progress-item:last-child {
+  margin-bottom: 0;
+}
+
+.progress-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.period-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.progress-value-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-main-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.progress-unit {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.progress-change {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.progress-change.positive {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.progress-change.negative {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.progress-bar {
+  position: relative;
+  height: 32px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 12px;
+  opacity: 0.8;
+}
+
+.progress-bar-text {
+  font-size: 11px;
+  color: white;
+  font-weight: 500;
+}
+
+/* Summary Stats */
+.progress-summary {
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.summary-item {
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.summary-item:hover {
+  border-color: #6366f1;
+  transform: translateY(-1px);
+}
+
+.summary-label {
+  display: block;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-value {
+  display: block;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.summary-value.positive {
+  color: #059669;
+}
+
+.summary-value.negative {
+  color: #dc2626;
+}
+
+.summary-value.blue {
+  color: #2563eb;
+}
+
+.summary-value.purple {
+  color: #7c3aed;
+}
+
+.summary-unit {
+  font-size: 11px;
+  margin-left: 2px;
+}
+
+/* Tips Section */
+.progress-tips {
+  margin-top: 24px;
+  padding: 16px;
+  background: #eff6ff;
+  border-radius: 8px;
+  border: 1px solid #bfdbfe;
+}
+
+.tips-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.tips-icon {
+  color: #3b82f6;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.tips-text h5 {
+  color: #1e40af;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.tips-text p {
+  color: #1e40af;
+  font-size: 11px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* No Data State */
+.no-data-container {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.no-data-icon {
+  color: #9ca3af;
+  margin-bottom: 16px;
+  font-size: 48px;
+}
+
+.no-data-container h4 {
+  color: #6b7280;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.no-data-container p {
+  color: #9ca3af;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .progress-overview-container {
+    padding: 16px;
+  }
+
+  .progress-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .progress-title-section {
+    gap: 8px;
+  }
+
+  .progress-icon {
+    font-size: 20px;
+  }
+
+  .progress-title-content h4 {
+    font-size: 18px;
+  }
+
+  .metric-selector {
+    gap: 6px;
+  }
+
+  .metric-button {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .progress-main-value {
+    font-size: 16px;
+  }
+
+  .progress-bar {
+    height: 28px;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .summary-item {
+    padding: 12px;
+  }
+
+  .summary-value {
+    font-size: 16px;
+  }
+
+  .progress-tips {
+    padding: 12px;
+  }
+
+  .tips-content {
+    gap: 8px;
+  }
+
+  .tips-icon {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .progress-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .progress-value-container {
+    align-self: flex-end;
+  }
+
+  .view-mode-toggle {
+    align-self: stretch;
+  }
+
+  .view-mode-button {
+    flex: 1;
+    text-align: center;
+  }
+}

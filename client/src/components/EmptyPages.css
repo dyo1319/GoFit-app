@@ -1,0 +1,161 @@
+/* Shared styles for empty pages */
+.page-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding-bottom: 80px; /* Space for bottom nav on mobile */
+}
+
+.page-content {
+  padding: 24px 5%;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.page-title svg {
+  color: #6366f1;
+}
+
+.page-header h1 {
+  color: #1e293b;
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.page-header p {
+  color: #64748b;
+  font-size: 16px;
+  margin: 0;
+}
+
+.coming-soon {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 48px 32px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  max-width: 500px;
+}
+
+.coming-soon-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  opacity: 0.6;
+}
+
+.coming-soon h3 {
+  color: #1e293b;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+}
+
+.coming-soon p {
+  color: #64748b;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+
+
+/* Desktop sidebar adjustments */
+@media (min-width: 768px) {
+  .page-container {
+    margin-left: 240px;
+    padding-bottom: 0;
+  }
+  
+  .page-content {
+    padding: 40px 5%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .page-container {
+    margin-left: 260px;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .page-content {
+    padding: 20px 4%;
+  }
+  
+  .page-header h1 {
+    font-size: 24px;
+  }
+  
+  .page-header p {
+    font-size: 14px;
+  }
+  
+  .coming-soon {
+    padding: 40px 20px;
+  }
+  
+  .coming-soon-icon {
+    font-size: 48px;
+  }
+  
+  .coming-soon h3 {
+    font-size: 20px;
+  }
+  
+  .profile-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+    padding: 24px;
+  }
+  
+  .user-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+  }
+  
+  .user-details h3 {
+    font-size: 20px;
+  }
+  
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .setting-item {
+    padding: 16px;
+  }
+  
+  .setting-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .setting-content h4 {
+    font-size: 16px;
+  }
+  
+  .sign-out-button {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}

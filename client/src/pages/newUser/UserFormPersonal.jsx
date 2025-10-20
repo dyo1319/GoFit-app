@@ -1,6 +1,7 @@
 import FormField from "./FormField";
 import { toSelectOptions, ROLES, GENDERS } from "../../utils/enums";
 import PermissionsChecklist from "../permissions/PermissionsChecklist";
+import { useAuth } from "../../context/AuthContext";
 
 const ACCESS_PROFILES = [
   { value: "default", label: "ברירת מחדל" },
@@ -16,7 +17,11 @@ export default function UserFormPersonal({
   disabled,
   duplicateCheckLoading = false 
 }) {
+  const { hasPermission } = useAuth();
   const isStaff = form.role === "trainer" || form.role === "admin";
+
+  const canManageStaffRoles = hasPermission('manage_staff_roles');
+  const canSetCustomPermissions = hasPermission('manage_permissions');
 
   return (
     <fieldset className="section" disabled={disabled}>
@@ -84,7 +89,8 @@ export default function UserFormPersonal({
           value={form?.role || "trainee"} 
           onChange={onChange}
           error={errors?.role}
-          disabled={disabled}
+          disabled={disabled || !canManageStaffRoles}
+          title={!canManageStaffRoles ? "אין לך הרשאות להקצות תפקידי staff" : ""}
         />
 
         <FormField
@@ -127,12 +133,17 @@ export default function UserFormPersonal({
               <PermissionsChecklist
                 selected={form.permissions_json || []}
                 onChange={(permissions) => onChange("permissions_json", permissions)}
-                disabled={disabled}
+                disabled={disabled || !canSetCustomPermissions} // 🔐 משתמש בהרשאה manage_permissions
                 compact={true}
               />
             </div>
             {errors?.permissions_json && (
               <span className="error-message">{errors.permissions_json}</span>
+            )}
+            {!canSetCustomPermissions && (
+              <span className="info-message" style={{ fontSize: "0.875rem", color: "#6b7280" }}>
+                אין לך הרשאות להגדיר הרשאות מותאמות אישית
+              </span>
             )}
           </div>
         )}
@@ -142,7 +153,10 @@ export default function UserFormPersonal({
         <button 
           type="button" 
           className="primary" 
-          onClick={onNext}
+          onClick={() => {
+            if (isStaff && form.access_profile === 'custom' && !canSetCustomPermissions) return;
+            onNext();
+          }}
           disabled={disabled}
         >
           הבא

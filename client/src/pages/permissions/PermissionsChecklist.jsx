@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext";
 import {
   FormGroup,
   FormControlLabel,
@@ -16,6 +17,7 @@ export default function PermissionsChecklist({
   compact = false 
 }) {
   const [catalog, setCatalog] = useState([]);
+  const { authenticatedFetch } = useAuth();
 
   useEffect(() => {
     fetchPermissionsCatalog();
@@ -23,7 +25,7 @@ export default function PermissionsChecklist({
 
   const fetchPermissionsCatalog = async () => {
     try {
-      const res = await fetch(`${API_BASE}/rbac/catalog`, { credentials: "include" });
+      const res = await authenticatedFetch(`${API_BASE}/rbac/catalog`);
       if (res.ok) {
         const json = await res.json();
         setCatalog(json.items || []);

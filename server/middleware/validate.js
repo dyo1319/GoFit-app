@@ -150,7 +150,24 @@ const staffUpdateAccessSchema = Joi.object({
   })
 }).min(1);
 
+const authSignupSchema = Joi.object({
+  phone_number: Joi.string().trim().pattern(/^\d+$/).min(9).max(15).required(),
+  username: Joi.string().trim().min(2).max(50).required(),
+  password: Joi.string().min(3).required(),
+  date_birth: DateValidator.allow(null),
+  gender: Joi.string().valid('male','female').allow(null)
+});
 
+const authSigninSchema = Joi.object({
+  phone_number: Joi.string().trim().pattern(/^\d+$/).min(9).max(15).required(),
+  password: Joi.string().min(3).required()
+});
+
+const profileUpdateSchema = Joi.object({
+  username: Joi.string().trim().min(2).max(50).optional(),
+  date_birth: DateValidator.allow(null).optional(),
+  gender: Joi.string().valid('male','female').allow(null).optional()
+}).min(1);
 
 module.exports = {
   validate,
@@ -166,5 +183,8 @@ module.exports = {
   roleParamSchema,
   rbacPutPresetSchema,
   staffUpdateAccessSchema,
-  DateValidator
+  DateValidator,
+  authSignupSchema,
+  authSigninSchema,
+  profileUpdateSchema
 };

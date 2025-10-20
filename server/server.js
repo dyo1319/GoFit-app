@@ -4,19 +4,22 @@ const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 
 let db_M = require('./db.js');
 global.db_pool = db_M.pool;
 
 
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+app.use(cors({ origin: (process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['http://localhost:5173']), credentials: true }));
 app.use(express.json());
 app.use(morgan('dev'));
 
 global.addSlashes    = require('slashes').addSlashes;
 global.stripSlashes  = require('slashes').stripSlashes;
+
+const auth_R = require('./routers/auth_R');
+app.use('/auth', auth_R);
 
 
 const usr_R = require('./routers/users_R');
@@ -31,12 +34,14 @@ app.use('/notifications', notificationsRouter);
 const analytics_R = require('./routers/analytics_R');
 app.use('/analytics', analytics_R);
 
-
 const rbac_R = require('./routers/rbac_R');
 app.use('/rbac', rbac_R);
 
 const staff_R = require('./routers/staff_R');
 app.use('/staff', staff_R);
+
+const bodyDetails_R = require('./routers/bodyDetails_R');
+app.use('/body-details', bodyDetails_R);
 
 const { notifyUpcomingRenewals, notifyFailedPayments } = require('./jobs/notifications_jobs');
 

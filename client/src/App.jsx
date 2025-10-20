@@ -11,67 +11,275 @@ import PendingPayments from "./pages/payments/PendingPayments";
 import NotificationsPage from "./pages/notifications/NotificationsPage";
 import PermissionsPage from "./pages/permissions/PermissionsPage";
 import SignIn from "./pages/login/SignIn";
+import Unauthorized from "./pages/unauthorized/Unauthorized";
+import Dashboard from "./pages/main-dashboard/Dashboard";
+import Workouts from "./pages/workout/Workouts";
+import Membership from "./pages/membership/Membership";
+import Profile from "./pages/profile/Profile";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation,useNavigate } from "react-router-dom";
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
 
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
-function AppContent() {
-  const { pathname } = useLocation();
-  const isAdmin = pathname.startsWith("/admin");
-  const nav = useNavigate();
+  return children;
+};
 
-  const handleSignInSuccess = () => {
-    // אחרי התחברות – נווט ישר לאדמין (אפשר להחליף בהמשך לפי role)
-    nav("/admin", { replace: true });
-  };
+const StaffRoute = ({ children }) => {
+  const { user } = useAuth();
+  const isStaff = user?.role === "trainer" || user?.role === "admin";
+  return isStaff ? children : <Navigate to="/unauthorized" replace />;
+};
 
+const PermissionRoute = ({ perm, children }) => {
+  const { hasPermission, user } = useAuth();
+  if (user?.role === "admin" || (perm && hasPermission(perm))) return children;
+  return <Navigate to="/unauthorized" replace />;
+};
+
+const AdminLayout = ({ children }) => {
   return (
     <>
-      {isAdmin && <Topbar />}
+      <Topbar />
       <div className="container">
-        {isAdmin && <Sidebar />}
-        <Routes>
-          {/* דף התחברות (ללא טופ/סייד) */}
-          <Route path="/login" element={
-            <SignIn onSignInSuccess={handleSignInSuccess} onSwitchToSignUp={() => {}} />
-          } />
-
-          {/* אזור אדמין */}
-          <Route path="/admin" element={<Home />} />
-          <Route path="/admin/users" element={<UserList />} />
-          <Route path="/admin/user/:id" element={<User />} />
-          <Route path="/admin/newUser" element={<NewUserPage />} />
-          <Route path="/admin/subscriptions" element={<Subscriptions />} />
-          <Route path="/admin/renewals/upcoming" element={<UpcomingRenewalsPage />} />
-          <Route path="/admin/payments/pending" element={<PendingPayments />} />
-          <Route path="/admin/notifications" element={<NotificationsPage />} />
-          <Route path="/admin/permissions" element={<PermissionsPage />} />
-          <Route path="/admin/team" element={<PermissionsPage />} />
-
-          {/* ברירת מחדל: שלח ל /login */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
+        <Sidebar />
+        {children}
       </div>
     </>
+  );
+};
+
+const AppLayout = ({ children }) => {
+  return <div className="app-layout">{children}</div>;
+};
+
+function AppContent() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  return (
+    <Routes>
+      <Route
+        path="/login"
+        element={isAuthenticated ? <Navigate to="/app" replace /> : <SignIn />}
+      />
+
+      <Route
+        path="/unauthorized"
+        element={
+          <ProtectedRoute>
+            <Unauthorized />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/app"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+             <Dashboard />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/app/workouts"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <Workouts />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/app/membership"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <Membership />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/app/profile"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <Profile />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <StaffRoute>
+              <AdminLayout>
+                <Home />
+              </AdminLayout>
+            </StaffRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedRoute>
+            <StaffRoute>
+              <AdminLayout>
+                <UserList />
+              </AdminLayout>
+            </StaffRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/user/:id"
+        element={
+          <ProtectedRoute>
+            <StaffRoute>
+              <AdminLayout>
+                <User />
+              </AdminLayout>
+            </StaffRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/newUser"
+        element={
+          <ProtectedRoute>
+            <StaffRoute>
+              <AdminLayout>
+                <NewUserPage />
+              </AdminLayout>
+            </StaffRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/subscriptions"
+        element={
+          <ProtectedRoute>
+            <StaffRoute>
+              <AdminLayout>
+                <Subscriptions />
+              </AdminLayout>
+            </StaffRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/renewals/upcoming"
+        element={
+          <ProtectedRoute>
+            <StaffRoute>
+              <AdminLayout>
+                <UpcomingRenewalsPage />
+              </AdminLayout>
+            </StaffRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/payments/pending"
+        element={
+          <ProtectedRoute>
+            <StaffRoute>
+              <AdminLayout>
+                <PendingPayments />
+              </AdminLayout>
+            </StaffRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/notifications"
+        element={
+          <ProtectedRoute>
+            <StaffRoute>
+              <AdminLayout>
+                <NotificationsPage />
+              </AdminLayout>
+            </StaffRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/permissions"
+        element={
+          <ProtectedRoute>
+            <StaffRoute>
+              <AdminLayout>
+                <PermissionRoute perm="manage_permissions">
+                  <PermissionsPage />
+                </PermissionRoute>
+              </AdminLayout>
+            </StaffRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/team"
+        element={
+          <ProtectedRoute>
+            <StaffRoute>
+              <AdminLayout>
+                <PermissionsPage />
+              </AdminLayout>
+            </StaffRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="/" element={<Navigate to={isAuthenticated ? "/app" : "/login"} replace />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
 }
 
 function App() {
   return (
     <Router>
-      <AppContent />
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </Router>
   );
 }
 
 export default App;
-
-
-
-
-
-
-
-
-

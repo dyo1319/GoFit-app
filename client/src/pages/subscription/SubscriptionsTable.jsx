@@ -1,7 +1,7 @@
 import { DataGrid } from "@mui/x-data-grid";
 import { Chip, Stack, IconButton, Button } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
-
+import { useAuth } from '../../context/AuthContext';
 
 export default function SubscriptionsTable({
   rows, rowCount, loading,
@@ -9,7 +9,16 @@ export default function SubscriptionsTable({
   sortModel, onSortModelChange,
   onEdit, onDelete, onPause, onResume, onCancel, onRestore,
   actionBusyId,
+  canEdit = true,
+  canDelete = true,
+  canManage = true,
 }) {
+  const { hasPermission } = useAuth();
+
+  const canEditSubs = canEdit && hasPermission('edit_subscriptions');
+  const canDeleteSubs = canDelete && hasPermission('delete_subscriptions');
+  const canManageSubs = canManage && hasPermission('manage_subscriptions');
+
   const columns = [
     { field: "id", headerName: "מזהה", flex: 0.6, headerAlign: "center", align: "center" },
     { field: "username", headerName: "שם", flex: 1, headerAlign: "center", align: "center" },
@@ -71,20 +80,25 @@ export default function SubscriptionsTable({
         const st = params.row.subscription_status;
         const id = params.row.id;
         const busy = (key) => actionBusyId === key;
+        
         return (
           <Stack direction="row" spacing={1} className="row-actions">
-            <IconButton size="small" color="primary" onClick={() => onEdit(params.row)}>
-              <Edit />
-            </IconButton>
-            <IconButton
-              size="small"
-              color="error"
-              onClick={() => onDelete(params.row)}
-              disabled={busy(`/S/${id}`)}
-            >
-              <Delete />
-            </IconButton>
-            {st === "active" && (
+            {canEditSubs && (
+              <IconButton size="small" color="primary" onClick={() => onEdit(params.row)}>
+                <Edit />
+              </IconButton>
+            )}
+            {canDeleteSubs && (
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => onDelete(params.row)}
+                disabled={busy(`/S/${id}`)}
+              >
+                <Delete />
+              </IconButton>
+            )}
+            {canManageSubs && st === "active" && (
               <Button
                 size="small"
                 variant="outlined"
@@ -94,7 +108,7 @@ export default function SubscriptionsTable({
                 הקפא
               </Button>
             )}
-            {st === "paused" && (
+            {canManageSubs && st === "paused" && (
               <Button
                 size="small"
                 variant="outlined"
@@ -104,7 +118,7 @@ export default function SubscriptionsTable({
                 חידוש מהקפאה
               </Button>
             )}
-            {st !== "canceled" && (
+            {canManageSubs && st !== "canceled" && (
               <Button
                 size="small"
                 variant="outlined"
@@ -115,7 +129,7 @@ export default function SubscriptionsTable({
                 בטל
               </Button>
             )}
-            {st === "canceled" && (
+            {canManageSubs && st === "canceled" && (
               <Button
                 size="small"
                 variant="contained"

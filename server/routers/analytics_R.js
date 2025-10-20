@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const analytics_Mid = require('../middleware/analytics_Mid');
 const { validate, analyticsDateRangeSchema } = require('../middleware/validate');
+const { verifyToken } = require('../middleware/auth_Mid');
+
 
 const setDefaultDates = (req, res, next) => {
   if (!req.query.from || !req.query.to) {
@@ -16,17 +18,19 @@ const setDefaultDates = (req, res, next) => {
 };
 
 router.get('/subscriptions/monthly', 
+  verifyToken, 
   setDefaultDates,
   validate(analyticsDateRangeSchema, 'query'), 
   analytics_Mid.getMonthlySubscriptions
 );
 
 router.get('/payments/monthly', 
+  verifyToken, 
   setDefaultDates,
   validate(analyticsDateRangeSchema, 'query'), 
   analytics_Mid.getMonthlyPayments
 );
 
-router.get('/dashboard/stats', analytics_Mid.getDashboardStats);
+router.get('/dashboard/stats', verifyToken, analytics_Mid.getDashboardStats); // Add verifyToken
 
 module.exports = router;

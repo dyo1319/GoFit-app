@@ -6,10 +6,14 @@ import {
   CreditCard, ReceiptLong, CalendarMonth, FitnessCenter,
   Assessment,  Logout
 } from "@mui/icons-material";
+import { useAuth } from "../../context/AuthContext";
+
 
 const linkCls = ({ isActive }) => `link ${isActive ? "active" : ""}`;
 
 export default function Sidebar() {
+  const { signOut } = useAuth();
+
   return (
     <div className="sidebar" dir="rtl">
       <div className="sidebarWrapper">
@@ -118,11 +122,15 @@ export default function Sidebar() {
                 צוות/הרשאות
               </NavLink>
             </li>
-            <li className="sidebarListItem">
-              <NavLink to="/admin/logout" className={linkCls}>
-                <Logout className="sidebarIcon" />
-                התנתקות
-              </NavLink>
+           <li className="sidebarListItem"
+              onClick={() => {
+                signOut();
+              }}
+              role="button"
+              tabIndex={0}
+            >
+              <Logout className="sidebarIcon" />
+              התנתקות
             </li>
           </ul>
         </div>

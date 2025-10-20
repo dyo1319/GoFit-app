@@ -8,10 +8,13 @@ import EditDialog from "./EditDialog";
 import { getSubs } from "../newUser/userApiService";
 import { pauseSub, resumeSub, restoreSub, cancelSub, hardDelete } from "./actions";
 import { useDebouncedValue } from "./hook";
+import { useAuth } from '../../context/AuthContext';
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_BASE;
 
 export default function SubscriptionPage() {
+  const { user, hasPermission, authenticatedFetch } = useAuth();
+
   const [rows, setRows] = React.useState([]);
   const [rowCount, setRowCount] = React.useState(0);
   const [loading, setLoading] = React.useState(false);
@@ -31,12 +34,18 @@ export default function SubscriptionPage() {
   const ctrlRef = React.useRef(null);
 
   const fetchSubs = React.useCallback(async () => {
+    if (!hasPermission('view_subscriptions')) {
+      setRows([]);
+      setRowCount(0);
+      return;
+    }
+
     if (ctrlRef.current) ctrlRef.current.abort();
     const ctrl = new AbortController();
     ctrlRef.current = ctrl;
     setLoading(true);
     try {
-      const { rows, total } = await getSubs(API_BASE, {
+      const { rows, total } = await getSubs(authenticatedFetch, {
         paginationModel,
         sortModel,
         query: qDebounced,
@@ -50,16 +59,24 @@ export default function SubscriptionPage() {
       console.error(e);
       setRows([]);
       setRowCount(0);
+      snack("שגיאה בטעינת המנויים", "error");
     } finally {
       setLoading(false);
     }
-  }, [paginationModel, sortModel, qDebounced, status, expDebounced]);
-
-  React.useEffect(() => { fetchSubs(); return () => ctrlRef.current?.abort(); }, [fetchSubs]);
+  }, [paginationModel, sortModel, qDebounced, status, expDebounced, hasPermission, authenticatedFetch, user]);
 
   React.useEffect(() => {
-    setPaginationModel(p => (p.page === 0 ? p : { ...p, page: 0 }));
-  }, [qDebounced, status, expDebounced]);
+    if (user && hasPermission('view_subscriptions')) {
+      fetchSubs();
+    }
+    return () => ctrlRef.current?.abort();
+  }, [fetchSubs, user, hasPermission]);
+
+  React.useEffect(() => {
+    if (user && hasPermission('view_subscriptions')) {
+      setPaginationModel(p => (p.page === 0 ? p : { ...p, page: 0 }));
+    }
+  }, [qDebounced, status, expDebounced, user, hasPermission]);
 
   const snack = (message, severity = "info") => setSnackbar({ open: true, message, severity });
   const closeSnack = () => setSnackbar((s) => ({ ...s, open: false }));
@@ -81,13 +98,51 @@ export default function SubscriptionPage() {
     }
   };
 
-  const onDelete  = (row) => doWrapped(`/S/${row.id}`,         () => hardDelete(API_BASE, row.id), "המנוי נמחק בהצלחה", "שגיאה במחיקת מנוי");
-  const onPause   = (row) => doWrapped(`/S/${row.id}/pause`,   () => pauseSub(API_BASE, row.id),   "המנוי הוקפא בהצלחה", "שגיאה בהקפאת המנוי");
-  const onResume  = (row) => doWrapped(`/S/${row.id}/resume`,  () => resumeSub(API_BASE, row.id),  "המנוי חודש בהצלחה",  "שגיאה בחידוש מהקפאה");
-  const onCancel  = (row) => doWrapped(`/S/${row.id}/cancel`,  () => cancelSub(API_BASE, row.id),  "המנוי בוטל בהצלחה",  "שגיאה בביטול המנוי");
-  const onRestore = (row) => doWrapped(`/S/${row.id}/restore`, () => restoreSub(API_BASE, row.id), "המנוי שוחזר בהצלחה", "שגיאה בשחזור המנוי");
+  const onDelete = (row) => {
+    if (!hasPermission('delete_subscriptions')) {
+      snack("אין לך הרשאות למחוק מנויים", "error");
+      return;
+    }
+    doWrapped(`/S/${row.id}`, () => hardDelete(authenticatedFetch, row.id), "המנוי נמחק בהצלחה", "שגיאה במחיקת מנוי");
+  };
+
+  const onPause = (row) => {
+    if (!hasPermission('manage_subscriptions')) {
+      snack("אין לך הרשאות לנהל מנויים", "error");
+      return;
+    }
+    doWrapped(`/S/${row.id}/pause`, () => pauseSub(authenticatedFetch, row.id), "המנוי הוקפא בהצלחה", "שגיאה בהקפאת המנוי");
+  };
+
+  const onResume = (row) => {
+    if (!hasPermission('manage_subscriptions')) {
+      snack("אין לך הרשאות לנהל מנויים", "error");
+      return;
+    }
+    doWrapped(`/S/${row.id}/resume`, () => resumeSub(authenticatedFetch, row.id), "המנוי חודש בהצלחה", "שגיאה בחידוש מהקפאה");
+  };
+
+  const onCancel = (row) => {
+    if (!hasPermission('manage_subscriptions')) {
+      snack("אין לך הרשאות לנהל מנויים", "error");
+      return;
+    }
+    doWrapped(`/S/${row.id}/cancel`, () => cancelSub(authenticatedFetch, row.id), "המנוי בוטל בהצלחה", "שגיאה בביטול המנוי");
+  };
+
+  const onRestore = (row) => {
+    if (!hasPermission('manage_subscriptions')) {
+      snack("אין לך הרשאות לנהל מנויים", "error");
+      return;
+    }
+    doWrapped(`/S/${row.id}/restore`, () => restoreSub(authenticatedFetch, row.id), "המנוי שוחזר בהצלחה", "שגיאה בשחזור המנוי");
+  };
 
   const openEdit = (row) => {
+    if (!hasPermission('edit_subscriptions')) {
+      snack("אין לך הרשאות לערוך מנויים", "error");
+      return;
+    }
     setEditing({
       id: row.id,
       payment_status: row.payment_status ?? "pending",
@@ -102,10 +157,9 @@ export default function SubscriptionPage() {
     if (!editing) return;
     setEditError("");
     try {
-      const res = await fetch(`${API_BASE}/S/${editing.id}`, {
+      const res = await authenticatedFetch(`/S/${editing.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({
           start_date: editing.start_date_original,
           end_date: editing.end_date_original,
@@ -127,11 +181,15 @@ export default function SubscriptionPage() {
   };
 
   const createSubscription = async ({ user_id, start_date, end_date, payment_status }) => {
+    if (!hasPermission('create_subscriptions')) {
+      snack("אין לך הרשאות ליצור מנויים", "error");
+      return;
+    }
+
     try {
-      const res = await fetch(`${API_BASE}/S`, {
+      const res = await authenticatedFetch(`/S`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
         body: JSON.stringify({ user_id, start_date, end_date, payment_status: payment_status || "pending" }),
       });
       if (res.ok) {
@@ -161,6 +219,28 @@ export default function SubscriptionPage() {
     setSortModel(prev => (sameSortModel(prev, model) ? prev : model));
   }, []);
 
+  if (!user) {
+    return (
+      <div className="subscriptions" dir="rtl">
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Typography>טוען...</Typography>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasPermission('view_subscriptions')) {
+    return (
+      <div className="subscriptions" dir="rtl">
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Typography color="error">
+            אין לך הרשאות לצפות במנויים
+          </Typography>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="subscriptions" dir="rtl">
       <Typography className="subscriptions__title" variant="h5">
@@ -172,8 +252,15 @@ export default function SubscriptionPage() {
           query={query} onQueryChange={setQuery}
           status={status} onStatusChange={setStatus}
           expiresInDays={expiresInDays} onExpiresChange={setExpiresInDays}
-          onAdd={() => setAddOpen(true)}
+          onAdd={() => {
+            if (!hasPermission('create_subscriptions')) {
+              snack("אין לך הרשאות ליצור מנויים", "error");
+              return;
+            }
+            setAddOpen(true);
+          }}
           onReset={() => { setQuery(""); setStatus(""); setExpiresInDays(""); }}
+          canAdd={hasPermission('create_subscriptions')}
         />
       </Box>
 
@@ -189,6 +276,9 @@ export default function SubscriptionPage() {
           onEdit={openEdit} onDelete={onDelete}
           onPause={onPause} onResume={onResume} onCancel={onCancel} onRestore={onRestore}
           actionBusyId={actionBusyId}
+          canEdit={hasPermission('edit_subscriptions')}
+          canDelete={hasPermission('delete_subscriptions')}
+          canManage={hasPermission('manage_subscriptions')}
         />
       </Paper>
 
@@ -207,7 +297,7 @@ export default function SubscriptionPage() {
         open={snackbar.open}
         autoHideDuration={6000}
         onClose={closeSnack}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }} // RTL נעים יותר
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert onClose={closeSnack} severity={snackbar.severity} sx={{ width: "100%" }}>
           {snackbar.message}

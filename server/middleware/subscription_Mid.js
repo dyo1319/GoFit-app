@@ -490,6 +490,181 @@ async function getDashboardStats(req, res) {
   }
 }
 
+
+async function getUserSubscriptions(req, res) {
+  try {
+    const db = global.db_pool.promise();
+    const userId = req.user.userId;
+
+    const [rows] = await db.query(
+      `SELECT
+        s.id, s.user_id, u.username,
+        DATE_FORMAT(s.start_date, '%Y-%m-%d') AS start_date,
+        DATE_FORMAT(s.end_date, '%Y-%m-%d') AS end_date,
+        s.payment_status, s.cancelled_at,
+        ${STATUS_CASE_SQL}, ${DAYS_LEFT_SQL}
+       FROM subscriptions s
+       JOIN users u ON u.id = s.user_id
+       WHERE s.user_id = ?
+       ORDER BY s.start_date DESC`,
+      [userId]
+    );
+
+    res.json({
+      success: true,
+      data: rows,
+      count: rows.length
+    });
+  } catch (err) {
+    console.error('subscriptions.getUserSubscriptions error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+}
+
+async function getCurrentSubscription(req, res) {
+  try {
+    const db = global.db_pool.promise();
+    const userId = req.user.userId;
+    const currentDate = new Date().toISOString().split('T')[0];
+
+    const [rows] = await db.query(
+      `SELECT
+        s.id, s.user_id, u.username,
+        DATE_FORMAT(s.start_date, '%Y-%m-%d') AS start_date,
+        DATE_FORMAT(s.end_date, '%Y-%m-%d') AS end_date,
+        s.payment_status, s.cancelled_at,
+        ${STATUS_CASE_SQL}, ${DAYS_LEFT_SQL}
+       FROM subscriptions s
+       JOIN users u ON u.id = s.user_id
+       WHERE s.user_id = ?
+         AND s.cancelled_at IS NULL
+         AND s.start_date <= ?
+         AND s.end_date >= ?
+       ORDER BY s.start_date DESC
+       LIMIT 1`,
+      [userId, currentDate, currentDate]
+    );
+
+    if (rows.length === 0) {
+      return res.json({
+        success: true,
+        data: null,
+        message: 'No active subscription found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: rows[0]
+    });
+  } catch (err) {
+    console.error('subscriptions.getCurrentSubscription error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+}
+
+async function getUserSubscriptionStats(req, res) {
+  try {
+    const db = global.db_pool.promise();
+    const userId = req.user.userId;
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
+
+    const [totalResult] = await db.query(
+      `SELECT COUNT(*) as total_subscriptions
+       FROM subscriptions 
+       WHERE user_id = ?`,
+      [userId]
+    );
+
+    const [activeResult] = await db.query(
+      `SELECT COUNT(*) as active_subscriptions
+       FROM subscriptions 
+       WHERE user_id = ? 
+         AND cancelled_at IS NULL 
+         AND end_date >= CURDATE()`,
+      [userId]
+    );
+
+    const [expiredResult] = await db.query(
+      `SELECT COUNT(*) as expired_subscriptions
+       FROM subscriptions 
+       WHERE user_id = ? 
+         AND cancelled_at IS NULL 
+         AND end_date < CURDATE()`,
+      [userId]
+    );
+
+    const totalSubscriptions = totalResult[0]?.total_subscriptions || 0;
+    const activeSubscriptions = activeResult[0]?.active_subscriptions || 0;
+    const expiredSubscriptions = expiredResult[0]?.expired_subscriptions || 0;
+
+    res.json({
+      success: true,
+      data: {
+        total_subscriptions: parseInt(totalSubscriptions),
+        active_subscriptions: parseInt(activeSubscriptions),
+        expired_subscriptions: parseInt(expiredSubscriptions),
+        current_month: currentMonth,
+        current_year: currentYear
+      }
+    });
+  } catch (err) {
+    console.error('subscriptions.getUserSubscriptionStats error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+}
+
+async function createUserSubscription(req, res) {
+  try {
+    const db = global.db_pool.promise();
+    const userId = req.user.userId;
+    const { start_date, end_date, payment_status = 'pending' } = req.body;
+
+    if (!start_date || !end_date) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Start date and end date are required' 
+      });
+    }
+
+    if (new Date(start_date) >= new Date(end_date)) {
+      return res.status(400).json({
+        success: false,
+        message: 'End date must be after start date'
+      });
+    }
+
+    const [overlap] = await db.query(
+      `SELECT 1 FROM subscriptions
+       WHERE user_id = ? AND cancelled_at IS NULL
+         AND ((start_date BETWEEN ? AND ?) OR (end_date BETWEEN ? AND ?) OR (start_date <= ? AND end_date >= ?))
+       LIMIT 1`,
+      [userId, start_date, end_date, start_date, end_date, start_date, end_date]
+    );
+
+    if (overlap.length) {
+      return res.status(409).json({ success: false, message: 'Active subscription already exists for this period' });
+    }
+
+    const [ins] = await db.query(
+      `INSERT INTO subscriptions (user_id, start_date, end_date, payment_status) VALUES (?,?,?,?)`,
+      [userId, start_date, end_date, payment_status]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Subscription created successfully',
+      data: { id: ins.insertId }
+    });
+  } catch (err) {
+    console.error('subscriptions.createUserSubscription error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+}
+
+
 module.exports = {
   list,
   getOne,
@@ -502,5 +677,9 @@ module.exports = {
   deletesub,
   count,
   getDashboardStats,
-  updatePaymentStatus
+  updatePaymentStatus,
+  getUserSubscriptions,
+  getCurrentSubscription,
+  getUserSubscriptionStats,
+  createUserSubscription
 };

@@ -6,6 +6,7 @@ export default function Filters({
   status, onStatusChange,
   expiresInDays, onExpiresChange,
   onAdd, onReset,
+  canAdd = true,
 }) {
   return (
       <Box
@@ -61,8 +62,15 @@ export default function Filters({
         name="subscription_filter_expires_days"
       />
 
-      <Button variant="contained" onClick={onAdd} sx={{ minWidth: 120 }}> הוסף מנוי</Button>
-      <Button variant="contained" onClick={onReset}>איפוס מסננים</Button>
+      {canAdd && (
+        <Button variant="contained" onClick={onAdd} sx={{ minWidth: 120 }}>
+          הוסף מנוי
+        </Button>
+      )}
+      
+      <Button variant="contained" onClick={onReset}>
+        איפוס מסננים
+      </Button>
     </Box>
   );
 }

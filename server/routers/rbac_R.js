@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { validate, roleParamSchema, rbacPutPresetSchema } = require('../middleware/validate');
+const { verifyToken } = require('../middleware/auth_Mid');
+const { requirePermission, requireAdmin } = require('../middleware/permission_Mid'); // UPDATED
 
-router.get('/catalog', async (req, res) => {
+router.get('/catalog', verifyToken, requirePermission('manage_permissions'), async (req, res) => {
   try {
     const db = global.db_pool.promise();
     const [rows] = await db.query(`
@@ -17,8 +19,8 @@ router.get('/catalog', async (req, res) => {
   }
 });
 
-router.get('/presets/:role', validate(roleParamSchema, 'params'), async (req, res) => {
-  try {
+router.get('/presets/:role', verifyToken, requirePermission('manage_permissions'), validate(roleParamSchema, 'params'), async (req, res) => {
+    try {
     const db = global.db_pool.promise();
     const role = req.params.role;
 
@@ -45,7 +47,7 @@ router.get('/presets/:role', validate(roleParamSchema, 'params'), async (req, re
   }
 });
 
-router.put('/presets/:role', validate(roleParamSchema, 'params'), validate(rbacPutPresetSchema), async (req, res) => {
+router.put('/presets/:role', verifyToken, requireAdmin, validate(roleParamSchema, 'params'), validate(rbacPutPresetSchema), async (req, res) => {
   const conn = await global.db_pool.promise().getConnection();
   try {
     const role = req.params.role;
@@ -82,6 +84,5 @@ router.put('/presets/:role', validate(roleParamSchema, 'params'), validate(rbacP
     conn.release();
   }
 });
-
 
 module.exports = router;

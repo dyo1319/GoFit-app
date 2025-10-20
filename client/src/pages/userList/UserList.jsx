@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
-import { Paper,Typography, Button, CircularProgress, Alert } from '@mui/material';
+import { Paper, Typography, Button, CircularProgress, Alert } from '@mui/material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { formatUsersData } from '../../utils/userFormatter';
+import { useAuth } from '../../context/AuthContext';
 import './userList.css';
-
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
 
 export default function DataTable() {
   const navigate = useNavigate();
+  const { user, hasPermission, authenticatedFetch, signOut } = useAuth();
 
   const [rows, setRows] = React.useState([]);
   const [rowCount, setRowCount] = React.useState(0);
@@ -18,12 +18,23 @@ export default function DataTable() {
   const [deleteLoading, setDeleteLoading] = React.useState(null);
   const [paginationModel, setPaginationModel] = React.useState({ page: 0, pageSize: 10 });
 
+  React.useEffect(() => {
+    if (user && !hasPermission('view_users')) {
+      navigate('/unauthorized');
+    }
+  }, [user, hasPermission, navigate]);
+
   const fetchUsers = React.useCallback(async (page = 0) => {
+    if (!hasPermission('view_users')) {
+      setError('אין לך הרשאות לצפות ברשימת המשתמשים');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      const url = `${API_BASE}/U/list?p=${page}`;
-      const res = await fetch(url, { credentials: 'include' });
+      const url = `/U/list?p=${page}`;
+      const res = await authenticatedFetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (data.success) {
@@ -41,13 +52,20 @@ export default function DataTable() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [hasPermission, authenticatedFetch]);
 
   React.useEffect(() => {
-    fetchUsers(paginationModel.page);
-  }, [fetchUsers, paginationModel.page]);
+    if (user && hasPermission('view_users')) {
+      fetchUsers(paginationModel.page);
+    }
+  }, [fetchUsers, paginationModel.page, user, hasPermission]);
 
   const handleDelete = async (id) => {
+    if (!hasPermission('delete_users')) {
+      setError('אין לך הרשאות למחוק משתמשים');
+      return;
+    }
+
     if (!window.confirm('האם אתה בטוח שברצונך למחוק משתמש זה?')) {
       return;
     }
@@ -60,9 +78,8 @@ export default function DataTable() {
     setDeleteLoading(id);
 
     try {
-      const res = await fetch(`${API_BASE}/U/users/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
+      const res = await authenticatedFetch(`/U/Delete/${id}`, {
+        method: 'DELETE'
       });
       
       if (!res.ok) {
@@ -73,6 +90,11 @@ export default function DataTable() {
       
       if (!result.success) {
         throw new Error(result.message || 'מחיקה נכשלה');
+      }
+
+      if (id === user.id) {
+        signOut();
+        return;
       }
 
       if (isLastRowOnPage) {
@@ -108,42 +130,59 @@ export default function DataTable() {
       filterable: false,
       renderCell: (params) => (
         <div className="userActions">
-          <Button
-            size="small"
-            variant="outlined"
-            className="userListEdit"
-            onClick={(e) => { e.stopPropagation(); navigate(`/user/${params.row.id}`); }}
-          >
-            ערוך
-          </Button>
-          <DeleteOutlineIcon
-            className="userListDelete"
-            onClick={(e) => { e.stopPropagation(); handleDelete(params.row.id); }}
-            style={{ 
-              opacity: deleteLoading === params.row.id ? 0.5 : 1,
-              pointerEvents: deleteLoading === params.row.id ? 'none' : 'auto'
-            }}
-            disabled={deleteLoading === params.row.id}
-          />
-          {deleteLoading === params.row.id && (
-            <CircularProgress size={16} style={{ marginLeft: '8px' }} />
+          {hasPermission('edit_users') && (
+            <Button
+              size="small"
+              variant="outlined"
+              className="userListEdit"
+              onClick={(e) => { e.stopPropagation(); navigate(`/admin/user/${params.row.id}`); }}
+            >
+              ערוך
+            </Button>
+          )}
+          {hasPermission('delete_users') && (
+            <>
+              <DeleteOutlineIcon
+                className="userListDelete"
+                onClick={(e) => { e.stopPropagation(); handleDelete(params.row.id); }}
+                style={{ 
+                  opacity: deleteLoading === params.row.id ? 0.5 : 1,
+                  pointerEvents: deleteLoading === params.row.id ? 'none' : 'auto'
+                }}
+                disabled={deleteLoading === params.row.id}
+              />
+              {deleteLoading === params.row.id && (
+                <CircularProgress size={16} style={{ marginLeft: '8px' }} />
+              )}
+            </>
           )}
         </div>
       ),
     },
   ];
 
+  if (!user) {
+    return (
+      <div className="loadingOverlay">
+        <CircularProgress />
+        <span style={{ marginRight: '8px' }}>טוען...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="userListContainer">
       <div className="userListHeader">
         <Typography variant="h6" className="userTitle">רשימת משתמשים</Typography>
-        <Button 
-          variant="contained" 
-          className="userAddButton"
-          onClick={() => navigate('/newUser')}
-        >
-          הוסף משתמש
-        </Button>
+        {hasPermission('create_users') && (
+          <Button 
+            variant="contained" 
+            className="userAddButton"
+            onClick={() => navigate('/newUser')}
+          >
+            הוסף משתמש
+          </Button>
+        )}
       </div>
 
       {error && (
@@ -153,7 +192,7 @@ export default function DataTable() {
       )}
 
       <Paper className="dataGridContainer">
-       <DataGrid
+        <DataGrid
           rows={rows}
           getRowId={(row) => row.id}
           columns={columns}

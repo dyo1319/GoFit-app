@@ -1,6 +1,6 @@
 const errorMessages = {
   400: "נתונים לא תקינים - אנא בדוק את הפרטים שהזנת",
-  401: "אין לך הרשאות לביצוע פעולה זו", 
+  401: "נדרשת התחברות מחדש - אנא התחבר שוב",
   403: "גישה נדחתה - אין הרשאות מתאימות",
   404: "שירות אינו זמין - אנא נסה שוב מאוחר יותר",
   409: "משתמש עם פרטים אלו כבר קיים במערכת",
@@ -28,6 +28,16 @@ const createNetworkErrorResponse = () => ({
   json: { message: "שגיאת רשת - נסה שוב או בדוק את החיבור לאינטרנט" }
 });
 
+const handlePermissionError = (status, action) => {
+  if (status === 403) {
+    return `אין לך הרשאות לביצוע ${action}`;
+  }
+  if (status === 401) {
+    return "נדרשת התחברות מחדש - אנא התחבר שוב";
+  }
+  return null;
+};
+
 export async function createUser(API_BASE, payload) {
   try {
     const res = await fetch(`${API_BASE}/U/Add`, {
@@ -40,11 +50,13 @@ export async function createUser(API_BASE, payload) {
     const json = await res.json().catch(() => ({}));
     
     if (!res.ok) {
-      return createErrorResponse(res.status, json);
+      const permissionMessage = handlePermissionError(res.status, "יצירת משתמש");
+      return createErrorResponse(res.status, json, permissionMessage);
     }
     
     return createSuccessResponse(res.status, json);
   } catch (error) {
+    console.error("Network error creating user:", error);
     return createNetworkErrorResponse();
   }
 }
@@ -58,6 +70,10 @@ export async function searchUsers(API_BASE, q, signal) {
     });
     
     if (!res.ok) {
+      if (res.status === 403) {
+        console.warn("User doesn't have permission to search users");
+        return [];
+      }
       return [];
     }
     
@@ -70,7 +86,7 @@ export async function searchUsers(API_BASE, q, signal) {
   }
 }
 
-export async function getSubs(API_BASE, {
+export async function getSubs(authenticatedFetch, {
   paginationModel,
   sortModel,
   query,
@@ -87,18 +103,15 @@ export async function getSubs(API_BASE, {
     const sort      = `${sortField}:${sortDir}`;
 
     const p = new URLSearchParams({ page, pageSize, sort });
-
     if (query?.trim()) p.set("query", query.trim());
-    if (status)        p.set("status", status);
+    if (status) p.set("status", status);
     if (expiresInDays !== "" && expiresInDays != null) p.set("expiresInDays", String(expiresInDays));
 
-    const res = await fetch(`${API_BASE}/S?${p.toString()}`, {
-      credentials: "include",
-      signal,
-    });
+    const res = await authenticatedFetch(`/S?${p.toString()}`, { signal });
 
     if (!res.ok) {
-      const msg = `Failed to load subscriptions (${res.status})`;
+      const permissionMessage = handlePermissionError(res.status, "טעינת מנויים");
+      const msg = permissionMessage || `Failed to load subscriptions (${res.status})`;
       throw new Error(msg);
     }
 
@@ -127,12 +140,35 @@ export async function updateUser(API_BASE, userId, payload) {
     const json = await res.json().catch(() => ({}));
     
     if (!res.ok) {
-      return createErrorResponse(res.status, json);
+      const permissionMessage = handlePermissionError(res.status, "עדכון משתמש");
+      return createErrorResponse(res.status, json, permissionMessage);
     }
     
     return createSuccessResponse(res.status, json);
   } catch (error) {
     console.error("Network error updating user:", error);
     return createNetworkErrorResponse();
+  }
+}
+
+export async function checkUserPermissions(API_BASE) {
+  try {
+    const res = await fetch(`${API_BASE}/auth/permissions`, {
+      credentials: "include",
+    });
+    
+    if (!res.ok) {
+      return { hasPermissions: false, permissions: [] };
+    }
+    
+    const data = await res.json();
+    return { 
+      hasPermissions: true, 
+      permissions: data.permissions || [],
+      user: data.user 
+    };
+  } catch (error) {
+    console.error("Error checking user permissions:", error);
+    return { hasPermissions: false, permissions: [] };
   }
 }

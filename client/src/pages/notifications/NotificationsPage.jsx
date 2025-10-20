@@ -1,4 +1,3 @@
-// client/src/notifications/NotificationsPage.jsx
 import * as React from "react";
 import { 
   Paper, 
@@ -11,12 +10,21 @@ import {
 } from "@mui/material";
 import NotificationsFilters from "./NotificationsFilters";
 import NotificationsTable from "./NotificationsTable";
-import { getNotifications, markAsRead, deleteOne, markAllAsRead, clearAll } from "./notificationsApi";
+import { 
+  getNotifications, 
+  markAsRead, 
+  deleteOne, 
+  markAllAsRead, 
+  clearAll,
+  getNotificationStats
+} from "./notificationsApi";
 import { useDebouncedValue } from "../subscription/hook";
-
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function NotificationsPage() {
+  const { user, hasPermission, authenticatedFetch } = useAuth();
+  const navigate = useNavigate();
   const [rows, setRows] = React.useState([]);
   const [rowCount, setRowCount] = React.useState(0);
   const [loading, setLoading] = React.useState(false);
@@ -24,6 +32,8 @@ export default function NotificationsPage() {
   const [query, setQuery] = React.useState("");
   const [type, setType] = React.useState("");
   const [onlyUnread, setOnlyUnread] = React.useState(true);
+  const [audience, setAudience] = React.useState(user?.role === 'admin' ? '' : 'user');
+  const [stats, setStats] = React.useState(null);
   const qDebounced = useDebouncedValue(query, 350);
 
   const [snackbar, setSnackbar] = React.useState({ 
@@ -33,14 +43,36 @@ export default function NotificationsPage() {
   });
   const ctrlRef = React.useRef(null);
 
+  React.useEffect(() => {
+    if (user && !hasPermission('view_notifications')) {
+      navigate('/unauthorized');
+    }
+  }, [user, hasPermission, navigate]);
+
   const snack = (message, severity = "info") => 
     setSnackbar({ open: true, message, severity });
   
   const closeSnack = () => 
     setSnackbar((s) => ({ ...s, open: false }));
 
+  const fetchStats = React.useCallback(async () => {
+    if (!hasPermission('view_notifications')) return;
+
+    try {
+      const statsData = await getNotificationStats(authenticatedFetch);
+      setStats(statsData);
+    } catch (error) {
+      console.error('Error fetching notification stats:', error);
+    }
+  }, [hasPermission, authenticatedFetch]);
+
   const fetchData = React.useCallback(async () => {
-    // Abort previous request
+    if (!hasPermission('view_notifications')) {
+      setRows([]);
+      setRowCount(0);
+      return;
+    }
+
     if (ctrlRef.current) {
       ctrlRef.current.abort();
     }
@@ -50,16 +82,19 @@ export default function NotificationsPage() {
     
     setLoading(true);
     try {
-      const { rows, total } = await getNotifications(API_BASE, {
+      const { rows, total } = await getNotifications(authenticatedFetch, {
         paginationModel,
         query: qDebounced,
         type,
         onlyUnread,
+        audience: user?.role === 'admin' ? audience : 'user',
         signal: ctrl.signal,
       });
       
       setRows(rows);
       setRowCount(total);
+      
+      fetchStats();
     } catch (error) {
       console.error('Error fetching notifications:', error);
       if (error.name !== 'AbortError') {
@@ -70,23 +105,36 @@ export default function NotificationsPage() {
     } finally {
       setLoading(false);
     }
-  }, [paginationModel, qDebounced, type, onlyUnread]);
+  }, [paginationModel, qDebounced, type, onlyUnread, audience, user?.role, hasPermission, authenticatedFetch, fetchStats]);
 
-  // Fetch data when dependencies change
   React.useEffect(() => { 
-    fetchData(); 
+    if (user && hasPermission('view_notifications')) {
+      fetchData(); 
+    }
     return () => ctrlRef.current?.abort();
-  }, [fetchData]);
+  }, [fetchData, user, hasPermission]);
 
-  // Reset to first page when filters change
   React.useEffect(() => { 
-    setPaginationModel((p) => ({ ...p, page: 0 })); 
-  }, [qDebounced, type, onlyUnread]);
+    if (user && hasPermission('view_notifications')) {
+      setPaginationModel((p) => ({ ...p, page: 0 })); 
+    }
+  }, [qDebounced, type, onlyUnread, audience, user, hasPermission]);
+
+  React.useEffect(() => {
+    if (user && hasPermission('view_notifications')) {
+      fetchStats();
+    }
+  }, [user, hasPermission, fetchStats]);
 
   const handleMarkRead = async (row) => {
+    if (!hasPermission('manage_notifications')) {
+      snack("אין לך הרשאות לנהל התראות", "error");
+      return;
+    }
+
     setLoading(true);
     try {
-      const { ok, json } = await markAsRead(API_BASE, row.id);
+      const { ok, json } = await markAsRead(authenticatedFetch, row.id);
       if (ok) {
         snack("התראה סומנה כנקראה", "success");
         fetchData();
@@ -101,9 +149,14 @@ export default function NotificationsPage() {
   };
 
   const handleDelete = async (row) => {
+    if (!hasPermission('manage_notifications')) {
+      snack("אין לך הרשאות לנהל התראות", "error");
+      return;
+    }
+
     setLoading(true);
     try {
-      const { ok, json } = await deleteOne(API_BASE, row.id);
+      const { ok, json } = await deleteOne(authenticatedFetch, row.id);
       if (ok) {
         snack("התראה נמחקה", "success");
         fetchData();
@@ -118,9 +171,14 @@ export default function NotificationsPage() {
   };
 
   const handleMarkAll = async () => {
+    if (!hasPermission('manage_notifications')) {
+      snack("אין לך הרשאות לנהל התראות", "error");
+      return;
+    }
+
     setLoading(true);
     try {
-      const { ok, json } = await markAllAsRead(API_BASE);
+      const { ok, json } = await markAllAsRead(authenticatedFetch);
       if (ok) {
         snack("כל ההתראות סומנו כנקראו", "success");
         fetchData();
@@ -135,13 +193,18 @@ export default function NotificationsPage() {
   };
 
   const handleClearAll = async () => {
+    if (!hasPermission('manage_notifications')) {
+      snack("אין לך הרשאות לנהל התראות", "error");
+      return;
+    }
+
     if (!window.confirm("האם אתה בטוח שברצונך למחוק את כל ההתראות? פעולה זו אינה ניתנת לביטול.")) {
       return;
     }
 
     setLoading(true);
     try {
-      const { ok, json } = await clearAll(API_BASE);
+      const { ok, json } = await clearAll(authenticatedFetch);
       if (ok) {
         snack("כל ההתראות נמחקו", "success");
         fetchData();
@@ -154,6 +217,28 @@ export default function NotificationsPage() {
       setLoading(false);
     }
   };
+
+  if (!user) {
+    return (
+      <Container maxWidth="xl" sx={{ py: 2 }}>
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Typography>טוען...</Typography>
+        </div>
+      </Container>
+    );
+  }
+
+  if (!hasPermission('view_notifications')) {
+    return (
+      <Container maxWidth="xl" sx={{ py: 2 }}>
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Alert severity="error" sx={{ maxWidth: 400, margin: '0 auto' }}>
+            אין לך הרשאות לצפות בהתראות
+          </Alert>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="xl" sx={{ py: 2 }}>
@@ -197,10 +282,15 @@ export default function NotificationsPage() {
             onTypeChange={setType}
             onlyUnread={onlyUnread}
             onOnlyUnreadChange={setOnlyUnread}
+            audience={audience}
+            onAudienceChange={setAudience}
             onRefresh={fetchData}
             onMarkAll={handleMarkAll}
             onClearAll={handleClearAll}
             loading={loading}
+            canManage={hasPermission('manage_notifications')}
+            stats={stats}
+            userRole={user?.role}
           />
         </Box>
 
@@ -212,6 +302,7 @@ export default function NotificationsPage() {
           onPaginationModelChange={setPaginationModel}
           onMarkRead={handleMarkRead}
           onDelete={handleDelete}
+          canManage={hasPermission('manage_notifications')}
         />
 
         <Snackbar 

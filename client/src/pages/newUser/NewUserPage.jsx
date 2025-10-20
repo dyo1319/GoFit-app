@@ -1,7 +1,8 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import NewUserForm from "./NewUserForm";
 import "./newUser.css";
+import { useAuth } from "../../context/AuthContext";
 
 import { validateUserForm, validateField } from "../../utils/validators";
 import { initialUserForm } from "../../utils/formDefaults";
@@ -54,6 +55,7 @@ const fieldToStep = {
 };
 
 export default function NewUserPage() {
+  const { hasPermission, authLoading } = useAuth();
   const [form, setForm] = useState(initialUserForm);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState({
@@ -64,6 +66,25 @@ export default function NewUserPage() {
 
   const navigate = useNavigate();
   const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
+
+  useEffect(() => {
+    if (!authLoading && !hasPermission('create_users')) {
+      navigate('/unauthorized');
+    }
+  }, [hasPermission, authLoading, navigate]);
+
+  if (authLoading) {
+    return (
+      <div className="loading-overlay">
+        <div className="loading-spinner"></div>
+        <p>טוען...</p>
+      </div>
+    );
+  }
+
+  if (!hasPermission('create_users')) {
+    return null;
+  }
 
   const handlePhoneDup = useCallback((isDup) => {
     setLoading(prev => ({ ...prev, duplicateCheck: false }));
@@ -82,54 +103,50 @@ export default function NewUserPage() {
 
   const onChange = makeFieldChange(setForm, setErrors);
 
-const validateStep = (currentStep) => {
-  const stepFields = {
-    1: ['username', 'phone', 'password', 'birth_date', 'role', 'gender', 'access_profile', 'permissions_json'],
-    2: ['weight', 'height', 'body_fat', 'muscle_mass', 'circumference', 'recorded_at'],
-    3: ['start_date', 'end_date', 'payment_status']
-  };
-  
-  const stepErrors = {};
-  const fieldsToValidate = stepFields[currentStep] || [];
-  
-  fieldsToValidate.forEach(field => {
-    const error = validateField(field, form[field], form);
-    if (error) {
-      stepErrors[field] = error;
-    }
-  });
-  
-  if (currentStep === 1 && form.access_profile === 'custom') {
-    if (!form.permissions_json || form.permissions_json.length === 0) {
-      stepErrors.permissions_json = "נדרש לבחור הרשאות עבור פרופיל מותאם אישית";
-    }
-  }
-  
-  if (currentStep === 3) {
-    if (form.start_date && form.end_date) {
-      const start = new Date(form.start_date);
-      const end = new Date(form.end_date);
-      if (start > end) {
-        stepErrors.end_date = "תאריך סיום חייב להיות אחרי תאריך התחלה";
+  const validateStep = (currentStep) => {
+    const stepFields = {
+      1: ['username', 'phone', 'password', 'birth_date', 'role', 'gender', 'access_profile', 'permissions_json'],
+      2: ['weight', 'height', 'body_fat', 'muscle_mass', 'circumference', 'recorded_at'],
+      3: ['start_date', 'end_date', 'payment_status']
+    };
+    
+    const stepErrors = {};
+    const fieldsToValidate = stepFields[currentStep] || [];
+    
+    fieldsToValidate.forEach(field => {
+      const error = validateField(field, form[field], form);
+      if (error) {
+        stepErrors[field] = error;
+      }
+    });
+    
+    if (currentStep === 1 && form.access_profile === 'custom') {
+      if (!form.permissions_json || form.permissions_json.length === 0) {
+        stepErrors.permissions_json = "נדרש לבחור הרשאות עבור פרופיל מותאם אישית";
       }
     }
-  }
-  return stepErrors;
-};
+    
+    if (currentStep === 3) {
+      if (form.start_date && form.end_date) {
+        const start = new Date(form.start_date);
+        const end = new Date(form.end_date);
+        if (start > end) {
+          stepErrors.end_date = "תאריך סיום חייב להיות אחרי תאריך התחלה";
+        }
+      }
+    }
+    return stepErrors;
+  };
 
   const handleNext = () => {
-    // Validate current step
     const stepErrors = validateStep(step);
     
-    // Also validate previous steps to ensure we don't move forward with previous errors
     if (step > 1) {
       const previousErrors = validateStep(step - 1);
       if (Object.keys(previousErrors).length > 0) {
-        // If there are errors in previous steps, go back to that step
         setStep(step - 1);
         setErrors(previousErrors);
         
-        // Scroll to first error after a short delay
         setTimeout(() => {
           const firstError = Object.keys(previousErrors)[0];
           const element = document.getElementById(firstError);
@@ -145,7 +162,6 @@ const validateStep = (currentStep) => {
     if (Object.keys(stepErrors).length > 0) {
       setErrors(stepErrors);
       
-      // Scroll to first error after a short delay
       setTimeout(() => {
         const firstError = Object.keys(stepErrors)[0];
         const element = document.getElementById(firstError);
@@ -157,7 +173,6 @@ const validateStep = (currentStep) => {
       return;
     }
     
-    // Only move to next step if no errors
     setStep((s) => Math.min(3, s + 1));
   };
 
@@ -166,28 +181,23 @@ const validateStep = (currentStep) => {
   };
 
   const onSubmit = async () => {
-    // First validate all steps
     let allErrors = {};
     
-    // Validate step 1
     const step1Errors = validateStep(1);
     if (Object.keys(step1Errors).length > 0) {
       allErrors = { ...allErrors, ...step1Errors };
     }
     
-    // Validate step 2
     const step2Errors = validateStep(2);
     if (Object.keys(step2Errors).length > 0) {
       allErrors = { ...allErrors, ...step2Errors };
     }
     
-    // Validate step 3
     const step3Errors = validateStep(3);
     if (Object.keys(step3Errors).length > 0) {
       allErrors = { ...allErrors, ...step3Errors };
     }
     
-    // Also run the full form validation for any additional checks
     const fullValidationErrors = validateUserForm(form);
     if (errors.phone) fullValidationErrors.phone = errors.phone;
     
@@ -195,13 +205,11 @@ const validateStep = (currentStep) => {
     
     setErrors(allErrors);
     if (Object.keys(allErrors).length) {
-      // Find the first error and navigate to that step
       const firstError = Object.keys(allErrors)[0];
       const errorStep = fieldToStep[firstError] || 1;
       
       if (errorStep !== step) {
         setStep(errorStep);
-        // Wait for step to render then scroll to error
         setTimeout(() => {
           const element = document.getElementById(firstError);
           if (element) {

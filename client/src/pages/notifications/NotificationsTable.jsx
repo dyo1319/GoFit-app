@@ -1,7 +1,6 @@
-// client/src/notifications/NotificationsTable.jsx
 import { DataGrid } from "@mui/x-data-grid";
-import { Chip, Stack, IconButton, Tooltip, Box } from "@mui/material";
-import { DoneAll, Delete, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Chip, Stack, IconButton, Tooltip, Box, Avatar } from "@mui/material";
+import { DoneAll, Delete, Visibility, VisibilityOff, Person, AdminPanelSettings } from "@mui/icons-material";
 
 const formatDate = (dateString) => {
   if (!dateString) return '-';
@@ -24,6 +23,7 @@ export default function NotificationsTable({
   onPaginationModelChange,
   onMarkRead,
   onDelete,
+  canManage = true,
 }) {
   const columns = [
     { 
@@ -37,6 +37,29 @@ export default function NotificationsTable({
           {params.value}
         </Box>
       ),
+    },
+    {
+      field: "audience",
+      headerName: "סוג",
+      flex: 0.6,
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => {
+        const isAdminNotification = params.value === 'admin' || params.value === null;
+        return (
+          <Tooltip title={isAdminNotification ? "התראת מערכת" : "התראה אישית"}>
+            <Avatar 
+              sx={{ 
+                width: 32, 
+                height: 32,
+                bgcolor: isAdminNotification ? 'secondary.main' : 'primary.main'
+              }}
+            >
+              {isAdminNotification ? <AdminPanelSettings /> : <Person />}
+            </Avatar>
+          </Tooltip>
+        );
+      },
     },
     { 
       field: "title", 
@@ -107,12 +130,12 @@ export default function NotificationsTable({
           {params.value ? (
             <>
               <Visibility fontSize="small" color="success" />
-              <span>{formatDate(params.value)}</span>
+              <span style={{ fontSize: '0.75rem' }}>{formatDate(params.value)}</span>
             </>
           ) : (
             <>
               <VisibilityOff fontSize="small" color="disabled" />
-              <span>לא נקרא</span>
+              <span style={{ fontSize: '0.75rem' }}>לא נקרא</span>
             </>
           )}
         </Box>
@@ -126,32 +149,49 @@ export default function NotificationsTable({
       align: "center",
       sortable: false,
       filterable: false,
-      renderCell: (params) => (
-        <Stack direction="row" spacing={0.5}>
-          {!params.row.read_at && (
-            <Tooltip title="סמן כנקרא">
-              <IconButton 
+      renderCell: (params) => {
+        const canManageThisNotification = canManage && 
+          (params.row.audience === 'admin' || 
+           params.row.user_id === null || 
+           params.row.audience === 'user');
+
+        return (
+          <Stack direction="row" spacing={0.5}>
+            {canManageThisNotification && !params.row.read_at && (
+              <Tooltip title="סמן כנקרא">
+                <IconButton 
+                  size="small" 
+                  color="success" 
+                  onClick={() => onMarkRead(params.row)}
+                  disabled={loading}
+                >
+                  <DoneAll />
+                </IconButton>
+              </Tooltip>
+            )}
+            {canManageThisNotification && (
+              <Tooltip title="מחק">
+                <IconButton 
+                  size="small" 
+                  color="error" 
+                  onClick={() => onDelete(params.row)}
+                  disabled={loading}
+                >
+                  <Delete />
+                </IconButton>
+              </Tooltip>
+            )}
+            {!canManageThisNotification && (
+              <Chip 
                 size="small" 
-                color="success" 
-                onClick={() => onMarkRead(params.row)}
-                disabled={loading}
-              >
-                <DoneAll />
-              </IconButton>
-            </Tooltip>
-          )}
-          <Tooltip title="מחק">
-            <IconButton 
-              size="small" 
-              color="error" 
-              onClick={() => onDelete(params.row)}
-              disabled={loading}
-            >
-              <Delete />
-            </IconButton>
-          </Tooltip>
-        </Stack>
-      ),
+                label="אין הרשאות" 
+                color="default" 
+                variant="outlined" 
+              />
+            )}
+          </Stack>
+        );
+      },
     },
   ];
 
@@ -181,11 +221,21 @@ export default function NotificationsTable({
           '& .unread-row': {
             backgroundColor: '#f8f9fa',
             fontWeight: '600',
+          },
+          '& .admin-notification': {
+            borderLeft: '4px solid #ed6c02',
+          },
+          '& .user-notification': {
+            borderLeft: '4px solid #1976d2',
           }
         }}
-        getRowClassName={(params) => 
-          !params.row.read_at ? 'unread-row' : ''
-        }
+        getRowClassName={(params) => {
+          const baseClass = !params.row.read_at ? 'unread-row' : '';
+          const notificationType = params.row.audience === 'admin' || params.row.audience === null 
+            ? 'admin-notification' 
+            : 'user-notification';
+          return `${baseClass} ${notificationType}`;
+        }}
         localeText={{
           noRowsLabel: "אין התראות להצגה",
           MuiTablePagination: {

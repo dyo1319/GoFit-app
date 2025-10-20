@@ -1,9 +1,9 @@
-// client/src/notifications/notificationsApi.js
-export async function getNotifications(API_BASE, {
+export async function getNotifications(authenticatedFetch, {
   paginationModel,
   query,
   type,
   onlyUnread,
+  audience = 'user',
   signal,
 }) {
   const page = (paginationModel?.page ?? 0) + 1;
@@ -17,10 +17,10 @@ export async function getNotifications(API_BASE, {
   if (query?.trim()) params.set("query", query.trim());
   if (type) params.set("type", type);
   if (onlyUnread) params.set("onlyUnread", "1");
+  if (audience) params.set("audience", audience);
 
   try {
-    const res = await fetch(`${API_BASE}/notifications?${params.toString()}`, {
-      credentials: "include",
+    const res = await authenticatedFetch(`/notifications?${params.toString()}`, {
       signal,
     });
 
@@ -30,7 +30,6 @@ export async function getNotifications(API_BASE, {
 
     const data = await res.json();
     
-    // Handle different response structures
     const rows = data?.data?.items ?? data?.data ?? data?.items ?? [];
     const total = data?.data?.total ?? data?.total ?? data?.pagination?.total ?? 0;
     
@@ -44,11 +43,33 @@ export async function getNotifications(API_BASE, {
   }
 }
 
-async function doAction(API_BASE, path, method = "POST") {
+export async function getNotificationStats(authenticatedFetch) {
   try {
-    const res = await fetch(`${API_BASE}${path}`, { 
-      method, 
-      credentials: "include" 
+    const res = await authenticatedFetch(`/notifications/stats`);
+
+    if (!res.ok) {
+      throw new Error(`Failed to load notification stats (${res.status})`);
+    }
+
+    const data = await res.json();
+    return data?.data || {
+      total: 0,
+      unread: 0,
+      info: 0,
+      warning: 0,
+      error: 0,
+      success: 0
+    };
+  } catch (error) {
+    console.error('Error fetching notification stats:', error);
+    throw error;
+  }
+}
+
+async function doAction(authenticatedFetch, path, method = "POST") {
+  try {
+    const res = await authenticatedFetch(path, { 
+      method,
     });
     
     if (!res.ok) {
@@ -63,14 +84,14 @@ async function doAction(API_BASE, path, method = "POST") {
   }
 }
 
-export const markAsRead = (API_BASE, id) => 
-  doAction(API_BASE, `/notifications/${id}/read`);
+export const markAsRead = (authenticatedFetch, id) => 
+  doAction(authenticatedFetch, `/notifications/${id}/read`);
 
-export const deleteOne = (API_BASE, id) => 
-  doAction(API_BASE, `/notifications/${id}`, "DELETE");
+export const deleteOne = (authenticatedFetch, id) => 
+  doAction(authenticatedFetch, `/notifications/${id}`, "DELETE");
 
-export const markAllAsRead = (API_BASE) => 
-  doAction(API_BASE, `/notifications/read-all`);
+export const markAllAsRead = (authenticatedFetch) => 
+  doAction(authenticatedFetch, `/notifications/read-all`);
 
-export const clearAll = (API_BASE) => 
-  doAction(API_BASE, `/notifications`, "DELETE");
+export const clearAll = (authenticatedFetch) => 
+  doAction(authenticatedFetch, `/notifications`, "DELETE");

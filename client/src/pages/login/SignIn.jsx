@@ -2,38 +2,34 @@ import React, { useState } from 'react';
 import './SignIn.css';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { isPhoneIL, normalizePhone } from '../../utils/validators';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
-
-const SignIn = ({ onSignInSuccess, onSwitchToSignUp }) => {
-  const [formData, setFormData] = useState({
-    phone_number: '',
-    password: '',
-  });
+const SignIn = () => {
+  const [formData, setFormData] = useState({ phone_number: '', password: '' });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  
+  const { signIn } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = location.state?.from?.pathname || '/admin';
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
     setFormData(prev => ({ ...prev, [name]: value }));
-
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
     if (errors.submit) setErrors(prev => ({ ...prev, submit: '' }));
-  };
-
-  // ולידציה לטלפון ישראלי: 10 ספרות, מתחיל ב-05
-  const validatePhoneNumber = (phone) => {
-    const digits = phone.replace(/\D/g, '');
-    return /^05\d{8}$/.test(digits);
   };
 
   const validateForm = () => {
     const newErrors = {};
     if (!formData.phone_number.trim()) {
       newErrors.phone_number = 'יש להזין מספר טלפון';
-    } else if (!validatePhoneNumber(formData.phone_number)) {
+    } else if (!isPhoneIL(formData.phone_number)) {
       newErrors.phone_number = 'מספר לא תקין (10 ספרות, מתחיל ב־05)';
     }
 
@@ -42,13 +38,11 @@ const SignIn = ({ onSignInSuccess, onSwitchToSignUp }) => {
     } else if (formData.password.length < 6) {
       newErrors.password = 'סיסמה חייבת להיות לפחות 6 תווים';
     }
-
     return newErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const newErrors = validateForm();
     if (Object.keys(newErrors).length) {
       setErrors(newErrors);
@@ -59,46 +53,34 @@ const SignIn = ({ onSignInSuccess, onSwitchToSignUp }) => {
     setErrors({});
 
     try {
-      // ניקוי מקפים ורווחים – שליחה כ-10 ספרות נקיות
-      const cleanPhone = formData.phone_number.replace(/\D/g, '');
+      const cleanPhone = normalizePhone(formData.phone_number);
+      const result = await signIn(cleanPhone, formData.password);
+      
+      if (result.success) {
+        const role = result.user.role;
+        let dest = '/admin';
+        if (role === 'admin') dest = '/admin/permissions';
+        else if (role === 'trainer') dest = '/admin/users';
+        else dest = '/unauthorized';
 
-      const res = await fetch(`${API_BASE}/api/auth/signin`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // במידה והשרת מחזיר cookie
-        body: JSON.stringify({
-          phone_number: cleanPhone,
-          password: formData.password,
-        }),
-      });
-
-      // במקרה של 204/טקסט – נגן על עצמנו
-      let data = {};
-      try { data = await res.json(); } catch (_) {}
-
-      if (res.ok && (data?.success || data?.user)) {
-        if (onSignInSuccess) {
-          onSignInSuccess(data.user, data.token);
-        }
+        console.log('Sign in successful, navigating to:', dest, '(was from:', from, ')');
+        navigate(dest, { replace: true });
       } else {
-        setErrors({ submit: data?.message || 'ההתחברות נכשלה. בדוק פרטים ונסה שוב.' });
+        setErrors({ submit: result.message || 'שגיאה בהתחברות' });
       }
-    } catch (err) {
+    } catch (error) {
+      console.error('Sign in error:', error);
       setErrors({ submit: 'שגיאת חיבור. בדוק רשת ונסה שוב.' });
     } finally {
       setIsLoading(false);
     }
   };
 
-  // פורמט נוח לישראל: 05X-XXX-XXXX
   const formatPhoneIL = (value) => {
-    const digits = value.replace(/\D/g, '').slice(0, 10);
-    // 05X
-    if (digits.length <= 3) return digits;
-    // 05X-XXX
-    if (digits.length <= 6) return `${digits.slice(0,3)}-${digits.slice(3)}`;
-    // 05X-XXX-XXXX
-    return `${digits.slice(0,3)}-${digits.slice(3,6)}-${digits.slice(6)}`;
+    const d = value.replace(/\D/g, '').slice(0, 10);
+    if (d.length <= 3) return d;
+    if (d.length <= 6) return `${d.slice(0,3)}-${d.slice(3)}`;
+    return `${d.slice(0,3)}-${d.slice(3,6)}-${d.slice(6)}`;
   };
 
   const handlePhoneChange = (e) => {
@@ -109,7 +91,7 @@ const SignIn = ({ onSignInSuccess, onSwitchToSignUp }) => {
   };
 
   const canSubmit =
-    validatePhoneNumber(formData.phone_number) &&
+    isPhoneIL(formData.phone_number) &&
     formData.password && formData.password.length >= 6 &&
     !isLoading;
 
@@ -172,34 +154,13 @@ const SignIn = ({ onSignInSuccess, onSwitchToSignUp }) => {
             )}
           </div>
 
-          <button
-            type="submit"
-            className="signin-button"
-            disabled={!canSubmit}
-          >
+          <button type="submit" className="signin-button" disabled={!canSubmit}>
             {isLoading ? 'מתחבר…' : 'התחבר'}
           </button>
         </form>
 
         <div className="signin-footer">
           <p><a href="#forgot-password">שכחת סיסמה?</a></p>
-          <p>
-            אין לך חשבון?{' '}
-            <button
-              type="button"
-              onClick={onSwitchToSignUp}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: '#2563eb',
-                cursor: 'pointer',
-                textDecoration: 'underline',
-                font: 'inherit'
-              }}
-            >
-              הרשמה
-            </button>
-          </p>
         </div>
       </div>
     </div>

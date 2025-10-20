@@ -1,15 +1,13 @@
-
-export async function doAction(API_BASE, path, method = "POST") {
-  const res = await fetch(`${API_BASE}${path}`, {
+export async function doAction(authenticatedFetch, path, method = "POST") {
+  const res = await authenticatedFetch(path, {
     method,
-    credentials: "include",
   });
   const json = await res.json().catch(() => ({}));
   return { ok: res.ok, status: res.status, json };
 }
 
-export const pauseSub   = (API_BASE, id) => doAction(API_BASE, `/S/${id}/pause`);
-export const resumeSub  = (API_BASE, id) => doAction(API_BASE, `/S/${id}/resume`);
-export const cancelSub  = (API_BASE, id) => doAction(API_BASE, `/S/${id}/cancel`);
-export const restoreSub = (API_BASE, id) => doAction(API_BASE, `/S/${id}/restore`);
-export const hardDelete = (API_BASE, id) => doAction(API_BASE, `/S/${id}`, "DELETE");
+export const pauseSub   = (authenticatedFetch, id) => doAction(authenticatedFetch, `/S/${id}/pause`);
+export const resumeSub  = (authenticatedFetch, id) => doAction(authenticatedFetch, `/S/${id}/resume`);
+export const cancelSub  = (authenticatedFetch, id) => doAction(authenticatedFetch, `/S/${id}/cancel`);
+export const restoreSub = (authenticatedFetch, id) => doAction(authenticatedFetch, `/S/${id}/restore`);
+export const hardDelete = (authenticatedFetch, id) => doAction(authenticatedFetch, `/S/${id}`, "DELETE");

@@ -1,23 +1,23 @@
 import * as React from "react";
-import { Paper, Box, Typography, Button, Chip, TextField, InputAdornment } from "@mui/material";
+import { Paper, Box, Typography, Button, Chip, TextField, InputAdornment, Alert } from "@mui/material";
 import { Check, Close, Search } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useDebouncedValue } from "../subscription/hook";
+import { useAuth } from '../../context/AuthContext';
 import "./pendingpay.css";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_BASE;
 
-async function updatePaymentStatus(id, status) {
-  const res = await fetch(`${API_BASE}/S/${id}/payment`, {
+async function updatePaymentStatus(authenticatedFetch, id, status) {
+  const res = await authenticatedFetch(`/S/${id}/payment`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    credentials: "include",
     body: JSON.stringify({ status }),
   });
   if (!res.ok) throw new Error("update failed");
 }
 
-async function fetchPending({ page, pageSize, sort, q, signal }) {
+async function fetchPending(authenticatedFetch, { page, pageSize, sort, q, signal }) {
   const params = {
     page,
     pageSize,
@@ -26,13 +26,14 @@ async function fetchPending({ page, pageSize, sort, q, signal }) {
     query: q || "",
   };
   const p = new URLSearchParams(params);
-  const res = await fetch(`${API_BASE}/S?${p}`, { credentials: "include", signal });
+  const res = await authenticatedFetch(`/S?${p.toString()}`, { signal });
   if (!res.ok) return { rows: [], total: 0 };
-  const out = await res.json();
-  return { rows: out.rows ?? out.data ?? [], total: out.total ?? 0 };
+  const out = await res.json().catch(() => ({}));
+  return { rows: out.rows ?? out.data ?? out?.data?.items ?? [], total: out.total ?? out?.data?.total ?? 0 };
 }
 
 export default function PendingPaymentsPage() {
+  const { user, hasPermission, authenticatedFetch } = useAuth();
   const [rows, setRows] = React.useState([]);
   const [rowCount, setRowCount] = React.useState(0);
   const [loading, setLoading] = React.useState(false);
@@ -51,6 +52,12 @@ export default function PendingPaymentsPage() {
   }, []);
 
   const load = React.useCallback(async (abortPrevious = true) => {
+    if (!hasPermission('view_subscriptions')) {
+      setRows([]);
+      setRowCount(0);
+      return;
+    }
+
     if (loadingRef.current) return;
     if (abortPrevious) ctrlRef.current?.abort();
 
@@ -61,7 +68,7 @@ export default function PendingPaymentsPage() {
 
     const sort = sortModel.length ? `${sortModel[0].field}:${sortModel[0].sort}` : "";
     try {
-      const { rows, total } = await fetchPending({
+      const { rows, total } = await fetchPending(authenticatedFetch, {
         page: paginationModel.page + 1,
         pageSize: paginationModel.pageSize,
         sort,
@@ -78,27 +85,38 @@ export default function PendingPaymentsPage() {
       loadingRef.current = false;
       if (mountedRef.current && !ctrl.signal.aborted) setLoading(false);
     }
-  }, [paginationModel, sortModel, qDeb]);
+  }, [paginationModel, sortModel, qDeb, hasPermission, authenticatedFetch]);
 
   React.useEffect(() => {
     if (!mountedRef.current) return;
-    if (paginationModel.page !== 0) setPaginationModel(prev => ({ ...prev, page: 0 }));
-    else load(false);
+    if (user && hasPermission('view_subscriptions')) {
+      if (paginationModel.page !== 0) setPaginationModel(prev => ({ ...prev, page: 0 }));
+      else load(false);
+    }
     return () => ctrlRef.current?.abort();
-  }, [qDeb, load]);
+  }, [qDeb, load, user, hasPermission, paginationModel.page]);
 
   React.useEffect(() => {
     if (!mountedRef.current) return;
-    load(true);
-  }, [paginationModel.page, paginationModel.pageSize, sortModel, load]);
+    if (user && hasPermission('view_subscriptions')) {
+      load(true);
+    }
+  }, [paginationModel.page, paginationModel.pageSize, sortModel, load, user, hasPermission]);
 
   React.useEffect(() => {
-    if (mountedRef.current) load(true);
-  }, []);
+    if (mountedRef.current && user && hasPermission('view_subscriptions')) {
+      load(true);
+    }
+  }, [user, hasPermission, load]);
 
   const onMark = async (id, status) => {
+    if (!hasPermission('manage_payment_status')) {
+      console.error("No permission to update payment status");
+      return;
+    }
+
     try {
-      await updatePaymentStatus(id, status);
+      await updatePaymentStatus(authenticatedFetch, id, status);
       if (mountedRef.current) load(true);
     } catch (e) {
       if (mountedRef.current) console.error("Failed to update payment status:", e);
@@ -132,18 +150,61 @@ export default function PendingPaymentsPage() {
       align: "center",
       headerAlign: "center",
       sortable: false,
-      renderCell: (p) => (
-        <div className="actions-container">
-          <Button size="small" variant="contained" startIcon={<Check />} onClick={() => onMark(p.row.id, "paid")}>
-            שולם
-          </Button>
-          <Button size="small" color="error" variant="outlined" startIcon={<Close />} onClick={() => onMark(p.row.id, "failed")}>
-            נכשל
-          </Button>
-        </div>
-      ),
+      renderCell: (p) => {
+        const canManagePayments = hasPermission('manage_payment_status');
+        return (
+          <div className="actions-container">
+            {canManagePayments ? (
+              <>
+                <Button
+                  size="small"
+                  variant="contained"
+                  startIcon={<Check />}
+                  onClick={() => onMark(p.row.id, "paid")}
+                >
+                  שולם
+                </Button>
+                <Button
+                  size="small"
+                  color="error"
+                  variant="outlined"
+                  startIcon={<Close />}
+                  onClick={() => onMark(p.row.id, "failed")}
+                  sx={{ ml: 1 }}
+                >
+                  נכשל
+                </Button>
+              </>
+            ) : (
+              <Chip size="small" label="אין הרשאות" color="default" variant="outlined" />
+            )}
+          </div>
+        );
+      },
     },
   ];
+
+  if (!user) {
+    return (
+      <div className="pendingPage" dir="rtl">
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Typography>טוען...</Typography>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasPermission('view_subscriptions')) {
+    return (
+      <div className="pendingPage" dir="rtl">
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Alert severity="error" sx={{ maxWidth: 400, margin: '0 auto' }}>
+            אין לך הרשאות לצפות בתשלומים ממתינים
+          </Alert>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pendingPage" dir="rtl">

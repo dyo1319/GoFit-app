@@ -1,4 +1,3 @@
-// client/src/notifications/NotificationsFilters.jsx
 import { 
   Box, 
   TextField, 
@@ -9,9 +8,10 @@ import {
   InputAdornment,
   Stack,
   useMediaQuery,
-  useTheme
+  useTheme,
+  Chip
 } from "@mui/material";
-import { Search, Refresh, DoneAll, DeleteSweep } from "@mui/icons-material";
+import { Search, Refresh, DoneAll, DeleteSweep, Notifications } from "@mui/icons-material";
 
 export default function NotificationsFilters({
   query,
@@ -20,13 +20,28 @@ export default function NotificationsFilters({
   onTypeChange,
   onlyUnread,
   onOnlyUnreadChange,
+  audience,
+  onAudienceChange,
   onRefresh,
   onMarkAll,
   onClearAll,
   loading = false,
+  canManage = true,
+  stats = null,
+  userRole = 'user',
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  const StatsChip = ({ label, value, color = 'default' }) => (
+    <Chip 
+      size="small" 
+      label={`${label}: ${value}`} 
+      color={color}
+      variant="outlined"
+      sx={{ minWidth: 'auto' }}
+    />
+  );
 
   return (
     <Box 
@@ -45,7 +60,31 @@ export default function NotificationsFilters({
         spacing={2} 
         sx={{ width: '100%', alignItems: isMobile ? 'stretch' : 'center' }}
       >
-        {/* Search and Filter Group */}
+        {stats && (
+          <Stack 
+            direction="row" 
+            spacing={1} 
+            sx={{ 
+              width: '100%', 
+              justifyContent: 'flex-start',
+              flexWrap: 'wrap',
+              gap: 1,
+              mb: 1
+            }}
+          >
+            <StatsChip label="סה״כ" value={stats.total} />
+            <StatsChip 
+              label="לא נקראו" 
+              value={stats.unread} 
+              color={stats.unread > 0 ? "warning" : "default"}
+            />
+            {stats.info > 0 && <StatsChip label="מידע" value={stats.info} color="info" />}
+            {stats.warning > 0 && <StatsChip label="אזהרות" value={stats.warning} color="warning" />}
+            {stats.error > 0 && <StatsChip label="שגיאות" value={stats.error} color="error" />}
+            {stats.success > 0 && <StatsChip label="הצלחות" value={stats.success} color="success" />}
+          </Stack>
+        )}
+
         <Stack direction={isMobile ? "column" : "row"} spacing={2} sx={{ flex: 1 }}>
           <TextField
             size="small"
@@ -79,6 +118,22 @@ export default function NotificationsFilters({
             <MenuItem value="success">הצלחה</MenuItem>
           </TextField>
 
+          {userRole === 'admin' && (
+            <TextField 
+              size="small" 
+              select 
+              label="סוג התראות" 
+              value={audience} 
+              onChange={(e) => onAudienceChange(e.target.value)} 
+              sx={{ minWidth: isMobile ? '100%' : 160 }}
+              disabled={loading}
+            >
+              <MenuItem value="user">התראות אישיות</MenuItem>
+              <MenuItem value="admin">התראות מערכת</MenuItem>
+              <MenuItem value="">כל ההתראות</MenuItem>
+            </TextField>
+          )}
+
           <FormControlLabel
             control={
               <Checkbox 
@@ -91,7 +146,6 @@ export default function NotificationsFilters({
           />
         </Stack>
 
-        {/* Action Buttons Group */}
         <Stack direction={isMobile ? "column" : "row"} spacing={1}>
           <Button 
             variant="outlined" 
@@ -102,26 +156,31 @@ export default function NotificationsFilters({
           >
             רענון
           </Button>
-          <Button 
-            variant="contained" 
-            color="success" 
-            onClick={onMarkAll}
-            disabled={loading}
-            startIcon={<DoneAll />}
-            size={isMobile ? "medium" : "small"}
-          >
-            סמן הכול כנקרא
-          </Button>
-          <Button 
-            variant="contained" 
-            color="error" 
-            onClick={onClearAll}
-            disabled={loading}
-            startIcon={<DeleteSweep />}
-            size={isMobile ? "medium" : "small"}
-          >
-            נקה הכול
-          </Button>
+          
+          {canManage && (
+            <>
+              <Button 
+                variant="contained" 
+                color="success" 
+                onClick={onMarkAll}
+                disabled={loading}
+                startIcon={<DoneAll />}
+                size={isMobile ? "medium" : "small"}
+              >
+                סמן הכול כנקרא
+              </Button>
+              <Button 
+                variant="contained" 
+                color="error" 
+                onClick={onClearAll}
+                disabled={loading}
+                startIcon={<DeleteSweep />}
+                size={isMobile ? "medium" : "small"}
+              >
+                נקה הכול
+              </Button>
+            </>
+          )}
         </Stack>
       </Stack>
     </Box>

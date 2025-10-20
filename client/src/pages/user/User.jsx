@@ -16,11 +16,11 @@ import {
   Payment,
   Schedule,
 } from "@mui/icons-material";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
+import { useAuth } from '../../context/AuthContext';
 import "./user.css";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
 const ROLE_HE2EN = { "מתאמן": "trainee", "מאמן": "trainer", "מנהל": "admin", "": null };
 const ROLE_EN2HE = { trainee: "מתאמן", trainer: "מאמן", admin: "מנהל", null: "" };
 const GENDER_HE2EN = { "זכר": "male", "נקבה": "female", "": null };
@@ -28,10 +28,13 @@ const GENDER_EN2HE = { male: "זכר", female: "נקבה", null: "" };
 
 export default function User() {
   const { id } = useParams();
+  const { user, hasPermission, authenticatedFetch, refreshPermissions } = useAuth(); // ADD missing imports
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(""); 
+  const [saving, setSaving] = useState(false);
 
   const [original, setOriginal] = useState(null);
   const [userForm, setUserForm] = useState({
@@ -53,13 +56,25 @@ export default function User() {
   });
 
   useEffect(() => {
+    if (user && !hasPermission('view_users')) {
+      navigate('/unauthorized');
+    }
+  }, [user, hasPermission, navigate]);
+
+  useEffect(() => {
     let ignore = false;
     async function load() {
+      if (!hasPermission('view_users')) {
+        setError('אין לך הרשאות לצפות בפרטי משתמש');
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       setError("");
       setSuccess(""); 
       try {
-        const res = await fetch(`${API_BASE}/U/users/${id}?expand=1`);
+        const res = await authenticatedFetch(`/U/users/${id}?expand=1`);
         const json = await res.json().catch(() => ({}));
 
         if (!res.ok || !json?.success) {
@@ -99,14 +114,15 @@ export default function User() {
       }
     }
 
-    if (id) load();
-    else {
+    if (id && user && hasPermission('view_users')) {
+      load();
+    } else if (!id) {
       setError("לא סופק מזהה משתמש");
       setLoading(false);
     }
 
     return () => { ignore = true; };
-  }, [id]);
+  }, [id, user, hasPermission, authenticatedFetch]);
 
   const handleInputChange = (field, value) => {
     setUserForm((prev) => ({ ...prev, [field]: value }));
@@ -138,9 +154,19 @@ export default function User() {
   };
 
   const handleSave = async () => {
+    if (!hasPermission('edit_users')) {
+      setError('אין לך הרשאות לערוך משתמשים');
+      return;
+    }
+
     setError("");
     setSuccess("");
-    if (!original) return;
+    setSaving(true);
+    
+    if (!original) {
+      setSaving(false);
+      return;
+    }
 
     const changed = {};
     const addIfChanged = (key, transform = (v) => v) => {
@@ -169,15 +195,17 @@ export default function User() {
 
     if (Object.keys(changed).length === 0) {
       setIsEditing(false);
+      setSaving(false);
       return;
     }
 
     try {
-      const res = await fetch(`${API_BASE}/U/users/${id}`, {
+      const res = await authenticatedFetch(`/U/Update/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(changed),
       });
+      
       const j = await res.json().catch(() => ({}));
       if (!res.ok || j?.success === false) {
         throw new Error(j?.message || `עדכון נכשל (${res.status})`);
@@ -185,7 +213,7 @@ export default function User() {
 
       setSuccess(j.message || "משתמש עודכן בהצלחה");
 
-      const afterRes = await fetch(`${API_BASE}/U/users/${id}?expand=1`);
+      const afterRes = await authenticatedFetch(`/U/users/${id}?expand=1`);
       const after = await afterRes.json().catch(() => ({}));
       if (!afterRes.ok || !after?.success) {
         throw new Error(after?.message || `שגיאה ברענון (${afterRes.status})`);
@@ -216,8 +244,15 @@ export default function User() {
       setUserForm(refreshed);
       setOriginal(refreshed);
       setIsEditing(false);
+
+      if (id === user.id) {
+        await refreshPermissions();
+      }
+      
     } catch (e) {
       setError(e.message || "שגיאת שרת בעת עדכון");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -227,6 +262,16 @@ export default function User() {
     setSuccess("");
   };
 
+  if (!user) {
+    return (
+      <div className="user">
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <p>טוען...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) return <div className="user"><p>טוען…</p></div>;
   if (error)   return <div className="user"><p style={{color:"#d33"}}>שגיאה: {error}</p></div>;
 
@@ -235,14 +280,22 @@ export default function User() {
       <div className="userTitleContainer">
         <h1 className="userTitle">עריכת משתמש</h1>
         <div className="userActions">
-          <Link to="/newUser" style={{ textDecoration: 'none' }}>
-            <button className="userAddButton">
-              <AccountCircle/> הוספת משתמש
+          {hasPermission('create_users') && (
+            <Link to="/newUser" style={{ textDecoration: 'none' }}>
+              <button className="userAddButton">
+                <AccountCircle/> הוספת משתמש
+              </button>
+            </Link>
+          )}
+          {hasPermission('edit_users') && (
+            <button 
+              className="editButton" 
+              onClick={() => setIsEditing(!isEditing)}
+              disabled={saving}
+            >
+              <Edit fontSize="small" />
             </button>
-          </Link>
-          <button className="editButton" onClick={() => setIsEditing(!isEditing)}>
-            <Edit fontSize="small" />
-          </button>
+          )}
         </div>
       </div>
 
@@ -349,7 +402,7 @@ export default function User() {
             </div>
           </div>
         </div>
-        {isEditing && (
+        {isEditing && hasPermission('edit_users') && (
           <div className="userUpdate">
             <div className="userUpdateHeader">
               <h3 className="userUpdateTitle">עדכון פרטי חבר</h3>
@@ -553,10 +606,26 @@ export default function User() {
               </div>
 
               <div className="userUpdateActions">
-                <button type="button" className="userUpdateButton saveButton" onClick={handleSave}>
-                  <Save fontSize="small" /> עדכן פרטים
+                <button 
+                  type="button" 
+                  className="userUpdateButton saveButton" 
+                  onClick={handleSave}
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <span>שומר...</span>
+                  ) : (
+                    <>
+                      <Save fontSize="small" /> עדכן פרטים
+                    </>
+                  )}
                 </button>
-                <button type="button" className="userUpdateButton cancelButton" onClick={handleCancel}>
+                <button 
+                  type="button" 
+                  className="userUpdateButton cancelButton" 
+                  onClick={handleCancel}
+                  disabled={saving}
+                >
                   <Cancel fontSize="small" /> ביטול
                 </button>
               </div>
