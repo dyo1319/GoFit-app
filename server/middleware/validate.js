@@ -52,6 +52,19 @@ const idParamSchema = Joi.object({
   id: Joi.number().integer().min(1).required()
 });
 
+const userIdParamSchema = Joi.object({
+  userId: Joi.number().integer().min(1).required()
+});
+
+const exerciseIdParamSchema = Joi.object({
+  exerciseId: Joi.number().integer().min(1).required()
+});
+
+const trainingProgramExerciseParamsSchema = Joi.object({
+  id: Joi.number().integer().min(1).required(),
+  exerciseId: Joi.number().integer().min(1).required()
+});
+
 const userCreateSchema = Joi.object({
   username: Joi.string().trim().min(2).max(50).required(),
   phone: Joi.string().trim().pattern(/^\d+$/).min(9).max(15).required(),
@@ -169,6 +182,54 @@ const profileUpdateSchema = Joi.object({
   gender: Joi.string().valid('male','female').allow(null).optional()
 }).min(1);
 
+const exerciseCreateSchema = Joi.object({
+  exercise_name: Joi.string().trim().min(2).max(255).required(),
+  category: Joi.string().trim().min(2).max(100).required(),
+  description: Joi.string().trim().max(1000).allow('', null),
+  muscle_group: Joi.string().trim().max(100).allow('', null),
+  difficulty: Joi.string().valid('beginner', 'intermediate', 'advanced').allow(null),
+  equipment: Joi.string().trim().max(100).allow('', null),
+  video_url: Joi.string().uri().allow('', null)
+});
+
+
+const exerciseUpdateSchema = Joi.object({
+  exercise_name: Joi.string().trim().min(2).max(255).optional(),
+  category: Joi.string().trim().min(2).max(100).optional(),
+  description: Joi.string().trim().max(1000).allow('', null).optional(),
+  muscle_group: Joi.string().trim().max(100).allow('', null).optional(),
+  difficulty: Joi.string().valid('beginner', 'intermediate', 'advanced').allow(null).optional(),
+  equipment: Joi.string().trim().max(100).allow('', null).optional(),
+  video_url: Joi.string().uri().allow('', null).optional()
+}).min(1);
+
+const trainingProgramCreateSchema = Joi.object({
+  program_name: Joi.string().trim().min(2).max(255).required(),
+  user_id: Joi.number().integer().min(1).required(),
+  exercises: Joi.array().items(
+    Joi.object({
+      exercise_id: Joi.number().integer().min(1).required(),
+      sets: Joi.string().trim().max(50).required(),
+      reps: Joi.string().trim().max(50).required(),
+      duration: Joi.number().integer().min(0).default(0)
+    })
+  ).min(1).required()
+});
+
+const trainingProgramExerciseSchema = Joi.object({
+  exercise_id: Joi.number().integer().min(1).required(),
+  sets: Joi.string().trim().max(50).required(),
+  reps: Joi.string().trim().max(50).required(),
+  duration: Joi.number().integer().min(0).default(0)
+});
+
+const trainingProgramExerciseUpdateSchema = Joi.object({
+  sets: Joi.string().trim().max(50).min(1).required(),
+  reps: Joi.string().trim().max(50).min(1).required(),
+  duration: Joi.number().integer().min(0).default(0)
+});
+
+
 module.exports = {
   validate,
   subscriptionListQuerySchema,
@@ -176,6 +237,9 @@ module.exports = {
   subscriptionUpdateSchema,
   paymentStatusSchema,
   idParamSchema,
+  userIdParamSchema,
+  exerciseIdParamSchema,
+  trainingProgramExerciseParamsSchema,
   userCreateSchema,
   userUpdateSchema,
   userSearchSchema,
@@ -186,5 +250,10 @@ module.exports = {
   DateValidator,
   authSignupSchema,
   authSigninSchema,
-  profileUpdateSchema
+  profileUpdateSchema,
+  exerciseCreateSchema,
+  exerciseUpdateSchema,
+  trainingProgramCreateSchema,
+  trainingProgramExerciseSchema,
+  trainingProgramExerciseUpdateSchema
 };

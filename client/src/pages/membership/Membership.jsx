@@ -5,7 +5,9 @@ import './Membership.css';
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
-const Membership = ({ user }) => {
+const Membership = ({ user: userProp }) => {
+  const { user: userCtx } = useAuth();
+  const user = userProp ?? userCtx ?? null;
   const { authenticatedFetch } = useAuth();
   const [subscriptions, setSubscriptions] = useState([]);
   const [currentSubscription, setCurrentSubscription] = useState(null);
@@ -63,9 +65,9 @@ const Membership = ({ user }) => {
 
   if (isLoading) {
     return (
-      <div className="page-container" dir="rtl">
+      <div className="membership-page" dir="rtl">
         <PageHeader />
-        <div className="page-content">
+        <div className="membership-content">
           <div className="loading-container">
             <div className="loading-spinner"><div className="spinner"></div></div>
             <p>טוען נתוני מנוי…</p>
@@ -77,9 +79,9 @@ const Membership = ({ user }) => {
 
   if (error) {
     return (
-      <div className="page-container" dir="rtl">
+      <div className="membership-page" dir="rtl">
         <PageHeader />
-        <div className="page-content">
+        <div className="membership-content">
           <div className="error-message">
             <span className="material-icons">warning</span>
             <p>{error}</p>
@@ -90,9 +92,9 @@ const Membership = ({ user }) => {
   }
 
   return (
-    <div className="page-container" dir="rtl">
+    <div className="membership-page" dir="rtl">
       <PageHeader />
-      <div className="page-content">
+      <div className="membership-content">
         <div className="page-header">
           <div className="page-title">
             <span className="material-icons">card_membership</span>
@@ -102,9 +104,9 @@ const Membership = ({ user }) => {
         </div>
 
         <div className="user-welcome-card">
-          <div className="user-avatar"><span>{user?.username?.charAt(0).toUpperCase() || 'מ'}</span></div>
+          <div className="user-avatar"><span>{user?.username?.charAt(0).toUpperCase() || user?.phone?.charAt(0).toUpperCase() || 'מ'}</span></div>
           <div className="user-info">
-            <h2>שלום, {user?.username || 'מתאמן/ת'}!</h2>
+            <h2>שלום, {user?.username || user?.phone || 'מתאמן/ת'}!</h2>
             <p>הנה תמונת מצב המנוי שלך</p>
           </div>
         </div>
@@ -122,7 +124,7 @@ const Membership = ({ user }) => {
             <div className="subscription-details">
               <div className="detail-grid">
                 <div className="detail-item">
-                  <span className="material-icons detail-icon">event</span>
+                  <span className="material-icons detail-icon">fitness_center</span>
                   <div className="detail-content">
                     <span className="detail-label">תאריך התחלה</span>
                     <span className="detail-value">{new Date(currentSubscription.start_date).toLocaleDateString('he-IL')}</span>
@@ -130,7 +132,7 @@ const Membership = ({ user }) => {
                 </div>
 
                 <div className="detail-item">
-                  <span className="material-icons detail-icon">event_available</span>
+                  <span className="material-icons detail-icon">timer</span>
                   <div className="detail-content">
                     <span className="detail-label">תאריך סיום</span>
                     <span className="detail-value">{new Date(currentSubscription.end_date).toLocaleDateString('he-IL')}</span>
@@ -138,7 +140,7 @@ const Membership = ({ user }) => {
                 </div>
 
                 <div className="detail-item">
-                  <span className="material-icons detail-icon">schedule</span>
+                  <span className="material-icons detail-icon">history</span>
                   <div className="detail-content">
                     <span className="detail-label">ימים שנותרו</span>
                     <span className={`detail-value ${getDaysRemaining(currentSubscription.end_date) <= 7 ? 'expiring-soon' : ''}`}>
@@ -170,7 +172,7 @@ const Membership = ({ user }) => {
             {/* תקציר/סטטיסטיקות */}
             <div className="monthly-stats">
               <div className="stats-header">
-                <span className="material-icons">bar_chart</span>
+                <span className="material-icons">fact_check</span>
                 <h4>סקירה</h4>
               </div>
               <div className="stats-grid">
@@ -245,6 +247,7 @@ const Membership = ({ user }) => {
             </div>
           </div>
         )}
+
       </div>
     </div>
   );

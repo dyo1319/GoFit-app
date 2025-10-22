@@ -16,6 +16,8 @@ import Dashboard from "./pages/main-dashboard/Dashboard";
 import Workouts from "./pages/workout/Workouts";
 import Membership from "./pages/membership/Membership";
 import Profile from "./pages/profile/Profile";
+import Exercises from "./pages/exrcises-admin/Exercises";
+import TrainingPrograms from "./pages/TrainingProgram-admin/TrainingPrograms";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
@@ -260,6 +262,36 @@ function AppContent() {
             <StaffRoute>
               <AdminLayout>
                 <PermissionsPage />
+              </AdminLayout>
+            </StaffRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/exercises"
+        element={
+          <ProtectedRoute>
+            <StaffRoute>
+              <AdminLayout>
+                <PermissionRoute perm="manage_plans">
+                  <Exercises />
+                </PermissionRoute>
+              </AdminLayout>
+            </StaffRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/programs"
+        element={
+          <ProtectedRoute>
+            <StaffRoute>
+              <AdminLayout>
+                <PermissionRoute perm="manage_plans">
+                  <TrainingPrograms />
+                </PermissionRoute>
               </AdminLayout>
             </StaffRoute>
           </ProtectedRoute>

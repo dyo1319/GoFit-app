@@ -17,3 +17,26 @@ export const initialUserForm = {
   end_date: "",
   payment_status: "pending"
 };
+
+export const initialExerciseForm = {
+  exercise_name: "",
+  category: "",
+  description: "",
+  muscle_group: "",
+  difficulty: "",
+  equipment: "",
+  video_url: ""
+};
+
+export const initialTrainingProgramForm = {
+  program_name: "",
+  user_id: "",
+  exercises: [
+    {
+      exercise_id: "",
+      sets: "",
+      reps: "",
+      duration: 0
+    }
+  ]
+};

@@ -43,6 +43,15 @@ app.use('/staff', staff_R);
 const bodyDetails_R = require('./routers/bodyDetails_R');
 app.use('/body-details', bodyDetails_R);
 
+const exercises_R = require('./routers/exercises_R');
+app.use('/exercises', exercises_R);
+
+const trainingPrograms_R = require('./routers/trainingPrograms_R');
+app.use('/training-programs', trainingPrograms_R);
+
+const workoutHistory_R = require('./routers/workoutHistory_R');
+app.use('/workout-history', workoutHistory_R);
+
 const { notifyUpcomingRenewals, notifyFailedPayments } = require('./jobs/notifications_jobs');
 
 async function runJobs() {

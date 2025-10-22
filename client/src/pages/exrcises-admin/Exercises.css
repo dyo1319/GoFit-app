@@ -1,0 +1,351 @@
+/* Exercises Admin Page Styles */
+.exercises-admin {
+  direction: rtl;
+  padding: 20px;
+  min-height: calc(100vh - 50px);
+  background: #fafafa;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  flex: 1;
+}
+
+.exercises-admin .page-container {
+  direction: rtl;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.exercises-admin .page-header {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid #f0f0f0;
+}
+
+.exercises-admin .page-header h1 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.exercises-admin .page-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+/* Search and Filter Card */
+.exercises-admin .MuiCard-root {
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid #f0f0f0;
+  margin-bottom: 20px;
+}
+
+.exercises-admin .MuiCardContent-root {
+  padding: 20px;
+}
+
+.exercises-admin .MuiBox-root {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Search Input */
+.exercises-admin .MuiTextField-root {
+  min-width: 200px;
+}
+
+.exercises-admin .MuiTextField-root .MuiInputLabel-root {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.exercises-admin .MuiTextField-root .MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+.exercises-admin .MuiTextField-root .MuiOutlinedInput-input {
+  padding: 10px 14px;
+  font-size: 0.875rem;
+}
+
+/* Add Button */
+.exercises-admin .MuiButton-contained {
+  background-color: #1976d2;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 600;
+  text-transform: none;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+  transition: all 0.2s ease;
+}
+
+.exercises-admin .MuiButton-contained:hover {
+  background-color: #1565c0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+}
+
+/* Table Styles */
+.exercises-admin .MuiTableContainer-root {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  border: 1px solid #f0f0f0;
+}
+
+.exercises-admin .MuiTable-root {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.exercises-admin .MuiTableHead-root {
+  background: #f5f5f5;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.exercises-admin .MuiTableHead-root .MuiTableCell-root {
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  padding: 16px 8px;
+  border-bottom: 2px solid #ececec;
+}
+
+.exercises-admin .MuiTableBody-root .MuiTableRow-root:nth-of-type(odd) {
+  background: #fafafa;
+}
+
+.exercises-admin .MuiTableBody-root .MuiTableRow-root:hover {
+  background: #f5f5f5;
+  transition: background-color 0.2s ease;
+}
+
+.exercises-admin .MuiTableBody-root .MuiTableCell-root {
+  text-align: center;
+  padding: 12px 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Action Buttons */
+.exercises-admin .MuiIconButton-root {
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.exercises-admin .MuiIconButton-root:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  transform: scale(1.05);
+}
+
+.exercises-admin .MuiIconButton-colorPrimary:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+}
+
+.exercises-admin .MuiIconButton-colorError:hover {
+  background-color: rgba(211, 47, 47, 0.1);
+}
+
+/* Chips */
+.exercises-admin .MuiChip-root {
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.exercises-admin .MuiChip-outlined {
+  border-width: 1px;
+}
+
+/* Dialog Styles */
+.exercises-admin .MuiDialog-paper {
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+.exercises-admin .MuiDialogTitle-root {
+  padding: 24px 24px 16px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.exercises-admin .MuiDialogContent-root {
+  padding: 24px;
+}
+
+.exercises-admin .MuiDialogActions-root {
+  padding: 16px 24px 24px;
+  gap: 12px;
+}
+
+.exercises-admin .MuiDialogActions-root .MuiButton-root {
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* Form Fields */
+.exercises-admin .MuiFormControl-root {
+  margin-bottom: 16px;
+}
+
+.exercises-admin .MuiFormControl-root .MuiInputLabel-root {
+  color: #6b7280;
+}
+
+.exercises-admin .MuiFormControl-root .MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+.exercises-admin .MuiFormControl-root .MuiOutlinedInput-input {
+  padding: 12px 14px;
+}
+
+/* Alert Messages */
+.exercises-admin .MuiAlert-root {
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.exercises-admin .MuiAlert-standardError {
+  background-color: #ffebee;
+  color: #d32f2f;
+  border: 1px solid #f5c6cb;
+}
+
+.exercises-admin .MuiAlert-standardSuccess {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+/* Loading State */
+.exercises-admin .loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+/* Empty State */
+.exercises-admin .MuiBox-root {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.exercises-admin .MuiTypography-h6 {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .exercises-admin {
+    padding: 16px;
+  }
+  
+  .exercises-admin .page-header {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .exercises-admin .page-header h1 {
+    font-size: 24px;
+  }
+  
+  .exercises-admin .MuiCardContent-root {
+    padding: 16px;
+  }
+  
+  .exercises-admin .MuiBox-root {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .exercises-admin .MuiTextField-root {
+    min-width: 100%;
+  }
+  
+  .exercises-admin .MuiTableHead-root .MuiTableCell-root,
+  .exercises-admin .MuiTableBody-root .MuiTableCell-root {
+    padding: 8px 4px;
+    font-size: 0.875rem;
+  }
+  
+  .exercises-admin .MuiDialogContent-root {
+    padding: 16px;
+  }
+  
+  .exercises-admin .MuiDialogActions-root {
+    padding: 12px 16px 16px;
+    flex-direction: column;
+  }
+  
+  .exercises-admin .MuiDialogActions-root .MuiButton-root {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .exercises-admin {
+    padding: 12px;
+  }
+  
+  .exercises-admin .page-header h1 {
+    font-size: 20px;
+  }
+  
+  .exercises-admin .page-header p {
+    font-size: 14px;
+  }
+}
+
+/* Scrollbar Styling */
+.exercises-admin ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.exercises-admin ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.exercises-admin ::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.exercises-admin ::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Print Styles */
+@media print {
+  .exercises-admin .MuiTableContainer-root {
+    box-shadow: none;
+    border: 1px solid #e0e0e0;
+    break-inside: avoid;
+  }
+  
+  .exercises-admin .MuiButton-root {
+    display: none;
+  }
+}

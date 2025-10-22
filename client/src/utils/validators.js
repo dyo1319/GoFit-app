@@ -135,3 +135,66 @@ export const validateField = (name, value, form = {}) => {
       return null;
   }
 };
+
+export const validateExerciseForm = (form) => {
+  const errors = {};
+
+  if (!form.exercise_name?.trim()) {
+    errors.exercise_name = "שם התרגיל חובה";
+  } else if (form.exercise_name.trim().length < 2) {
+    errors.exercise_name = "שם התרגיל חייב להכיל לפחות 2 תווים";
+  }
+
+  if (!form.category?.trim()) {
+    errors.category = "קטגוריה חובה";
+  }
+
+  if (form.description && form.description.length > 1000) {
+    errors.description = "תיאור לא יכול להכיל יותר מ-1000 תווים";
+  }
+
+  if (form.video_url && !isValidUrl(form.video_url)) {
+    errors.video_url = "קישור לסרטון אינו תקין";
+  }
+
+  return errors;
+};
+
+export const validateTrainingProgramForm = (form) => {
+  const errors = {};
+
+  if (!form.program_name?.trim()) {
+    errors.program_name = "שם התוכנית חובה";
+  }
+
+  if (!form.user_id) {
+    errors.user_id = "מתאמן חובה";
+  }
+
+  if (!form.exercises || form.exercises.length === 0) {
+    errors.exercises = "יש להוסיף לפחות תרגיל אחד";
+  } else {
+    form.exercises.forEach((exercise, index) => {
+      if (!exercise.exercise_id) {
+        errors[`exercises[${index}].exercise_id`] = "תרגיל חובה";
+      }
+      if (!exercise.sets?.trim()) {
+        errors[`exercises[${index}].sets`] = "מספר סטים חובה";
+      }
+      if (!exercise.reps?.trim()) {
+        errors[`exercises[${index}].reps`] = "מספר חזרות חובה";
+      }
+    });
+  }
+
+  return errors;
+};
+
+export const isValidUrl = (string) => {
+  try {
+    new URL(string);
+    return true;
+  } catch (_) {
+    return false;
+  }
+};

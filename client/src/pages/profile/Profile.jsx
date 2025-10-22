@@ -147,9 +147,9 @@ const Profile = ({ user: userProp }) => {
 
   if (!user) {
     return (
-      <div className="page-container" dir="rtl">
+      <div className="profile-page" dir="rtl">
         <PageHeader />
-        <div className="page-content">
+        <div className="profile-content">
           <div className="loading-container">
             <div className="loading-spinner">
               <div className="spinner" />
@@ -166,9 +166,9 @@ const Profile = ({ user: userProp }) => {
     .toUpperCase();
 
   return (
-    <div className="page-container" dir="rtl">
+    <div className="profile-page" dir="rtl">
       <PageHeader />
-      <div className="page-content">
+      <div className="profile-content">
         <div className="page-header">
           <div className="page-title">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">

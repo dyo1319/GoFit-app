@@ -71,7 +71,7 @@ export default function Sidebar() {
           </ul>
         </div>
 
-        <div className="sidebarMenu">
+       <div className="sidebarMenu">
           <h3 className="sidebarTitle">אימונים ושיעורים</h3>
           <ul className="sidebarList">
             <li className="sidebarListItem">
@@ -81,8 +81,14 @@ export default function Sidebar() {
               </NavLink>
             </li>
             <li className="sidebarListItem">
-              <NavLink to="/admin/programs" className={linkCls}>
+              <NavLink to="/admin/exercises" className={linkCls}>
                 <FitnessCenter className="sidebarIcon" />
+                ספריית תרגילים
+              </NavLink>
+            </li>
+            <li className="sidebarListItem">
+              <NavLink to="/admin/programs" className={linkCls}>
+                <Assessment className="sidebarIcon" />
                 תוכניות אימון
               </NavLink>
             </li>

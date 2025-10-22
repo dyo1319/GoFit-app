@@ -1,9 +1,10 @@
+/* Dashboard Page Styles - Consistent with Profile/Workout/Membership theme */
+
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
 .dashboard {
   min-height: 100vh;
-  width: 100%;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  margin: 0;
-  padding: 0;
+  background-color: #f8fafc;
 }
 
 .dashboard-header {
@@ -50,16 +51,16 @@
 }
 
 .dashboard-main {
-  padding: 24px 5%;
+  padding: 20px 5%;
   width: 100%;
   box-sizing: border-box;
-  margin: 0;
 }
 
 .dashboard-content {
   animation: fadeIn 0.6s ease-out;
   width: 100%;
   margin: 0;
+  box-sizing: border-box;
 }
 
 @keyframes fadeIn {
@@ -143,6 +144,7 @@
 .workout-stats-section {
   margin-bottom: 40px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .section-header {
@@ -165,10 +167,11 @@
 
 .fitness-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
   margin-bottom: 32px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .fitness-card {
@@ -180,6 +183,8 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   width: 100%;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .fitness-card:hover {
@@ -192,6 +197,7 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 20px;
+  flex-direction: row-reverse;
 }
 
 .card-header svg {
@@ -210,6 +216,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .metric-item {
@@ -219,6 +226,8 @@
   border-radius: 8px;
   border: 1px solid #e2e8f0;
   transition: all 0.2s ease;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .metric-item:hover {
@@ -247,6 +256,8 @@
   display: flex;
   align-items: center;
   gap: 24px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .body-fat-circle {
@@ -280,6 +291,8 @@
 
 .muscle-info {
   flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .muscle-info p {
@@ -296,6 +309,7 @@
 .visits-display {
   text-align: center;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .visits-count {
@@ -398,12 +412,9 @@
 
 /* Tablet */
 @media (max-width: 1024px) and (min-width: 769px) {
-  .dashboard-main {
-    padding: 24px 4%;
-  }
-  
   .fitness-cards {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
   }
   
   .metrics-grid {
@@ -414,75 +425,52 @@
   .dashboard-nav {
     padding: 12px 4%;
   }
-}
-
-/* Desktop sidebar layout */
-@media (min-width: 768px) {
-  .dashboard.dashboard-with-sidebar {
-    margin-left: 240px;
-    width: calc(100vw - 240px);
-    min-height: 100vh;
-    position: relative;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    margin-top: 0;
-    margin-right: 0;
-    margin-bottom: 0;
-    padding: 0;
-  }
   
-  .dashboard.dashboard-with-sidebar .dashboard-header {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-  }
-  
-  .dashboard.dashboard-with-sidebar .dashboard-nav {
-    margin: 0;
-    padding: 12px 5%;
-  }
-  
-  .dashboard.dashboard-with-sidebar .dashboard-main {
-    margin: 0;
-    padding: 24px 5%;
-  }
-}
-
-@media (min-width: 1200px) {
-  .dashboard.dashboard-with-sidebar {
-    margin-left: 260px;
-    width: calc(100vw - 260px);
-  }
-}
-
-/* Large screens */
-@media (min-width: 1025px) {
   .dashboard-main {
-    padding: 32px 3%;
+    padding: 30px 4%;
   }
-  
-  .dashboard-nav {
-    padding: 16px 3%;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .dashboard { 
+    margin-right: 240px; 
+    padding-bottom: 0; 
   }
-  
-  .fitness-cards {
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  .dashboard-main { 
+    padding: 40px 5%; 
+    width: calc(100vw - 240px);
     max-width: none;
   }
 }
 
-/* Extra large screens */
-@media (min-width: 1400px) {
+@media (min-width: 1200px) {
+  .dashboard { 
+    margin-right: 260px; 
+  }
   .dashboard-main {
-    padding: 40px 5%;
-    max-width: 1400px;
-    margin: 0 auto;
+    width: calc(100vw - 260px);
+    max-width: none;
   }
   
-  .dashboard-nav {
-    padding: 16px 5%;
-    max-width: 1400px;
-    margin: 0 auto;
+  .fitness-cards {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 32px;
+  }
+  
+  .metrics-grid {
+    gap: 20px;
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1600px) {
+  .fitness-cards {
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 40px;
+  }
+  
+  .dashboard-main {
+    padding: 50px 6%;
   }
 }

@@ -1,0 +1,598 @@
+/* Training Programs Admin Page Styles */
+.training-programs-admin {
+  direction: rtl;
+  padding: 20px;
+  min-height: calc(100vh - 50px);
+  background: #fafafa;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  flex: 1;
+}
+
+.training-programs-admin .page-container {
+  direction: rtl;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.training-programs-admin .page-header {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid #f0f0f0;
+}
+
+.training-programs-admin .page-header h1 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.training-programs-admin .page-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+/* Tabs Card */
+.training-programs-admin .MuiCard-root {
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid #f0f0f0;
+  margin-bottom: 20px;
+}
+
+.training-programs-admin .MuiCardContent-root {
+  padding: 0;
+}
+
+.training-programs-admin .MuiTabs-root {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.training-programs-admin .MuiTabs-root .MuiTab-root {
+  text-transform: none;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 16px 24px;
+  min-height: 48px;
+  color: #6b7280;
+  transition: all 0.2s ease;
+}
+
+.training-programs-admin .MuiTabs-root .MuiTab-root.Mui-selected {
+  color: #1976d2;
+}
+
+.training-programs-admin .MuiTabs-root .MuiTabs-indicator {
+  background-color: #1976d2;
+  height: 3px;
+}
+
+/* Table Styles */
+.training-programs-admin .MuiTableContainer-root {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  border: 1px solid #f0f0f0;
+}
+
+.training-programs-admin .MuiTable-root {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.training-programs-admin .MuiTableHead-root {
+  background: #f5f5f5;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.training-programs-admin .MuiTableHead-root .MuiTableCell-root {
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  padding: 16px 8px;
+  border-bottom: 2px solid #ececec;
+}
+
+.training-programs-admin .MuiTableBody-root .MuiTableRow-root:nth-of-type(odd) {
+  background: #fafafa;
+}
+
+.training-programs-admin .MuiTableBody-root .MuiTableRow-root:hover {
+  background: #f5f5f5;
+  transition: background-color 0.2s ease;
+}
+
+.training-programs-admin .MuiTableBody-root .MuiTableCell-root {
+  text-align: center;
+  padding: 12px 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Action Buttons */
+.training-programs-admin .MuiButton-root {
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  text-transform: none;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.training-programs-admin .MuiButton-contained {
+  background-color: #1976d2;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+}
+
+.training-programs-admin .MuiButton-contained:hover {
+  background-color: #1565c0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+}
+
+.training-programs-admin .MuiButton-outlined {
+  border-color: #1976d2;
+  color: #1976d2;
+}
+
+.training-programs-admin .MuiButton-outlined:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+  border-color: #1565c0;
+  color: #1565c0;
+}
+
+.training-programs-admin .MuiButton-text {
+  color: #1976d2;
+}
+
+.training-programs-admin .MuiButton-text:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+}
+
+.training-programs-admin .MuiIconButton-root {
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.training-programs-admin .MuiIconButton-root:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  transform: scale(1.05);
+}
+
+.training-programs-admin .MuiIconButton-colorError:hover {
+  background-color: rgba(211, 47, 47, 0.1);
+}
+
+/* Chips */
+.training-programs-admin .MuiChip-root {
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.training-programs-admin .MuiChip-outlined {
+  border-width: 1px;
+}
+
+.training-programs-admin .MuiChip-colorSuccess {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+}
+
+.training-programs-admin .MuiChip-colorDefault {
+  background-color: #f5f5f5;
+  color: #6b7280;
+}
+
+/* Accordion Styles */
+.training-programs-admin .MuiAccordion-root {
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+  border: 1px solid #f0f0f0 !important;
+  margin-bottom: 16px !important;
+  overflow: hidden;
+}
+
+.training-programs-admin .MuiAccordion-root:before {
+  display: none;
+}
+
+.training-programs-admin .MuiAccordionSummary-root {
+  background: #f8f9fa;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.training-programs-admin .MuiAccordionSummary-root:hover {
+  background: #f0f0f0;
+}
+
+.training-programs-admin .MuiAccordionSummary-content {
+  margin: 0;
+}
+
+.training-programs-admin .MuiAccordionDetails-root {
+  padding: 20px;
+  background: #fff;
+}
+
+.training-programs-admin .MuiAccordionDetails-root .MuiIconButton-root {
+  margin-left: auto;
+}
+
+/* Exercise Action Buttons */
+.training-programs-admin .exercise-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.training-programs-admin .exercise-actions .MuiIconButton-root {
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.training-programs-admin .exercise-actions .MuiIconButton-root:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  transform: scale(1.05);
+}
+
+.training-programs-admin .exercise-actions .MuiIconButton-colorPrimary:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+}
+
+.training-programs-admin .exercise-actions .MuiIconButton-colorError:hover {
+  background-color: rgba(211, 47, 47, 0.1);
+}
+
+/* Add Exercise Button */
+.training-programs-admin .add-exercise-button {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.training-programs-admin .add-exercise-button .MuiButton-root {
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  text-transform: none;
+  font-size: 13px;
+}
+
+.training-programs-admin .add-exercise-button .MuiButton-outlined {
+  border-color: #1976d2;
+  color: #1976d2;
+}
+
+.training-programs-admin .add-exercise-button .MuiButton-outlined:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+  border-color: #1565c0;
+  color: #1565c0;
+}
+
+/* Program Header in Accordion */
+.training-programs-admin .program-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.training-programs-admin .program-title {
+  flex-grow: 1;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.training-programs-admin .program-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.training-programs-admin .program-count-chip {
+  background-color: rgba(25, 118, 210, 0.1);
+  color: #1976d2;
+  border: 1px solid rgba(25, 118, 210, 0.3);
+}
+
+.training-programs-admin .program-creator {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* Dialog Styles */
+.training-programs-admin .MuiDialog-paper {
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+.training-programs-admin .MuiDialogTitle-root {
+  padding: 24px 24px 16px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.training-programs-admin .MuiDialogContent-root {
+  padding: 24px;
+}
+
+.training-programs-admin .MuiDialogActions-root {
+  padding: 16px 24px 24px;
+  gap: 12px;
+}
+
+.training-programs-admin .MuiDialogActions-root .MuiButton-root {
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* Form Fields */
+.training-programs-admin .MuiFormControl-root {
+  margin-bottom: 16px;
+}
+
+.training-programs-admin .MuiFormControl-root .MuiInputLabel-root {
+  color: #6b7280;
+}
+
+.training-programs-admin .MuiFormControl-root .MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+.training-programs-admin .MuiFormControl-root .MuiOutlinedInput-input {
+  padding: 12px 14px;
+}
+
+/* Exercise Cards in Dialog */
+.training-programs-admin .exercise-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+.training-programs-admin .exercise-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.training-programs-admin .exercise-card.error {
+  border-color: #d32f2f;
+  background-color: #ffebee;
+}
+
+.training-programs-admin .exercise-card-header {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.training-programs-admin .exercise-card-fields {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.training-programs-admin .exercise-card-fields .MuiTextField-root {
+  min-width: 100px;
+}
+
+.training-programs-admin .exercise-info {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Alert Messages */
+.training-programs-admin .MuiAlert-root {
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.training-programs-admin .MuiAlert-standardError {
+  background-color: #ffebee;
+  color: #d32f2f;
+  border: 1px solid #f5c6cb;
+}
+
+.training-programs-admin .MuiAlert-standardSuccess {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.training-programs-admin .MuiAlert-standardInfo {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid #bbdefb;
+}
+
+/* Loading State */
+.training-programs-admin .loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+/* Empty State */
+.training-programs-admin .MuiBox-root {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.training-programs-admin .MuiTypography-h6 {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Back Button */
+.training-programs-admin .back-button {
+  margin-bottom: 16px;
+}
+
+.training-programs-admin .back-button .MuiButton-root {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.training-programs-admin .back-button .MuiButton-root:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: #333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .training-programs-admin {
+    padding: 16px;
+  }
+  
+  .training-programs-admin .page-header {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .training-programs-admin .page-header h1 {
+    font-size: 24px;
+  }
+  
+  .training-programs-admin .MuiTabs-root .MuiTab-root {
+    padding: 12px 16px;
+    font-size: 13px;
+  }
+  
+  .training-programs-admin .MuiTableHead-root .MuiTableCell-root,
+  .training-programs-admin .MuiTableBody-root .MuiTableCell-root {
+    padding: 8px 4px;
+    font-size: 0.875rem;
+  }
+  
+  .training-programs-admin .program-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .training-programs-admin .program-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .training-programs-admin .exercise-card-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .training-programs-admin .exercise-card-fields {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .training-programs-admin .exercise-card-fields .MuiTextField-root {
+    min-width: 100%;
+  }
+  
+  .training-programs-admin .MuiDialogContent-root {
+    padding: 16px;
+  }
+  
+  .training-programs-admin .MuiDialogActions-root {
+    padding: 12px 16px 16px;
+    flex-direction: column;
+  }
+  
+  .training-programs-admin .MuiDialogActions-root .MuiButton-root {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .training-programs-admin {
+    padding: 12px;
+  }
+  
+  .training-programs-admin .page-header h1 {
+    font-size: 20px;
+  }
+  
+  .training-programs-admin .page-header p {
+    font-size: 14px;
+  }
+  
+  .training-programs-admin .MuiAccordionSummary-root {
+    padding: 12px 16px;
+  }
+  
+  .training-programs-admin .MuiAccordionDetails-root {
+    padding: 16px;
+  }
+}
+
+/* Scrollbar Styling */
+.training-programs-admin ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.training-programs-admin ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.training-programs-admin ::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.training-programs-admin ::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Print Styles */
+@media print {
+  .training-programs-admin .MuiTableContainer-root {
+    box-shadow: none;
+    border: 1px solid #e0e0e0;
+    break-inside: avoid;
+  }
+  
+  .training-programs-admin .MuiButton-root {
+    display: none;
+  }
+  
+  .training-programs-admin .MuiAccordion-root {
+    box-shadow: none !important;
+    border: 1px solid #e0e0e0 !important;
+  }
+}

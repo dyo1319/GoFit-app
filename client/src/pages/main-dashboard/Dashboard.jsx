@@ -235,7 +235,7 @@ const Dashboard = ({ user, onSignOut }) => {
     if (isLoading) return renderLoadingState();
 
     return (
-      <div className="dashboard dashboard-with-sidebar" dir="rtl">
+      <div className="dashboard" dir="rtl">
         <PageHeader />
         <main className="dashboard-main">
           <div className="dashboard-content">
@@ -260,7 +260,7 @@ const Dashboard = ({ user, onSignOut }) => {
   };
 
   return (
-    <div className={activeTab === 'dashboard' ? 'dashboard-with-sidebar' : ''}>
+    <div>
       {renderContent()}
       <BottomNavBar activeTab={activeTab} onTabChange={setActiveTab} />
     </div>
