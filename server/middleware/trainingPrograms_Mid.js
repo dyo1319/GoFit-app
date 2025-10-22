@@ -209,6 +209,19 @@ async function addExerciseToProgram(req, res, next) {
       });
     }
 
+    // Check if exercise already exists in this program
+    const [existingExercises] = await db.query(
+      'SELECT id FROM trainingprogram_exercises WHERE training_program_id = ? AND exercise_id = ?',
+      [programId, exercise_id]
+    );
+    
+    if (existingExercises.length > 0) {
+      return res.status(409).json({ 
+        success: false, 
+        message: 'Exercise already exists in this training program' 
+      });
+    }
+
     // Ensure all parameters are properly handled
     const safeParams = {
       exercise_id: exercise_id || null,

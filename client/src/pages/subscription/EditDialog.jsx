@@ -17,7 +17,16 @@ export default function EditDialog({ open, onClose, editing, setEditing, onUpdat
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth className="rtlDialog">
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth="sm" 
+      fullWidth 
+      className="rtlDialog"
+      disableEnforceFocus={false}
+      disableAutoFocus={false}
+      disableRestoreFocus={false}
+    >
       <DialogTitle>ערוך מנוי</DialogTitle>
       <DialogContent>
         {errorMsg && <Alert severity="error" sx={{ mb: 2 }}>{errorMsg}</Alert>}

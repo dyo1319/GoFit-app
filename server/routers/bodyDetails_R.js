@@ -12,7 +12,7 @@ const bodyDetailCreateSchema = Joi.object({
   body_fat: Joi.number().min(0).max(100).allow(null),
   muscle_mass: Joi.number().min(0).allow(null),
   circumference: Joi.number().min(0).allow(null),
-  recorded_at: Joi.date().required()
+  recorded_at: Joi.string().pattern(/^\d{4}-\d{2}-\d{2}$/).required()
 });
 
 const bodyDetailUpdateSchema = Joi.object({
@@ -21,7 +21,7 @@ const bodyDetailUpdateSchema = Joi.object({
   body_fat: Joi.number().min(0).max(100).allow(null),
   muscle_mass: Joi.number().min(0).allow(null),
   circumference: Joi.number().min(0).allow(null),
-  recorded_at: Joi.date().required()
+  recorded_at: Joi.string().pattern(/^\d{4}-\d{2}-\d{2}$/).required()
 }).min(1);
 
 router.get('/', verifyToken, bodyDetails_Mid.getUserBodyDetails);

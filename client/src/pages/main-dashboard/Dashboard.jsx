@@ -5,6 +5,7 @@ import BottomNavBar from '../../components/BottomNavBar';
 import Workouts from '../workout/Workouts';
 import Membership from '../membership/Membership';
 import Profile from '../profile/Profile';
+import BodyDetailsPage from '../bodydetails/Bodydetails';
 import ProgressOverview from '../../components/ProgressOverview';
 import './Dashboard.css';
 import '../../components/BottomNavBar.css';
@@ -140,7 +141,7 @@ const Dashboard = ({ user, onSignOut }) => {
   const renderFitnessCards = (latestData, activeDays, bmi) => (
     <div className="fitness-cards" dir="rtl">
       {/* מדדי גוף */}
-      <div className="fitness-card">
+      <div className="fitness-card clickable-card" onClick={() => setActiveTab('bodydetails')}>
         <div className="card-header">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
             <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" fill="currentColor"/>
@@ -160,6 +161,9 @@ const Dashboard = ({ user, onSignOut }) => {
             <span className="metric-value">{bmi || '--'}</span>
             <span className="metric-label">BMI</span>
           </div>
+        </div>
+        <div className="card-footer">
+          <span className="click-hint">לחץ לניהול מדדי גוף</span>
         </div>
       </div>
 
@@ -254,6 +258,7 @@ const Dashboard = ({ user, onSignOut }) => {
       case 'workouts':   return <Workouts user={user} />;
       case 'membership': return <Membership user={user} />;
       case 'profile':    return <Profile user={user} onSignOut={onSignOut} />;
+      case 'bodydetails': return <BodyDetailsPage user={user} />;
       case 'dashboard':
       default:           return renderDashboard();
     }

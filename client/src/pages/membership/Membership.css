@@ -9,8 +9,8 @@
 
 .membership-content {
   padding: 20px 5%;
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Page Header Styles */
@@ -517,5 +517,35 @@
 
   .subscription-history {
     padding: 20px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .membership-page { 
+    margin-right: 240px; 
+    padding-bottom: 0; 
+  }
+  .membership-content { 
+    padding: 40px 5%; 
+    width: calc(100vw - 240px);
+    max-width: none;
+  }
+}
+
+@media (min-width: 1200px) {
+  .membership-page { 
+    margin-right: 260px; 
+  }
+  .membership-content {
+    width: calc(100vw - 260px);
+    max-width: none;
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1600px) {
+  .membership-content {
+    padding: 50px 6%;
   }
 }

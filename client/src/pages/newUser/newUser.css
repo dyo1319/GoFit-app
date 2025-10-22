@@ -1,4 +1,13 @@
-.newUser { flex: 4; }
+.newUser { 
+  flex: 4; 
+  min-height: 100vh;
+  background-color: #f8fafc;
+  direction: rtl;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 80px 20px 20px 20px !important;
+}
 
 .pageTitle {
   font-size: 28px;
@@ -244,6 +253,10 @@
 }
 
 @media (max-width: 768px) {
+  .newUser {
+    padding: 76px 16px 80px 16px !important; /* Mobile topbar height + padding, bottom nav space */
+  }
+  
   .formGrid { 
     grid-template-columns: 1fr; 
   }
@@ -251,5 +264,21 @@
   .stepsNav {
     flex-direction: column;
     gap: 10px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .newUser { 
+    margin-right: 240px; 
+    padding-bottom: 0; 
+    padding: 80px 20px 0 20px !important; /* Desktop topbar height + padding */
+  }
+}
+
+@media (min-width: 1200px) {
+  .newUser { 
+    margin-right: 260px; 
+    padding: 80px 20px 0 20px !important; /* Large desktop topbar height + padding */
   }
 }

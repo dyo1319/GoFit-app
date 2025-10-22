@@ -242,6 +242,30 @@ export default function TrainingPrograms() {
     setEditExerciseDialog(true);
   };
 
+  // Get available exercises for a program (excluding already added ones)
+  const getAvailableExercises = (programId) => {
+    if (!programId || !userPrograms.length) return exercises;
+    
+    const currentProgram = userPrograms.find(program => program.id === programId);
+    if (!currentProgram || !currentProgram.exercises) return exercises;
+    
+    const usedExerciseIds = currentProgram.exercises.map(ex => parseInt(ex.id));
+    
+    // If we're editing an existing exercise (form has an exercise_id), include it in available options
+    if (exerciseForm.exercise_id && exerciseForm.exercise_id !== '') {
+      const currentExerciseId = parseInt(exerciseForm.exercise_id);
+      // Remove the current exercise from the "used" list so it appears in dropdown
+      const filteredUsedIds = usedExerciseIds.filter(id => id !== currentExerciseId);
+      const availableExercises = exercises.filter(exercise => !filteredUsedIds.includes(parseInt(exercise.id)));
+      console.log('Editing mode - Available exercises:', availableExercises.map(ex => ex.id));
+      return availableExercises;
+    }
+    
+    const availableExercises = exercises.filter(exercise => !usedExerciseIds.includes(parseInt(exercise.id)));
+    console.log('Adding mode - Available exercises:', availableExercises.map(ex => ex.id));
+    return availableExercises;
+  };
+
   const handleDeleteExercise = async (programId, exerciseId, index) => {
     if (!window.confirm('האם אתה בטוח שברצונך למחוק תרגיל זה מהתוכנית?')) return;
 
@@ -306,7 +330,12 @@ export default function TrainingPrograms() {
         setSuccess(editingExercise ? 'התרגיל עודכן בהצלחה' : 'התרגיל נוסף לתוכנית בהצלחה');
         setTimeout(() => setSuccess(''), 3000);
       } else {
-        setError(data.message || 'הפעולה נכשלה');
+        // Handle specific error cases
+        if (response.status === 409) {
+          setError('התרגיל כבר קיים בתוכנית זו. אנא בחר תרגיל אחר.');
+        } else {
+          setError(data.message || 'הפעולה נכשלה');
+        }
       }
     } catch (err) {
       setError('שגיאה בשמירת התרגיל: ' + err.message);
@@ -569,7 +598,15 @@ export default function TrainingPrograms() {
         )}
       </TabPanel>
 
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="lg" fullWidth>
+      <Dialog 
+        open={openDialog} 
+        onClose={() => setOpenDialog(false)} 
+        maxWidth="lg" 
+        fullWidth
+        disableEnforceFocus={false}
+        disableAutoFocus={false}
+        disableRestoreFocus={false}
+      >
         <DialogTitle>
           תוכנית אימון חדשה - {selectedTrainee?.username}
         </DialogTitle>
@@ -577,6 +614,8 @@ export default function TrainingPrograms() {
           <DialogContent>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               <TextField
+                id="program_name"
+                name="program_name"
                 label="שם התוכנית"
                 value={form.program_name}
                 onChange={(e) => handleFieldChange('program_name', e.target.value)}
@@ -600,6 +639,8 @@ export default function TrainingPrograms() {
                   <Card key={index} className={`exercise-card ${errors[`exercises[${index}].exercise_id`] ? 'error' : ''}`}>
                     <Box className="exercise-card-header">
                       <TextField
+                        id={`exercise_select_${index}`}
+                        name={`exercise_select_${index}`}
                         select
                         label="תרגיל"
                         value={exercise.exercise_id}
@@ -619,6 +660,8 @@ export default function TrainingPrograms() {
 
                       <Box className="exercise-card-fields">
                         <TextField
+                          id={`exercise_sets_${index}`}
+                          name={`exercise_sets_${index}`}
                           label="סטים"
                           value={exercise.sets}
                           onChange={(e) => updateExercise(index, 'sets', e.target.value)}
@@ -629,6 +672,8 @@ export default function TrainingPrograms() {
                         />
 
                         <TextField
+                          id={`exercise_reps_${index}`}
+                          name={`exercise_reps_${index}`}
                           label="חזרות"
                           value={exercise.reps}
                           onChange={(e) => updateExercise(index, 'reps', e.target.value)}
@@ -639,6 +684,8 @@ export default function TrainingPrograms() {
                         />
 
                         <TextField
+                          id={`exercise_duration_${index}`}
+                          name={`exercise_duration_${index}`}
                           label="משך (דקות)"
                           type="number"
                           value={exercise.duration}
@@ -697,7 +744,18 @@ export default function TrainingPrograms() {
       </Dialog>
 
       {/* Exercise Edit Dialog */}
-      <Dialog open={editExerciseDialog} onClose={() => setEditExerciseDialog(false)} maxWidth="md" fullWidth>
+      <Dialog 
+        open={editExerciseDialog} 
+        onClose={() => {
+          setEditExerciseDialog(false);
+          setError(''); // Clear any error messages when closing dialog
+        }} 
+        maxWidth="md" 
+        fullWidth
+        disableEnforceFocus={false}
+        disableAutoFocus={false}
+        disableRestoreFocus={false}
+      >
         <DialogTitle>
           {editingExercise ? 'עריכת תרגיל בתוכנית' : 'הוספת תרגיל לתוכנית'}
         </DialogTitle>
@@ -705,6 +763,8 @@ export default function TrainingPrograms() {
           <DialogContent>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
               <TextField
+                id="edit_exercise_select"
+                name="edit_exercise_select"
                 select
                 label="תרגיל"
                 value={exerciseForm.exercise_id}
@@ -714,15 +774,22 @@ export default function TrainingPrograms() {
                 disabled={editingExercise} // Disable when editing existing exercise
               >
                 <MenuItem value="">בחר תרגיל</MenuItem>
-                {exercises.map(ex => (
+                {getAvailableExercises(editingProgramId).map(ex => (
                   <MenuItem key={ex.id} value={ex.id}>
                     {ex.exercise_name} ({ex.category})
                   </MenuItem>
                 ))}
+                {getAvailableExercises(editingProgramId).length === 0 && (
+                  <MenuItem disabled>
+                    כל התרגילים כבר נוספו לתוכנית זו
+                  </MenuItem>
+                )}
               </TextField>
 
               <Box sx={{ display: 'flex', gap: 2 }}>
                 <TextField
+                  id="edit_exercise_sets"
+                  name="edit_exercise_sets"
                   label="סטים"
                   value={exerciseForm.sets}
                   onChange={(e) => setExerciseForm({...exerciseForm, sets: e.target.value})}
@@ -732,6 +799,8 @@ export default function TrainingPrograms() {
                 />
 
                 <TextField
+                  id="edit_exercise_reps"
+                  name="edit_exercise_reps"
                   label="חזרות"
                   value={exerciseForm.reps}
                   onChange={(e) => setExerciseForm({...exerciseForm, reps: e.target.value})}
@@ -741,6 +810,8 @@ export default function TrainingPrograms() {
                 />
 
                 <TextField
+                  id="edit_exercise_duration"
+                  name="edit_exercise_duration"
                   label="משך (דקות)"
                   type="number"
                   value={exerciseForm.duration}
@@ -752,6 +823,7 @@ export default function TrainingPrograms() {
               {exerciseForm.exercise_id && (
                 <Box sx={{ mt: 1, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
                   {(() => {
+                    // Always use the original exercises list to find the exercise for preview
                     const selectedExercise = exercises.find(ex => ex.id === exerciseForm.exercise_id);
                     return selectedExercise ? (
                       <Typography variant="body2" color="textSecondary">

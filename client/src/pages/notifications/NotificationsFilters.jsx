@@ -87,6 +87,8 @@ export default function NotificationsFilters({
 
         <Stack direction={isMobile ? "column" : "row"} spacing={2} sx={{ flex: 1 }}>
           <TextField
+            id="notifications_search"
+            name="notifications_search"
             size="small"
             label="חיפוש (כותרת/תוכן)"
             value={query}
@@ -103,6 +105,8 @@ export default function NotificationsFilters({
           />
 
           <TextField 
+            id="notifications_type"
+            name="notifications_type"
             size="small" 
             select 
             label="סוג" 
@@ -120,6 +124,8 @@ export default function NotificationsFilters({
 
           {userRole === 'admin' && (
             <TextField 
+              id="notifications_audience"
+              name="notifications_audience"
               size="small" 
               select 
               label="סוג התראות" 

@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import Sidebar from "./components/sidebar/Sidebar";
 import Topbar from "./components/topbar/Topbar";
 import "./App.css";
@@ -53,14 +54,27 @@ const PermissionRoute = ({ perm, children }) => {
 };
 
 const AdminLayout = ({ children }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleMenuToggle = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleCloseMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <>
-      <Topbar />
+    <React.Fragment>
+      <Topbar onMenuToggle={handleMenuToggle} />
       <div className="container">
-        <Sidebar />
+        <Sidebar 
+          isMobileMenuOpen={isMobileMenuOpen} 
+          onCloseMobileMenu={handleCloseMobileMenu} 
+        />
         {children}
       </div>
-    </>
+    </React.Fragment>
   );
 };
 
@@ -100,7 +114,7 @@ function AppContent() {
         element={
           <ProtectedRoute>
             <AppLayout>
-             <Dashboard />
+              <Dashboard />
             </AppLayout>
           </ProtectedRoute>
         }

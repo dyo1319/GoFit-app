@@ -1,8 +1,12 @@
+/* Renewals Admin Page Styles - Consistent with App Pages Theme */
+
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
 :root{
-  --page-bg:#fafafa;
+  --page-bg:#f8fafc;
   --card-bg:#fff;
   --card-shadow:0 6px 18px rgba(0,0,0,.06);
-  --card-border:#f0f0f0;
+  --card-border:#e2e8f0;
   --header-bg:#f5f5f5;
   --row-alt:#fafafa;
   --row-hover:#f9f9f9;
@@ -12,20 +16,65 @@
   --gap-lg:24px;
 }
 
+/* Page Header Styles */
+.dashboard-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0;
+  width: 100%;
+  margin: 0;
+}
+
+.dashboard-nav {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 12px 5%;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.dashboard-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.dashboard-nav h1 {
+  color: #1e293b;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
 .renewalsPage{
+  min-height: 100vh;
+  background-color: var(--page-bg);
   direction: rtl;
-  padding: 16px;
-  min-height: calc(100vh - 50px);
-  background: var(--page-bg);
   width: 100%;
   box-sizing: border-box;
   margin: 0;
   flex: 1;
+  padding: 60px 20px 20px 20px !important;
 }
 .renewalsPage__title{
   margin: 0 0 12px 0;
   font-weight: 800;
   letter-spacing: .2px;
+  color: #1e293b;
 }
 
 /* ===== Filters card ===== */
@@ -105,39 +154,88 @@
   margin-left:8px;
 }
 
-@media (min-width:600px){
-  .renewalsPage{ padding:20px; }
-  .renewalsFiltersCard{ padding:20px; }
-}
-@media (min-width:900px){
-  .renewalsFiltersCard{ gap:24px; }
-}
-@media (min-width:1200px){
-  .renewalsPage{ padding:24px; }
-  .renewalsFiltersCard{ gap:28px; padding:24px; }
-}
-@media (min-width:1400px){
-  .renewalsPage{ padding:28px 32px; }
-  .renewalsCard{ padding:20px; }
-  .renewalsFiltersCard{ gap:32px; padding:32px; }
-}
-
-@media (max-width:768px){
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .renewalsPage {
+    padding: 56px 16px 80px 16px !important; /* Mobile topbar height + padding, bottom nav space */
+  }
+  
+  .dashboard-nav {
+    padding: 10px 4%;
+  }
+  
+  .brand-icon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .dashboard-nav h1 {
+    font-size: 18px;
+  }
+  
   .renewalsFiltersCard{
     gap: var(--gap-sm);
     width:100%;
     flex-direction: column;
     align-items: stretch;
+    padding: 16px;
   }
+  
   .renewalsFiltersCard .searchField,
   .renewalsFiltersCard .daysField{
     min-width: unset;
     width:100%;
   }
 }
-@media (max-width:480px){
-  .renewalsPage{ padding:8px; }
-  .renewalsCard{ min-height:480px; }
+
+/* Extra Small Mobile */
+@media (max-width: 480px) {
+  .renewalsPage{ 
+    padding: 8px; 
+  }
+  .renewalsCard{ 
+    min-height: 480px; 
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .dashboard-nav {
+    padding: 12px 4%;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .renewalsPage { 
+    margin-right: 240px; 
+    padding-bottom: 0; 
+    padding: 60px 20px 0 20px !important; /* Desktop topbar height + padding */
+  }
+  .dashboard-nav {
+    padding: 12px 5%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .renewalsPage { 
+    margin-right: 260px; 
+    padding: 60px 20px 0 20px !important; /* Large desktop topbar height + padding */
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1600px) {
+  .renewalsPage{ 
+    padding: 28px 32px; 
+  }
+  .renewalsCard{ 
+    padding: 20px; 
+  }
+  .renewalsFiltersCard{ 
+    gap: 32px; 
+    padding: 32px; 
+  }
 }
 
 .renewalsGrid .MuiDataGrid-overlay{ background-color: rgba(255,255,255,.8); }

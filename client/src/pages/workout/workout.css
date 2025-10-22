@@ -386,6 +386,21 @@
   font-weight: 600;
 }
 
+/* Exercise Library GIF Styles */
+.exercise-library-media {
+  margin: 12px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.exercise-library-gif {
+  width: 100%;
+  height: auto;
+  max-height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
 .no-exercises {
   text-align: center;
   padding: 48px 24px;
@@ -566,6 +581,33 @@
   margin: 4px 0;
 }
 
+.history-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.history-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-label {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-value {
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .history-stats {
   margin-top: 12px;
   display: flex;
@@ -610,6 +652,36 @@
   background: #fef3c7;
   color: #d97706;
   border-color: #fed7aa;
+}
+
+/* Mobile responsive styles for history */
+@media (max-width: 768px) {
+  .history-details-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .history-detail-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  
+  .history-detail-item:last-child {
+    border-bottom: none;
+  }
+  
+  .detail-label {
+    font-size: 11px;
+    margin: 0;
+  }
+  
+  .detail-value {
+    font-size: 13px;
+    text-align: left;
+  }
 }
 
 /* Program Details Dialog */
@@ -886,5 +958,211 @@
   }
   .dashboard-nav h1 {
     font-size: 18px;
+  }
+}
+
+/* Enhanced Exercise Display Styles */
+.exercise-item.current {
+  border-color: #6366f1;
+  background: #f8fafc;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
+}
+
+.exercise-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.exercise-number {
+  background: #6366f1;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* GIF Container Styles */
+.exercise-gif-container {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto 16px auto;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.exercise-gif {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+.exercise-metrics {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.exercise-metric {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.exercise-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.exercise-checkbox {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.exercise-checkbox:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.exercise-checkbox:active {
+  transform: translateY(0);
+}
+
+.exercise-item.completed .exercise-checkbox {
+  background: #6b7280;
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+}
+
+.exercise-item.completed .exercise-checkbox:hover {
+  box-shadow: 0 6px 16px rgba(107, 114, 128, 0.4);
+}
+
+/* Workout Navigation Styles */
+.workout-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-btn {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.nav-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+}
+
+.nav-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 4px rgba(156, 163, 175, 0.3);
+}
+
+.workout-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  margin: 0 20px;
+}
+
+.progress-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Mobile Responsive for Enhanced Exercise Display */
+@media (max-width: 768px) {
+  .exercise-gif-container {
+    max-width: 250px;
+  }
+  
+  .exercise-metrics {
+    gap: 12px;
+  }
+  
+  .exercise-metric {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  .exercise-checkbox {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  
+  .workout-navigation {
+    flex-direction: column;
+    gap: 16px;
+    padding: 12px;
+  }
+  
+  .nav-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+  
+  .workout-progress {
+    margin: 0;
+    width: 100%;
   }
 }

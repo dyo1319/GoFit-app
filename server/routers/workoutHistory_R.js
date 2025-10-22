@@ -7,6 +7,9 @@ const { verifyToken } = require('../middleware/auth_Mid');
 router.get('/user/workout-history', verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const offset = (page - 1) * limit;
     
     const db = global.db_pool.promise();
     
@@ -18,10 +21,10 @@ router.get('/user/workout-history', verifyToken, async (req, res) => {
       LEFT JOIN trainingprogram tp ON wh.program_id = tp.id
       WHERE wh.user_id = ?
       ORDER BY wh.start_time DESC
-      LIMIT 50
+      LIMIT ? OFFSET ?
     `;
     
-    const [rows] = await db.query(query, [userId]);
+    const [rows] = await db.query(query, [userId, limit, offset]);
     
     // Parse JSON fields and handle potential null values
     const workoutHistory = rows.map(row => {

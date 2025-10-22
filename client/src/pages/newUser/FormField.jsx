@@ -3,7 +3,7 @@ import { useCallback } from "react";
 export default function FormField({
   name, label, type="text", value, error, onChange,
   required=false, placeholder, options=[], min, max, step,
-  disabled=false, autoComplete="on", loading=false, title
+  disabled=false, autoComplete="on", loading=false, title, id
 }) {
   const blockInvalidNumberInput = useCallback((e) => {
     if (["e","E","+","-"].includes(e.key)) e.preventDefault();
@@ -13,16 +13,18 @@ export default function FormField({
 
   const inputClass = `form-input ${error ? "error" : ""} ${disabled ? "disabled" : ""}`;
 
+  const fieldId = id || name;
+
   return (
     <div className="newUserItem">
-      <label htmlFor={name}>
+      <label htmlFor={fieldId}>
         {label} {required && <span className="required">*</span>}
         {loading && <span className="loading-indicator"> 🔄</span>}
       </label>
 
       {type === "select" ? (
         <select 
-          id={name} 
+          id={fieldId} 
           name={name} 
           value={value} 
           onChange={handle} 
@@ -35,7 +37,7 @@ export default function FormField({
         </select>
       ) : type === "textarea" ? (
         <textarea
-          id={name}
+          id={fieldId}
           name={name}
           placeholder={placeholder}
           value={value}
@@ -49,7 +51,7 @@ export default function FormField({
         />
       ) : (
         <input
-          id={name}
+          id={fieldId}
           name={name}
           type={type}
           placeholder={placeholder}

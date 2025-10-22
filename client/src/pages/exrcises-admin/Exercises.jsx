@@ -39,6 +39,25 @@ export default function Exercises() {
 
   const handleFieldChange = makeFieldChange(setForm, setErrors);
 
+  // Helper function to detect if URL is a GIF
+  const isGifUrl = (url) => {
+    if (!url) return false;
+    const gifExtensions = ['.gif', '.GIF'];
+    const gifDomains = ['giphy.com', 'tenor.com', 'imgur.com'];
+    
+    // Check file extension
+    if (gifExtensions.some(ext => url.includes(ext))) {
+      return true;
+    }
+    
+    // Check domain
+    if (gifDomains.some(domain => url.includes(domain))) {
+      return true;
+    }
+    
+    return false;
+  };
+
   useEffect(() => {
     fetchExercises();
   }, []);
@@ -144,7 +163,7 @@ export default function Exercises() {
 
   const filteredExercises = exercises.filter(exercise => {
     const matchesSearch = exercise.exercise_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         exercise.description?.toLowerCase().includes(searchTerm.toLowerCase());
+                         exercise.description && exercise.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !filterCategory || exercise.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
@@ -240,6 +259,27 @@ export default function Exercises() {
                     <Typography variant="body2" color="textSecondary">
                       {exercise.description.substring(0, 50)}...
                     </Typography>
+                  )}
+                  {exercise.video_url && isGifUrl(exercise.video_url) && (
+                    <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <img 
+                        src={exercise.video_url} 
+                        alt={exercise.exercise_name}
+                        style={{ 
+                          width: 40, 
+                          height: 40, 
+                          objectFit: 'cover', 
+                          borderRadius: 4,
+                          border: '1px solid #e0e0e0'
+                        }}
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                        }}
+                      />
+                      <Typography variant="caption" color="textSecondary">
+                        GIF
+                      </Typography>
+                    </Box>
                   )}
                 </TableCell>
                 <TableCell>
@@ -372,11 +412,11 @@ export default function Exercises() {
               />
 
               <TextField
-                label="קישור לסרטון (אופציונלי)"
+                label="קישור ל-GIF (אופציונלי)"
                 value={form.video_url}
                 onChange={(e) => handleFieldChange('video_url', e.target.value)}
                 error={!!errors.video_url}
-                helperText={errors.video_url}
+                helperText={errors.video_url || "הכנס קישור ל-GIF של התרגיל"}
                 fullWidth
               />
             </Box>

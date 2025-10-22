@@ -238,12 +238,12 @@ export default function PermissionsPage() {
 
       <Paper className="perm-filters-card">
         <TextField
+          id="permissions_search"
+          name="permissions_search"
           className="perm-search"
           placeholder="חפש לפי שם או טלפון"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          id="permissions-search"
-          name="permissions_search"
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -272,7 +272,16 @@ export default function PermissionsPage() {
         </div>
       </Paper>
 
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md" dir="rtl">
+      <Dialog 
+        open={open} 
+        onClose={handleClose} 
+        fullWidth 
+        maxWidth="md" 
+        dir="rtl"
+        disableEnforceFocus={false}
+        disableAutoFocus={false}
+        disableRestoreFocus={false}
+      >
         <DialogTitle>עריכת גישה – {selected?.username}</DialogTitle>
         <DialogContent dividers className="perm-dialog">
           <Stack spacing={2}>

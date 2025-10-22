@@ -1,13 +1,60 @@
-/* Training Programs Admin Page Styles */
+/* Training Programs Admin Page Styles - Consistent with App Pages Theme */
+
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
 .training-programs-admin {
+  min-height: 100vh;
+  background-color: #f8fafc;
   direction: rtl;
-  padding: 20px;
-  min-height: calc(100vh - 50px);
-  background: #fafafa;
   width: 100%;
   box-sizing: border-box;
   margin: 0;
   flex: 1;
+  padding: 60px 20px 20px 20px !important;
+}
+
+/* Page Header Styles */
+.dashboard-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0;
+  width: 100%;
+  margin: 0;
+}
+
+.dashboard-nav {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 12px 5%;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.dashboard-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.dashboard-nav h1 {
+  color: #1e293b;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .training-programs-admin .page-container {
@@ -23,14 +70,14 @@
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  border: 1px solid #f0f0f0;
+  border: 1px solid #e2e8f0;
 }
 
 .training-programs-admin .page-header h1 {
   margin: 0 0 8px 0;
   font-size: 28px;
   font-weight: 700;
-  color: #333;
+  color: #1e293b;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -38,7 +85,7 @@
 
 .training-programs-admin .page-header p {
   margin: 0;
-  color: #6b7280;
+  color: #64748b;
   font-size: 16px;
 }
 
@@ -469,10 +516,23 @@
   color: #333;
 }
 
-/* Responsive Design */
+/* Mobile Responsive */
 @media (max-width: 768px) {
   .training-programs-admin {
-    padding: 16px;
+    padding: 56px 16px 80px 16px !important; /* Mobile topbar height + padding, bottom nav space */
+  }
+  
+  .dashboard-nav {
+    padding: 10px 4%;
+  }
+  
+  .brand-icon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .dashboard-nav h1 {
+    font-size: 18px;
   }
   
   .training-programs-admin .page-header {
@@ -537,11 +597,8 @@
   }
 }
 
+/* Extra Small Mobile */
 @media (max-width: 480px) {
-  .training-programs-admin {
-    padding: 12px;
-  }
-  
   .training-programs-admin .page-header h1 {
     font-size: 20px;
   }
@@ -556,6 +613,43 @@
   
   .training-programs-admin .MuiAccordionDetails-root {
     padding: 16px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .dashboard-nav {
+    padding: 12px 4%;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .training-programs-admin { 
+    margin-right: 240px; 
+    padding-bottom: 0; 
+    padding: 60px 20px 0 20px !important; /* Desktop topbar height + padding */
+  }
+  .dashboard-nav {
+    padding: 12px 5%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .training-programs-admin { 
+    margin-right: 260px; 
+    padding: 60px 20px 0 20px !important; /* Large desktop topbar height + padding */
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1600px) {
+  .training-programs-admin .page-header {
+    padding: 32px;
+  }
+  
+  .training-programs-admin .MuiCardContent-root {
+    padding: 32px;
   }
 }
 

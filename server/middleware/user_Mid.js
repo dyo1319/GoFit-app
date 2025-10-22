@@ -384,5 +384,6 @@ module.exports = {
   GetOneUser, 
   DeleteUser, 
   search, 
-  UpdateUser 
+  UpdateUser,
+  normalizeDate
 };

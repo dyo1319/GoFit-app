@@ -21,6 +21,31 @@ function toYMD(dateLike) {
   return '';
 }
 
+function formatDateDisplay(dateStr) {
+  if (!dateStr || dateStr === 'null' || dateStr === 'undefined') return 'לא הוגדר';
+  
+  try {
+    // Handle YYYY-MM-DD format
+    if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(dateStr)) {
+      const [year, month, day] = dateStr.split('-');
+      return `${day}-${month}-${year}`;
+    }
+    
+    // Handle other date formats
+    const date = new Date(dateStr);
+    if (!isNaN(date.getTime())) {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    }
+  } catch (error) {
+    console.error('Error formatting date:', error);
+  }
+  
+  return 'לא הוגדר';
+}
+
 const Profile = ({ user: userProp }) => {
   const { user: userCtx } = useAuth();
   const user = userProp ?? userCtx ?? null;
@@ -202,14 +227,18 @@ const Profile = ({ user: userProp }) => {
 
           {isEditing ? (
             <>
-              <label>שם משתמש</label>
+              <label htmlFor="profile_username">שם משתמש</label>
               <input
+                id="profile_username"
+                name="username"
                 value={form.username}
                 onChange={e => setForm({ ...form, username: e.target.value })}
               />
 
-              <label>תאריך לידה</label>
+              <label htmlFor="profile_birth_date">תאריך לידה</label>
               <input
+                id="profile_birth_date"
+                name="birth_date"
                 type="date"
                 inputMode="none"
                 value={form.birth_date || ''}
@@ -244,7 +273,7 @@ const Profile = ({ user: userProp }) => {
 
               <div className="field-display">
                 <label>תאריך לידה</label>
-                <div className="field-value">{form.birth_date || 'לא הוגדר'}</div>
+                <div className="field-value">{formatDateDisplay(form.birth_date)}</div>
               </div>
 
               <div className="field-display">

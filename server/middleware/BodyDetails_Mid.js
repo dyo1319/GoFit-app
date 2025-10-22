@@ -23,7 +23,7 @@ async function getUserBodyDetails(req, res) {
     console.error('bodyDetails.getUserBodyDetails error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Database error occurred' 
+      message: 'שגיאה במסד הנתונים' 
     });
   }
 }
@@ -52,13 +52,18 @@ async function getRecentBodyDetails(req, res) {
     console.error('bodyDetails.getRecentBodyDetails error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Database error occurred' 
+      message: 'שגיאה במסד הנתונים' 
     });
   }
 }
 
 async function createBodyDetail(req, res) {
   try {
+    console.log('createBodyDetail - req.body:', req.body);
+    console.log('createBodyDetail - req.user:', req.user);
+    console.log('createBodyDetail - userId from req.user.userId:', req.user.userId);
+    console.log('createBodyDetail - userId from req.user.id:', req.user.id);
+    
     const db = global.db_pool.promise();
     const userId = req.user.userId;
     const { weight, height, body_fat, muscle_mass, circumference, recorded_at } = req.body;
@@ -66,14 +71,14 @@ async function createBodyDetail(req, res) {
     if (!recorded_at) {
       return res.status(400).json({ 
         success: false, 
-        message: 'Record date is required' 
+        message: 'תאריך הרשומה נדרש' 
       });
     }
 
     if (!weight && !height && !body_fat && !muscle_mass && !circumference) {
       return res.status(400).json({ 
         success: false, 
-        message: 'At least one body measurement is required' 
+        message: 'נדרש לפחות מדד גוף אחד' 
       });
     }
 
@@ -85,27 +90,35 @@ async function createBodyDetail(req, res) {
     if (checkResult.length > 0) {
       return res.status(400).json({ 
         success: false, 
-        message: 'A record already exists for this date. Please update the existing record instead.' 
+        message: 'קיימת כבר רשומה עבור תאריך זה. אנא עדכן את הרשומה הקיימת במקום זאת.' 
       });
     }
 
+    const insertValues = [
+      userId,
+      weight || null,
+      height || null, 
+      body_fat || null,
+      muscle_mass || null,
+      circumference || null,
+      normalizeDate(recorded_at)
+    ];
+    
+    console.log('Insert values:', insertValues);
+    console.log('Normalized date:', normalizeDate(recorded_at));
+    console.log('About to execute database query...');
+    
     const [result] = await db.query(
       `INSERT INTO bodydetails (user_id, weight, height, body_fat, muscle_mass, circumference, recorded_at)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [
-        userId,
-        weight || null,
-        height || null, 
-        body_fat || null,
-        muscle_mass || null,
-        circumference || null,
-        normalizeDate(recorded_at)
-      ]
+      insertValues
     );
+    
+    console.log('Database query executed successfully. Result:', result);
 
     res.status(201).json({
       success: true,
-      message: 'Body details saved successfully',
+      message: 'מדדי הגוף נשמרו בהצלחה',
       data: {
         id: result.insertId,
         user_id: userId,
@@ -119,9 +132,10 @@ async function createBodyDetail(req, res) {
     });
   } catch (error) {
     console.error('bodyDetails.createBodyDetail error:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({ 
       success: false, 
-      message: 'Failed to save body details' 
+      message: 'שגיאה בשמירת מדדי הגוף' 
     });
   }
 }
@@ -136,7 +150,7 @@ async function updateBodyDetail(req, res) {
     if (!weight && !height && !body_fat && !muscle_mass && !circumference) {
       return res.status(400).json({ 
         success: false, 
-        message: 'At least one body measurement is required' 
+        message: 'נדרש לפחות מדד גוף אחד' 
       });
     }
 
@@ -146,11 +160,11 @@ async function updateBodyDetail(req, res) {
     );
 
     if (checkResult.length === 0) {
-      return res.status(404).json({ success: false, message: 'Record not found' });
+      return res.status(404).json({ success: false, message: 'הרשומה לא נמצאה' });
     }
 
     if (checkResult[0].user_id != userId) {
-      return res.status(403).json({ success: false, message: 'Access denied' });
+      return res.status(403).json({ success: false, message: 'אין הרשאה לגשת' });
     }
 
     const [updateResult] = await db.query(
@@ -169,18 +183,18 @@ async function updateBodyDetail(req, res) {
     );
 
     if (updateResult.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: 'Record not found' });
+      return res.status(404).json({ success: false, message: 'הרשומה לא נמצאה' });
     }
 
     res.json({
       success: true,
-      message: 'Body details updated successfully'
+      message: 'מדדי הגוף עודכנו בהצלחה'
     });
   } catch (error) {
     console.error('bodyDetails.updateBodyDetail error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Failed to update body details' 
+      message: 'שגיאה בעדכון מדדי הגוף' 
     });
   }
 }
@@ -197,11 +211,11 @@ async function deleteBodyDetail(req, res) {
     );
 
     if (checkResult.length === 0) {
-      return res.status(404).json({ success: false, message: 'Record not found' });
+      return res.status(404).json({ success: false, message: 'הרשומה לא נמצאה' });
     }
 
     if (checkResult[0].user_id != userId) {
-      return res.status(403).json({ success: false, message: 'Access denied' });
+      return res.status(403).json({ success: false, message: 'אין הרשאה לגשת' });
     }
 
     const [deleteResult] = await db.query(
@@ -210,18 +224,18 @@ async function deleteBodyDetail(req, res) {
     );
 
     if (deleteResult.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: 'Record not found' });
+      return res.status(404).json({ success: false, message: 'הרשומה לא נמצאה' });
     }
 
     res.json({
       success: true,
-      message: 'Body details deleted successfully'
+      message: 'מדדי הגוף נמחקו בהצלחה'
     });
   } catch (error) {
     console.error('bodyDetails.deleteBodyDetail error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Failed to delete body details' 
+      message: 'שגיאה במחיקת מדדי הגוף' 
     });
   }
 }
@@ -245,7 +259,7 @@ async function getLatestBodyDetail(req, res) {
       return res.json({
         success: true,
         data: null,
-        message: 'No body details found'
+        message: 'לא נמצאו מדדי גוף'
       });
     }
 
@@ -257,7 +271,7 @@ async function getLatestBodyDetail(req, res) {
     console.error('bodyDetails.getLatestBodyDetail error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Database error occurred' 
+      message: 'שגיאה במסד הנתונים' 
     });
   }
 }
@@ -314,7 +328,7 @@ async function getBodyStats(req, res) {
     console.error('bodyDetails.getBodyStats error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Database error occurred' 
+      message: 'שגיאה במסד הנתונים' 
     });
   }
 }

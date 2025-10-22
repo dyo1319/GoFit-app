@@ -413,7 +413,7 @@ export default function User() {
                   <h4 className="sectionTitle">פרטי חשבון</h4>
                   <div className="userUpdateRow">
                     <div className="userUpdateItem">
-                      <label>שם משתמש</label>
+                      <label htmlFor="username">שם משתמש</label>
                       <input
                         type="text"
                         value={userForm.username}
@@ -424,7 +424,7 @@ export default function User() {
                       />
                     </div>
                     <div className="userUpdateItem">
-                      <label>תפקיד</label>
+                      <label htmlFor="role">תפקיד</label>
                       <select
                         value={userForm.role}
                         onChange={(e) => handleInputChange("role", e.target.value)}
@@ -440,7 +440,7 @@ export default function User() {
                   </div>
                   <div className="userUpdateRow">
                     <div className="userUpdateItem">
-                      <label>מספר טלפון</label>
+                      <label htmlFor="phone">מספר טלפון</label>
                       <input
                         type="tel"
                         value={userForm.phone}
@@ -452,7 +452,7 @@ export default function User() {
                       />
                     </div>
                     <div className="userUpdateItem">
-                      <label>תאריך לידה</label>
+                      <label htmlFor="birth_date">תאריך לידה</label>
                       <input
                         type="date"
                         value={userForm.birth_date}
@@ -465,7 +465,7 @@ export default function User() {
                   </div>
                   <div className="userUpdateRow">
                     <div className="userUpdateItem">
-                      <label>מגדר</label>
+                      <label htmlFor="gender">מגדר</label>
                       <select
                         value={userForm.gender}
                         onChange={(e) => handleInputChange("gender", e.target.value)}
@@ -485,7 +485,7 @@ export default function User() {
                   <h4 className="sectionTitle">מדדי גוף</h4>
                   <div className="userUpdateRow">
                     <div className="userUpdateItem">
-                      <label>משקל (ק"ג)</label>
+                      <label htmlFor="weight">משקל (ק"ג)</label>
                       <input
                         type="number"
                         value={userForm.weight}
@@ -497,7 +497,7 @@ export default function User() {
                       />
                     </div>
                     <div className="userUpdateItem">
-                      <label>גובה (ס"מ)</label>
+                      <label htmlFor="height">גובה (ס"מ)</label>
                       <input
                         type="number"
                         value={userForm.height}
@@ -510,7 +510,7 @@ export default function User() {
                   </div>
                   <div className="userUpdateRow">
                     <div className="userUpdateItem">
-                      <label>אחוז שומן (%)</label>
+                      <label htmlFor="body_fat">אחוז שומן (%)</label>
                       <input
                         type="number"
                         value={userForm.body_fat}
@@ -522,7 +522,7 @@ export default function User() {
                       />
                     </div>
                     <div className="userUpdateItem">
-                      <label>מסת שריר</label>
+                      <label htmlFor="muscle_mass">מסת שריר</label>
                       <input
                         type="number"
                         value={userForm.muscle_mass}
@@ -536,7 +536,7 @@ export default function User() {
                   </div>
                   <div className="userUpdateRow">
                     <div className="userUpdateItem">
-                      <label>היקף מותניים (ס"מ)</label>
+                      <label htmlFor="circumference">היקף מותניים (ס"מ)</label>
                       <input
                         type="number"
                         value={userForm.circumference}
@@ -547,7 +547,7 @@ export default function User() {
                       />
                     </div>
                     <div className="userUpdateItem">
-                      <label>תאריך מדידה</label>
+                      <label htmlFor="recorded_at">תאריך מדידה</label>
                       <input
                         type="date"
                         value={userForm.recorded_at}
@@ -563,7 +563,7 @@ export default function User() {
                   <h4 className="sectionTitle">פרטי מנוי</h4>
                   <div className="userUpdateRow">
                     <div className="userUpdateItem">
-                      <label>תאריך התחלה</label>
+                      <label htmlFor="start_date">תאריך התחלה</label>
                       <input
                         type="date"
                         value={userForm.start_date}
@@ -574,7 +574,7 @@ export default function User() {
                       />
                     </div>
                     <div className="userUpdateItem">
-                      <label>תאריך סיום</label>
+                      <label htmlFor="end_date">תאריך סיום</label>
                       <input
                         type="date"
                         value={userForm.end_date}

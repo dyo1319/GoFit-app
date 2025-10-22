@@ -1,12 +1,61 @@
+/* User Admin Page Styles - Consistent with App Pages Theme */
+
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
 body{
   text-decoration: none;
 }
 
 .user {
-  flex: 4;
-  padding: 20px;
-  background-color: #f8f9fa;
   min-height: 100vh;
+  background-color: #f8fafc;
+  padding: 20px;
+  flex: 4;
+  padding-top: 80px;
+}
+
+/* Page Header Styles */
+.dashboard-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0;
+  width: 100%;
+  margin: 0;
+}
+
+.dashboard-nav {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 12px 5%;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.dashboard-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.dashboard-nav h1 {
+  color: #1e293b;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .userTitleContainer {
@@ -19,7 +68,7 @@ body{
 }
 
 .userTitle {
-  color: #2c3e50;
+  color: #1e293b;
   margin: 0;
   font-size: 28px;
   font-weight: 600;
@@ -330,18 +379,26 @@ body{
   100% { transform: rotate(360deg); }
 }
 
-@media (max-width: 1200px) {
-  .userContainer {
-    flex-direction: column;
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .user {
+    padding-bottom: 80px; /* Space for bottom nav */
+    padding-top: 76px; /* Mobile topbar height + padding */
   }
   
-  .userShow, .userUpdate {
-    flex: none;
-    width: 100%;
+  .dashboard-nav {
+    padding: 10px 4%;
   }
-}
-
-@media (max-width: 768px) {
+  
+  .brand-icon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .dashboard-nav h1 {
+    font-size: 18px;
+  }
+  
   .user {
     padding: 15px;
   }
@@ -363,5 +420,45 @@ body{
   .userUpdateButton {
     width: 100%;
     justify-content: center;
+  }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 480px) {
+  .user {
+    padding: 12px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .dashboard-nav {
+    padding: 12px 4%;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .user { 
+    margin-right: 240px; 
+    padding-bottom: 0; 
+    padding-top: 80px; /* Desktop topbar height + padding */
+  }
+  .dashboard-nav {
+    padding: 12px 5%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .user { 
+    margin-right: 260px; 
+    padding-top: 80px; /* Large desktop topbar height + padding */
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1600px) {
+  .user {
+    padding: 40px;
   }
 }

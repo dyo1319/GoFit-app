@@ -241,16 +241,17 @@ export default function NotificationsPage() {
   }
 
   return (
-    <Container maxWidth="xl" sx={{ py: 2 }}>
-      <Paper 
-        sx={{ 
-          p: 3, 
-          minHeight: 600,
-          width: "100%",
-          position: 'relative'
-        }} 
-        dir="rtl"
-      >
+    <div className="notifications-admin">
+      <Container maxWidth="xl" sx={{ py: 2 }}>
+        <Paper 
+          sx={{ 
+            p: 3, 
+            minHeight: 600,
+            width: "100%",
+            position: 'relative'
+          }} 
+          dir="rtl"
+        >
         {loading && (
           <Box
             sx={{
@@ -322,5 +323,6 @@ export default function NotificationsPage() {
         </Snackbar>
       </Paper>
     </Container>
+    </div>
   );
 }

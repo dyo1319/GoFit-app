@@ -33,11 +33,11 @@ const BottomNavBar = ({ activeTab, onTabChange, onLogout }) => {
       )
     },
     {
-      id: 'body-details',
+      id: 'bodydetails',
       label: 'מדדי גוף',
       icon: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M7 2h10a2 2 0 0 1 2 2v16l-7-3-7 3V4a2 2 0 0 1 2-2zm3 5h4v2h-4V7zm0 4h7v2h-7v-2zm0 4h5v2h-5v-2z" fill="currentColor"/>
+          <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" fill="currentColor"/>
         </svg>
       )
     },

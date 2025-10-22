@@ -17,7 +17,7 @@ import {
 } from '@mui/icons-material';
 import { trainingProgramService } from '../../services/trainingProgramService';
 import { exerciseService } from '../../services/exerciseService';
-import { formatToHebrewDate } from '../../utils/dateFormatter';
+import { formatToHebrewDate, formatToWorkoutDateTime, calculateDuration, formatToTime } from '../../utils/dateFormatter';
 import { getDifficultyHebrew } from '../../utils/exerciseFormatter';
 import './workout.css';
 
@@ -37,6 +37,25 @@ export default function Workouts() {
   const [filterCategory, setFilterCategory] = useState('');
 
   const categories = ['כוח', 'קרדיו', 'גמישות', 'יוגה', 'פילאטיס', 'פונקציונלי', 'אחר'];
+
+  // Helper function to detect if URL is a GIF
+  const isGifUrl = (url) => {
+    if (!url) return false;
+    const gifExtensions = ['.gif', '.GIF'];
+    const gifDomains = ['giphy.com', 'tenor.com', 'imgur.com'];
+    
+    // Check file extension
+    if (gifExtensions.some(ext => url.includes(ext))) {
+      return true;
+    }
+    
+    // Check domain
+    if (gifDomains.some(domain => url.includes(domain))) {
+      return true;
+    }
+    
+    return false;
+  };
 
   useEffect(() => {
     fetchMyPrograms();
@@ -110,6 +129,30 @@ export default function Workouts() {
     setCurrentWorkout(updatedWorkout);
   };
 
+  const nextExercise = () => {
+    if (!currentWorkout) return;
+    
+    const nextIndex = currentWorkout.currentExerciseIndex + 1;
+    if (nextIndex < currentWorkout.program.exercises.length) {
+      setCurrentWorkout({
+        ...currentWorkout,
+        currentExerciseIndex: nextIndex
+      });
+    }
+  };
+
+  const previousExercise = () => {
+    if (!currentWorkout) return;
+    
+    const prevIndex = currentWorkout.currentExerciseIndex - 1;
+    if (prevIndex >= 0) {
+      setCurrentWorkout({
+        ...currentWorkout,
+        currentExerciseIndex: prevIndex
+      });
+    }
+  };
+
   const finishWorkout = async () => {
     if (!currentWorkout) return;
     
@@ -170,7 +213,7 @@ export default function Workouts() {
 
   const filteredExercises = exerciseLibrary.filter(exercise => {
     const matchesSearch = exercise.exercise_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         exercise.description?.toLowerCase().includes(searchTerm.toLowerCase());
+                         exercise.description && exercise.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !filterCategory || exercise.category === filterCategory;
     return matchesSearch && matchesCategory;
   });
@@ -254,7 +297,7 @@ export default function Workouts() {
                       </div>
                       <div className="program-stats">
                         <span className="program-chip">
-                          {program.exercises?.length || 0} תרגילים
+                          {(program.exercises && program.exercises.length) || 0} תרגילים
                         </span>
                       </div>
                       <div className="program-actions">
@@ -323,6 +366,18 @@ export default function Workouts() {
                         </span>
                       )}
                     </div>
+                    {exercise.video_url && isGifUrl(exercise.video_url) && (
+                      <div className="exercise-library-media">
+                        <img 
+                          src={exercise.video_url} 
+                          alt={exercise.exercise_name}
+                          className="exercise-library-gif"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
                     {exercise.description && (
                       <p className="exercise-description">
                         {exercise.description.substring(0, 100)}...
@@ -377,34 +432,104 @@ export default function Workouts() {
                     </p>
                   </div>
 
+                  <div className="workout-navigation">
+                    <button
+                      className="nav-btn prev-btn"
+                      onClick={previousExercise}
+                      disabled={currentWorkout.currentExerciseIndex === 0}
+                    >
+                      <span>←</span>
+                      תרגיל קודם
+                    </button>
+                    
+                    <div className="workout-progress">
+                      <span className="progress-text">
+                        {currentWorkout.currentExerciseIndex + 1} / {currentWorkout.program.exercises.length}
+                      </span>
+                      <div className="progress-bar">
+                        <div 
+                          className="progress-fill"
+                          style={{
+                            width: `${((currentWorkout.currentExerciseIndex + 1) / currentWorkout.program.exercises.length) * 100}%`
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                    
+                    <button
+                      className="nav-btn next-btn"
+                      onClick={nextExercise}
+                      disabled={currentWorkout.currentExerciseIndex >= currentWorkout.program.exercises.length - 1}
+                    >
+                      תרגיל הבא
+                      <span>→</span>
+                    </button>
+                  </div>
+
                   <div className="exercises-list">
-                    {currentWorkout.program.exercises?.map((exercise, index) => (
+                    {currentWorkout.program.exercises && currentWorkout.program.exercises.map((exercise, index) => (
                       <div 
                         key={index} 
                         className={`exercise-item ${
                           currentWorkout.completedExercises.includes(index) ? 'completed' : ''
-                        }`}
+                        } ${currentWorkout.currentExerciseIndex === index ? 'current' : ''}`}
+                        style={{
+                          display: currentWorkout.currentExerciseIndex === index ? 'block' : 'none'
+                        }}
                       >
                         <div className="exercise-item-content">
-                          <button
-                            className="exercise-checkbox"
-                            onClick={() => completeExercise(index)}
-                          >
-                            {currentWorkout.completedExercises.includes(index) ? 
-                              <CheckCircle style={{ color: '#10b981' }} /> : 
-                              <RadioButtonUnchecked style={{ color: '#64748b' }} />
-                            }
-                          </button>
-                          <div className="exercise-details">
+                          <div className="exercise-header">
                             <h4 className="exercise-title">{exercise.exercise_name}</h4>
-                            <p className="exercise-description-text">{exercise.description}</p>
+                            <div className="exercise-number">
+                              {index + 1} / {currentWorkout.program.exercises.length}
+                            </div>
+                          </div>
+                          
+                          {exercise.video_url && isGifUrl(exercise.video_url) && (
+                            <div className="exercise-gif-container">
+                              <img 
+                                src={exercise.video_url} 
+                                alt={exercise.exercise_name}
+                                className="exercise-gif"
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                }}
+                              />
+                            </div>
+                          )}
+                          
+                          <div className="exercise-details">
+                            {exercise.description && (
+                              <p className="exercise-description-text">{exercise.description}</p>
+                            )}
                             <div className="exercise-metrics">
-                              <span className="exercise-metric">{exercise.sets} סטים</span>
-                              <span className="exercise-metric">{exercise.reps} חזרות</span>
+                              <span className="exercise-metric">
+                                <strong>{exercise.sets}</strong> סטים
+                              </span>
+                              <span className="exercise-metric">
+                                <strong>{exercise.reps}</strong> חזרות
+                              </span>
                               {exercise.duration > 0 && (
-                                <span className="exercise-metric">{exercise.duration} דקות</span>
+                                <span className="exercise-metric">
+                                  <strong>{exercise.duration}</strong> דקות
+                                </span>
                               )}
                             </div>
+                          </div>
+                          
+                          <div className="exercise-actions">
+                            <button
+                              className="exercise-checkbox"
+                              onClick={() => completeExercise(index)}
+                            >
+                              {currentWorkout.completedExercises.includes(index) ? 
+                                <CheckCircle style={{ color: '#10b981' }} /> : 
+                                <RadioButtonUnchecked style={{ color: '#64748b' }} />
+                              }
+                              <span>
+                                {currentWorkout.completedExercises.includes(index) ? 'הושלם' : 'סמן כהושלם'}
+                              </span>
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -446,16 +571,27 @@ export default function Workouts() {
                     return (
                       <div key={workout.id || index} className="history-item">
                         <h4 className="history-program-name">{programName}</h4>
-                        <p className="history-times">התחיל: {formatToHebrewDate(startTime)}</p>
-                        <p className="history-times">הסתיים: {formatToHebrewDate(endTime)}</p>
-                        <div className="history-stats">
+                        <div className="history-details-grid">
+                          <div className="history-detail-item">
+                            <span className="detail-label">תאריך:</span>
+                            <span className="detail-value">{formatToHebrewDate(startTime)}</span>
+                          </div>
+                          <div className="history-detail-item">
+                            <span className="detail-label">התחיל שעה:</span>
+                            <span className="detail-value">{formatToTime(startTime)}</span>
+                          </div>
+                          <div className="history-detail-item">
+                            <span className="detail-label">הסתיים שעה:</span>
+                            <span className="detail-value">{formatToTime(endTime)}</span>
+                          </div>
                           {duration && (
-                            <span className="history-stat">
-                              <Timer />
-                              <span className="stat-label">משך:</span>
-                              <span className="stat-value">{duration} דקות</span>
-                            </span>
+                            <div className="history-detail-item">
+                              <span className="detail-label">משך:</span>
+                              <span className="detail-value">{duration} דקות</span>
+                            </div>
                           )}
+                        </div>
+                        <div className="history-stats">
                           <span className={`history-completion-chip ${
                             completedExercises.length === totalExercises ? '' : 'incomplete'
                           }`}>
@@ -480,7 +616,7 @@ export default function Workouts() {
           className="program-dialog"
         >
           <DialogTitle className="program-dialog-title">
-            {selectedProgram?.program_name}
+            {selectedProgram && selectedProgram.program_name}
           </DialogTitle>
           <DialogContent className="program-dialog-content">
             {selectedProgram && (
@@ -504,7 +640,7 @@ export default function Workouts() {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {selectedProgram.exercises?.map((exercise, index) => (
+                        {selectedProgram.exercises && selectedProgram.exercises.map((exercise, index) => (
                           <TableRow key={index}>
                             <TableCell>
                               <div className="exercise-name-cell">

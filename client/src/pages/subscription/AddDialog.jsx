@@ -47,7 +47,16 @@ export default function AddDialog({ API_BASE, open, onClose, onCreate }) {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth className="rtlDialog">
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth="sm" 
+      fullWidth 
+      className="rtlDialog"
+      disableEnforceFocus={false}
+      disableAutoFocus={false}
+      disableRestoreFocus={false}
+    >
       <DialogTitle>הוסף מנוי חדש</DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>

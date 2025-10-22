@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./topbar.css";
-import { Notifications, MarkEmailRead } from "@mui/icons-material";
+import { Notifications, MarkEmailRead, Menu } from "@mui/icons-material";
 import { 
   IconButton, 
   Badge, 
@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import { useAuth } from "../../context/AuthContext";
 
-export default function Topbar() {
+export default function Topbar({ onMenuToggle }) {
   const { authenticatedFetch } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -142,6 +142,14 @@ export default function Topbar() {
             <Badge badgeContent={unreadCount} color="error">
               <Notifications />
             </Badge>
+          </IconButton>
+          <IconButton 
+            color="inherit" 
+            onClick={onMenuToggle}
+            sx={{ display: { xs: 'flex', md: 'none' } }}
+            className="hamburger-button"
+          >
+            <Menu />
           </IconButton>
         </div>
       </div>

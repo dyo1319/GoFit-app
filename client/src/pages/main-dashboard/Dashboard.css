@@ -5,6 +5,7 @@
 .dashboard {
   min-height: 100vh;
   background-color: #f8fafc;
+  padding: 60px 20px 20px 20px !important;
 }
 
 .dashboard-header {
@@ -192,6 +193,31 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+.clickable-card {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clickable-card:hover {
+  border-color: #6366f1;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+  transform: translateY(-2px);
+}
+
+.card-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.click-hint {
+  color: #6366f1;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  display: block;
+}
+
 .card-header {
   display: flex;
   align-items: center;
@@ -339,7 +365,7 @@
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .dashboard {
-    padding-bottom: 80px; /* Space for bottom nav */
+    padding: 56px 16px 80px 16px !important; /* Mobile topbar height + padding, bottom nav space */
   }
   
   .dashboard-nav {
@@ -436,6 +462,7 @@
   .dashboard { 
     margin-right: 240px; 
     padding-bottom: 0; 
+    padding: 60px 20px 0 20px !important; /* Desktop topbar height + padding */
   }
   .dashboard-main { 
     padding: 40px 5%; 
@@ -447,6 +474,7 @@
 @media (min-width: 1200px) {
   .dashboard { 
     margin-right: 260px; 
+    padding: 60px 20px 0 20px !important; /* Large desktop topbar height + padding */
   }
   .dashboard-main {
     width: calc(100vw - 260px);

@@ -1,18 +1,67 @@
+/* Subscription Admin Page Styles - Consistent with App Pages Theme */
+
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
 .subscriptions {
+  min-height: 100vh;
+  background-color: #f8fafc;
   direction: rtl;
-  padding: 16px;
-  min-height: calc(100vh - 50px);
-  background: #fafafa;
   width: 100%;
   box-sizing: border-box;
   margin: 0;
   flex: 1;
+  padding: 60px 20px 20px 20px !important;
+}
+
+/* Page Header Styles */
+.dashboard-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0;
+  width: 100%;
+  margin: 0;
+}
+
+.dashboard-nav {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 12px 5%;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.dashboard-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.dashboard-nav h1 {
+  color: #1e293b;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .subscriptions__title {
   margin: 0 0 12px 0;
   font-weight: 800;
   letter-spacing: 0.2px;
+  color: #1e293b;
 }
 
 .subscriptions__filters {
@@ -24,13 +73,13 @@
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  border: 1px solid #f0f0f0;
+  border: 1px solid #e2e8f0;
   width: 100%;
   box-sizing: border-box;
 }
 
 .subscriptions__filters .MuiTextField-root { min-width: 200px; }
-.subscriptions__filters .MuiInputLabel-root { color: #6b7280; font-size: 0.875rem; }
+.subscriptions__filters .MuiInputLabel-root { color: #64748b; font-size: 0.875rem; }
 .subscriptions__filters .MuiOutlinedInput-root { border-radius: 8px; }
 .subscriptions__filters .MuiOutlinedInput-input { padding: 10px 14px; font-size: 0.875rem; }
 
@@ -102,25 +151,80 @@
   font-size: 12px;
 }
 
-@media (min-width: 600px) {
-  .subscriptions { padding: 20px; }
-  .subscriptions__filters { padding: 20px; }
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .subscriptions {
+    padding: 56px 16px 80px 16px !important; /* Mobile topbar height + padding, bottom nav space */
+  }
+  
+  .dashboard-nav {
+    padding: 10px 4%;
+  }
+  
+  .brand-icon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .dashboard-nav h1 {
+    font-size: 18px;
+  }
+  
+  .subscriptions__filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .subscriptions__filters .MuiTextField-root {
+    min-width: 100%;
+  }
 }
 
-@media (min-width: 900px) {
-  .subscriptions {padding: 20px;}
-  .subscriptions__filters { gap: 24px; }
+/* Extra Small Mobile */
+@media (max-width: 480px) {
+  .subscriptions__filters {
+    padding: 12px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .dashboard-nav {
+    padding: 12px 4%;
+  }
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .subscriptions { 
+    margin-right: 240px; 
+    padding-bottom: 0; 
+    padding: 60px 20px 0 20px !important; /* Desktop topbar height + padding */
+  }
+  .dashboard-nav {
+    padding: 12px 5%;
+  }
 }
 
 @media (min-width: 1200px) {
-  .subscriptions { padding: 24px; }
-  .subscriptions__filters { gap: 28px; padding: 24px; }
+  .subscriptions { 
+    margin-right: 260px; 
+    padding: 60px 20px 0 20px !important; /* Large desktop topbar height + padding */
+  }
 }
 
-@media (min-width: 1400px) {
-  .subscriptions { padding: 28px 32px; }
-  .subscriptionList { padding: 20px; }
-  .subscriptions__filters { gap: 32px; padding: 32px; }
+/* Large Desktop */
+@media (min-width: 1600px) {
+  .subscriptions__filters {
+    padding: 32px;
+    gap: 32px;
+  }
+  
+  .subscriptionList {
+    padding: 32px;
+  }
 }
 
 .subscriptions ::-webkit-scrollbar { width: 6px; height: 6px; }

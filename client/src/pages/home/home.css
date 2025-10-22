@@ -1,19 +1,67 @@
-/* src/pages/home/home.css */
+/* Home Admin Page Styles - Consistent with App Pages Theme */
+
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
 .home {
+  min-height: 100vh;
+  background-color: #f8fafc;
   direction: rtl;
-  padding: 16px;
-  min-height: calc(100vh - 50px);
-  background: #fafafa;
   width: 100%;
   box-sizing: border-box;
   margin: 0;
   flex: 1;
+  padding: 60px 20px 20px 20px !important;
+}
+
+/* Page Header Styles */
+.dashboard-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0;
+  width: 100%;
+  margin: 0;
+}
+
+.dashboard-nav {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 12px 5%;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.dashboard-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.dashboard-nav h1 {
+  color: #1e293b;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
 }
 
 .home__title {
   margin: 0 0 12px 0;
   font-weight: 800;
   letter-spacing: 0.2px;
+  color: #1e293b;
 }
 
 .home__cards-grid {
@@ -428,85 +476,146 @@
   font-size: 0.875rem;
 }
 
-/* Responsive Design */
-@media (min-width: 600px) {
+/* Mobile Responsive */
+@media (max-width: 768px) {
   .home {
-    padding: 20px;
+    padding: 56px 16px 80px 16px !important; /* Mobile topbar height + padding, bottom nav space */
   }
+  
+  .dashboard-nav {
+    padding: 10px 4%;
+  }
+  
+  .brand-icon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .dashboard-nav h1 {
+    font-size: 18px;
+  }
+  
   .home .stat-card {
-    grid-column: span 6;
+    grid-column: span 12;
   }
+  
   .home .header-container {
-    margin-bottom: 28px;
+    margin-bottom: 20px;
   }
+  
   .home .analytics-filters {
-    padding: 24px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .home .analytics-filters .MuiTextField-root {
+    min-width: 100%;
   }
 }
 
-@media (min-width: 900px) {
-  .home .stat-card {
-    grid-column: span 3;
+/* Extra Small Mobile */
+@media (max-width: 480px) {
+  .home .header-container {
+    margin-bottom: 16px;
   }
+  
+  .home .analytics-filters {
+    padding: 12px;
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .dashboard-nav {
+    padding: 12px 4%;
+  }
+  
+  .home .stat-card {
+    grid-column: span 6;
+  }
+  
   .home .charts-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
   }
+  
   .home .chart-card {
     margin-bottom: 0;
   }
-  .home .header-container {
-    margin-bottom: 32px;
-  }
+  
   .home .analytics-filters {
     gap: 24px;
+    padding: 24px;
   }
+  
   .home .analytics-chart-container {
     height: 450px;
   }
 }
 
-@media (min-width: 1200px) {
-  .home {
-    padding: 24px;
+/* Desktop */
+@media (min-width: 768px) {
+  .home { 
+    margin-right: 240px; 
+    padding-bottom: 0; 
+    padding: 60px 20px 0 20px !important; /* Desktop topbar height + padding */
   }
-  .home .charts-container {
-    gap: 24px;
+  .dashboard-nav {
+    padding: 12px 5%;
   }
+  
+  .home .stat-card {
+    grid-column: span 3;
+  }
+  
   .home .header-container {
-    margin-bottom: 36px;
+    margin-bottom: 32px;
   }
+  
   .home .analytics-filters {
     gap: 28px;
     padding: 28px;
   }
+  
   .home .analytics-chart-container {
     height: 500px;
   }
 }
 
-@media (min-width: 1400px) {
-  .home {
-    padding: 28px 32px;
+@media (min-width: 1200px) {
+  .home { 
+    margin-right: 260px; 
+    padding: 60px 20px 0 20px !important; /* Large desktop topbar height + padding */
   }
+}
+
+/* Large Desktop */
+@media (min-width: 1600px) {
   .home__cards-grid {
     gap: 20px;
     margin-bottom: 28px;
   }
+  
   .home .charts-container {
     gap: 28px;
   }
+  
   .home .stat-card {
     padding: 20px;
   }
+  
   .home .chart-card {
     padding: 20px;
   }
+  
   .home .analytics-filters {
     gap: 32px;
     padding: 32px;
   }
+  
   .home .analytics-chart-card {
     padding: 32px;
   }
