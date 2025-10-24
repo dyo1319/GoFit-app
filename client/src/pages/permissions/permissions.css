@@ -1,5 +1,3 @@
-/* Permissions Admin Page Styles - Consistent with App Pages Theme */
-
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
 :root{
@@ -27,7 +25,6 @@
   padding: 60px 20px 20px 20px !important;
 }
 
-/* Page Header Styles */
 .dashboard-header {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
@@ -300,10 +297,9 @@
   text-align: center;
 }
 
-/* Mobile Responsive */
 @media (max-width: 768px) {
   .perm-page {
-    padding: 56px 16px 80px 16px !important; /* Mobile topbar height + padding, bottom nav space */
+    padding: 56px 16px 80px 16px !important; 
   }
   
   .dashboard-nav {
@@ -333,7 +329,6 @@
   }
 }
 
-/* Extra Small Mobile */
 @media (max-width: 480px) {
   .perm-page{ 
     padding: 8px; 
@@ -343,19 +338,17 @@
   }
 }
 
-/* Tablet */
 @media (max-width: 1024px) and (min-width: 769px) {
   .dashboard-nav {
     padding: 12px 4%;
   }
 }
 
-/* Desktop */
 @media (min-width: 768px) {
   .perm-page { 
     margin-right: 240px; 
     padding-bottom: 0; 
-    padding: 60px 20px 0 20px !important; /* Desktop topbar height + padding */
+    padding: 60px 20px 0 20px !important;
   }
   .dashboard-nav {
     padding: 12px 5%;
@@ -365,11 +358,10 @@
 @media (min-width: 1200px) {
   .perm-page { 
     margin-right: 260px; 
-    padding: 60px 20px 0 20px !important; /* Large desktop topbar height + padding */
+    padding: 60px 20px 0 20px !important; 
   }
 }
 
-/* Large Desktop */
 @media (min-width: 1600px) {
   .perm-page{ 
     padding: 28px 32px; 

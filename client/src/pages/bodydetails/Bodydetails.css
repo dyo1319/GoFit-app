@@ -1,4 +1,3 @@
-/* Body Details Page Styles - Consistent with Dashboard/Profile theme */
 
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
@@ -7,7 +6,6 @@
   background-color: #f8fafc;
 }
 
-/* Page Header Styles */
 .dashboard-header {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
@@ -81,7 +79,6 @@
   margin: 0;
 }
 
-/* Body Details Container */
 .bodydetails-container {
   background: white;
   border-radius: 16px;
@@ -89,7 +86,6 @@
   overflow: hidden;
 }
 
-/* Tabs */
 .bodydetails-tabs {
   display: flex;
   background: #f8fafc;
@@ -128,7 +124,6 @@
   background: #6366f1;
 }
 
-/* Content Area */
 .bodydetails-content-area {
   min-height: 500px;
 }
@@ -137,7 +132,6 @@
   padding: 32px;
 }
 
-/* Form Styling */
 .body-details-form {
   display: flex;
   flex-direction: column;
@@ -184,7 +178,6 @@
   color: #9ca3af;
 }
 
-/* BMI Preview */
 .bmi-preview {
   background: #f0f9ff;
   border: 1px solid #bae6fd;
@@ -195,7 +188,6 @@
   font-weight: 600;
 }
 
-/* Messages */
 .error-message {
   background: #fef2f2;
   border: 1px solid #fecaca;
@@ -216,7 +208,6 @@
   text-align: center;
 }
 
-/* Form Actions */
 .form-actions {
   display: flex;
   gap: 12px;
@@ -224,7 +215,6 @@
   margin-top: 8px;
 }
 
-/* Buttons */
 .btn-primary {
   background: #6366f1;
   color: white;
@@ -304,7 +294,6 @@
   cursor: not-allowed;
 }
 
-/* History Tab */
 .history-list {
   display: flex;
   flex-direction: column;
@@ -354,7 +343,6 @@
   justify-content: flex-end;
 }
 
-/* Progress Tab */
 .progress-content {
   display: flex;
   flex-direction: column;
@@ -411,7 +399,6 @@
   border-radius: 6px;
 }
 
-/* Progress Changes */
 .progress-changes h4 {
   color: #1e293b;
   font-size: 18px;
@@ -478,7 +465,6 @@
   margin: 0;
 }
 
-/* No Data States */
 .no-data, .no-comparison {
   text-align: center;
   padding: 40px 20px;
@@ -496,10 +482,9 @@
   font-size: 14px;
 }
 
-/* Mobile Responsive */
 @media (max-width: 768px) {
   .bodydetails-page {
-    padding-bottom: 80px; /* Space for bottom nav */
+    padding-bottom: 80px; 
   }
   
   .dashboard-nav {
@@ -608,7 +593,6 @@
   }
 }
 
-/* Extra Small Mobile */
 @media (max-width: 480px) {
   .bodydetails-content {
     padding: 16px 3%;
@@ -649,7 +633,6 @@
   }
 }
 
-/* Desktop */
 @media (min-width: 768px) {
   .bodydetails-page { 
     margin-right: 240px; 
@@ -675,7 +658,6 @@
   }
 }
 
-/* Large Desktop */
 @media (min-width: 1600px) {
   .bodydetails-content {
     padding: 50px 6%;

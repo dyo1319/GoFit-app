@@ -90,7 +90,6 @@ export default function TrainingPrograms() {
         setExercises(data.data);
       }
     } catch (err) {
-      console.error('Error loading exercises:', err);
     }
   };
 
@@ -103,7 +102,6 @@ export default function TrainingPrograms() {
         setUserPrograms(data.data);
       }
     } catch (err) {
-      console.error('Error loading user programs:', err);
     }
   };
 
@@ -242,7 +240,6 @@ export default function TrainingPrograms() {
     setEditExerciseDialog(true);
   };
 
-  // Get available exercises for a program (excluding already added ones)
   const getAvailableExercises = (programId) => {
     if (!programId || !userPrograms.length) return exercises;
     
@@ -251,18 +248,14 @@ export default function TrainingPrograms() {
     
     const usedExerciseIds = currentProgram.exercises.map(ex => parseInt(ex.id));
     
-    // If we're editing an existing exercise (form has an exercise_id), include it in available options
     if (exerciseForm.exercise_id && exerciseForm.exercise_id !== '') {
       const currentExerciseId = parseInt(exerciseForm.exercise_id);
-      // Remove the current exercise from the "used" list so it appears in dropdown
       const filteredUsedIds = usedExerciseIds.filter(id => id !== currentExerciseId);
       const availableExercises = exercises.filter(exercise => !filteredUsedIds.includes(parseInt(exercise.id)));
-      console.log('Editing mode - Available exercises:', availableExercises.map(ex => ex.id));
       return availableExercises;
     }
     
     const availableExercises = exercises.filter(exercise => !usedExerciseIds.includes(parseInt(exercise.id)));
-    console.log('Adding mode - Available exercises:', availableExercises.map(ex => ex.id));
     return availableExercises;
   };
 
@@ -298,16 +291,13 @@ export default function TrainingPrograms() {
       
       const method = editingExercise ? 'PUT' : 'POST';
 
-      // Ensure all form data is properly formatted
       const formData = editingExercise 
         ? {
-            // For editing, don't change the exercise_id, only update parameters
             sets: exerciseForm.sets || '1',
             reps: exerciseForm.reps || '1',
             duration: parseInt(exerciseForm.duration) || 0
           }
         : {
-            // For adding new exercise, include exercise_id
             exercise_id: parseInt(exerciseForm.exercise_id) || null,
             sets: exerciseForm.sets || '1',
             reps: exerciseForm.reps || '1',
@@ -330,7 +320,6 @@ export default function TrainingPrograms() {
         setSuccess(editingExercise ? 'התרגיל עודכן בהצלחה' : 'התרגיל נוסף לתוכנית בהצלחה');
         setTimeout(() => setSuccess(''), 3000);
       } else {
-        // Handle specific error cases
         if (response.status === 409) {
           setError('התרגיל כבר קיים בתוכנית זו. אנא בחר תרגיל אחר.');
         } else {
@@ -391,7 +380,7 @@ export default function TrainingPrograms() {
                 <TableCell>טלפון</TableCell>
                 <TableCell>מספר תוכניות</TableCell>
                 <TableCell>תוכנית אחרונה</TableCell>
-                <TableCell>פעולות</TableCell>
+                <TableCell sx={{ textAlign: 'center', fontWeight: 700 }}>פעולות</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -417,23 +406,64 @@ export default function TrainingPrograms() {
                       'אין תוכניות'
                     }
                   </TableCell>
-                  <TableCell>
+                  <TableCell sx={{ textAlign: 'center' }}>
                     {hasPermission('manage_plans') && (
-                      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        gap: 1, 
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
                         <Button
-                          variant="outlined"
+                          variant="contained"
                           size="small"
                           onClick={() => handleCreateProgram(trainee)}
-                          startIcon={<Add />}
+                          sx={{
+                            borderRadius: '8px',
+                            padding: '8px 16px',
+                            fontWeight: 600,
+                            textTransform: 'none',
+                            fontSize: '0.75rem',
+                            background: 'linear-gradient(135deg, #10b981, #059669)',
+                            color: 'white',
+                            border: 'none',
+                            boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
+                            transition: 'all 0.2s ease',
+                            minWidth: '120px',
+                            '&:hover': {
+                              background: 'linear-gradient(135deg, #059669, #047857)',
+                              transform: 'translateY(-1px)',
+                              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)'
+                            }
+                          }}
                         >
                           תוכנית חדשה
                         </Button>
                         {trainee.program_count > 0 && (
                           <Button
-                            variant="text"
+                            variant="outlined"
                             size="small"
                             onClick={() => viewUserPrograms(trainee)}
-                            startIcon={<Visibility />}
+                            sx={{
+                              borderRadius: '8px',
+                              padding: '8px 16px',
+                              fontWeight: 600,
+                              textTransform: 'none',
+                              fontSize: '0.75rem',
+                              border: '2px solid #6366f1',
+                              color: '#6366f1',
+                              backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                              transition: 'all 0.2s ease',
+                              minWidth: '120px',
+                              '&:hover': {
+                                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                borderColor: '#5b5bd6',
+                                color: '#5b5bd6',
+                                transform: 'translateY(-1px)',
+                                boxShadow: '0 4px 8px rgba(99, 102, 241, 0.2)'
+                              }
+                            }}
                           >
                             צפייה בתוכניות
                           </Button>
@@ -552,24 +582,51 @@ export default function TrainingPrograms() {
                               />
                             )}
                           </TableCell>
-                          <TableCell>
+                          <TableCell sx={{ textAlign: 'center' }}>
                             {hasPermission('manage_plans') && (
-                              <Box className="exercise-actions">
+                              <Box sx={{ 
+                                display: 'flex', 
+                                gap: 1, 
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}>
                                 <IconButton 
                                   size="small" 
                                   onClick={() => handleEditExercise(program.id, exercise, index)}
-                                  color="primary"
                                   title="עריכת תרגיל"
+                                  sx={{
+                                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                                    color: '#6366f1',
+                                    borderRadius: '8px',
+                                    padding: '6px',
+                                    transition: 'all 0.2s ease',
+                                    '&:hover': {
+                                      backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                                      transform: 'scale(1.1)',
+                                      boxShadow: '0 4px 8px rgba(99, 102, 241, 0.3)'
+                                    }
+                                  }}
                                 >
-                                  <Edit />
+                                  <Edit fontSize="small" />
                                 </IconButton>
                                 <IconButton 
                                   size="small" 
                                   onClick={() => handleDeleteExercise(program.id, exercise.training_exercise_id, index)}
-                                  color="error"
                                   title="מחיקת תרגיל"
+                                  sx={{
+                                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                    color: '#ef4444',
+                                    borderRadius: '8px',
+                                    padding: '6px',
+                                    transition: 'all 0.2s ease',
+                                    '&:hover': {
+                                      backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                                      transform: 'scale(1.1)',
+                                      boxShadow: '0 4px 8px rgba(239, 68, 68, 0.3)'
+                                    }
+                                  }}
                                 >
-                                  <Delete />
+                                  <Delete fontSize="small" />
                                 </IconButton>
                               </Box>
                             )}
@@ -581,12 +638,32 @@ export default function TrainingPrograms() {
                 </TableContainer>
                 
                 {hasPermission('manage_plans') && (
-                  <Box className="add-exercise-button">
+                  <Box sx={{ 
+                    marginTop: '16px', 
+                    display: 'flex', 
+                    justifyContent: 'center'
+                  }}>
                     <Button
-                      variant="outlined"
-                      startIcon={<Add />}
+                      variant="contained"
                       onClick={() => handleAddExerciseToProgram(program.id)}
                       size="small"
+                      sx={{
+                        borderRadius: '12px',
+                        padding: '10px 20px',
+                        fontWeight: 600,
+                        textTransform: 'none',
+                        fontSize: '0.875rem',
+                        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+                        color: 'white',
+                        border: 'none',
+                        boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          background: 'linear-gradient(135deg, #5b5bd6, #7c3aed)',
+                          transform: 'translateY(-1px)',
+                          boxShadow: '0 6px 16px rgba(99, 102, 241, 0.4)'
+                        }
+                      }}
                     >
                       הוסף תרגיל לתוכנית
                     </Button>
@@ -604,14 +681,67 @@ export default function TrainingPrograms() {
         maxWidth="lg" 
         fullWidth
         disableEnforceFocus={false}
-        disableAutoFocus={false}
+        disableAutoFocus={true}
         disableRestoreFocus={false}
+        disableScrollLock={false}
+        hideBackdrop={false}
+        dir="rtl"
+        PaperProps={{
+          sx: {
+            borderRadius: '12px',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+            background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+            border: '1px solid rgba(226, 232, 240, 0.8)',
+            backdropFilter: 'blur(10px)',
+            maxWidth: '800px',
+            width: '95%',
+            direction: 'rtl',
+            textAlign: 'right'
+          }
+        }}
+        BackdropProps={{
+          sx: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(4px)'
+          }
+        }}
       >
-        <DialogTitle>
-          תוכנית אימון חדשה - {selectedTrainee?.username}
+        <DialogTitle sx={{
+          padding: '24px 24px 16px',
+          fontSize: '1.5rem',
+          fontWeight: 700,
+          color: 'white',
+          background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+          borderRadius: '12px 12px 0 0',
+          margin: 0,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          direction: 'rtl',
+          textAlign: 'right',
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '3px',
+            background: 'rgba(255, 255, 255, 0.3)',
+            borderRadius: '12px 12px 0 0'
+          }
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexDirection: 'row-reverse' }}>
+            <Assignment sx={{ fontSize: '1.5rem' }} />
+            תוכנית אימון חדשה - {selectedTrainee?.username}
+          </Box>
         </DialogTitle>
         <form onSubmit={handleSubmit}>
-          <DialogContent>
+          <DialogContent sx={{ 
+            padding: '24px',
+            backgroundColor: '#ffffff',
+            direction: 'rtl'
+          }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               <TextField
                 id="program_name"
@@ -623,10 +753,65 @@ export default function TrainingPrograms() {
                 helperText={errors.program_name}
                 required
                 fullWidth
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    display: 'none'
+                  },
+                  '& .MuiInputBase-input': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    padding: '16px 20px',
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                    backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                    borderRadius: '12px',
+                    border: '2px solid transparent',
+                    transition: 'all 0.3s ease',
+                    '&:focus': {
+                      backgroundColor: '#ffffff',
+                      borderColor: '#6366f1',
+                      boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.1)'
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgba(248, 250, 252, 1)',
+                      borderColor: 'rgba(99, 102, 241, 0.3)'
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    position: 'static',
+                    transform: 'none',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: '#374151',
+                    marginBottom: '8px',
+                    textAlign: 'right',
+                    direction: 'rtl'
+                  },
+                  '& .MuiFormHelperText-root': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    marginTop: '4px',
+                    fontSize: '0.75rem',
+                    fontWeight: 500
+                  }
+                }}
               />
 
               <Box>
-                <Typography variant="h6" gutterBottom>
+                <Typography variant="h6" gutterBottom sx={{
+                  fontSize: '1.25rem',
+                  fontWeight: 700,
+                  color: '#1e293b',
+                  marginBottom: '16px',
+                  textAlign: 'right',
+                  direction: 'rtl',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  flexDirection: 'row-reverse'
+                }}>
+                  <FitnessCenter sx={{ fontSize: '1.25rem', color: '#6366f1' }} />
                   תרגילים בתוכנית
                 </Typography>
                 {errors.exercises && (
@@ -636,7 +821,19 @@ export default function TrainingPrograms() {
                 )}
                 
                 {form.exercises.map((exercise, index) => (
-                  <Card key={index} className={`exercise-card ${errors[`exercises[${index}].exercise_id`] ? 'error' : ''}`}>
+                  <Card key={index} sx={{
+                    border: errors[`exercises[${index}].exercise_id`] ? '2px solid #ef4444' : '1px solid rgba(226, 232, 240, 0.8)',
+                    borderRadius: '12px',
+                    padding: '20px',
+                    marginBottom: '16px',
+                    background: errors[`exercises[${index}].exercise_id`] ? 'rgba(239, 68, 68, 0.05)' : '#ffffff',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+                      transform: 'translateY(-2px)'
+                    }
+                  }}>
                     <Box className="exercise-card-header">
                       <TextField
                         id={`exercise_select_${index}`}
@@ -648,7 +845,55 @@ export default function TrainingPrograms() {
                         error={!!errors[`exercises[${index}].exercise_id`]}
                         helperText={errors[`exercises[${index}].exercise_id`]}
                         required
-                        sx={{ minWidth: 250 }}
+                        variant="outlined"
+                        sx={{ 
+                          minWidth: 250,
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            display: 'none'
+                          },
+                          '& .MuiSelect-select': {
+                            textAlign: 'right',
+                            direction: 'rtl',
+                            padding: '12px 16px',
+                            fontSize: '0.875rem',
+                            fontWeight: 500,
+                            backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                            borderRadius: '8px',
+                            border: '2px solid transparent',
+                            transition: 'all 0.3s ease',
+                            '&:focus': {
+                              backgroundColor: '#ffffff',
+                              borderColor: '#6366f1',
+                              boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.1)'
+                            },
+                            '&:hover': {
+                              backgroundColor: 'rgba(248, 250, 252, 1)',
+                              borderColor: 'rgba(99, 102, 241, 0.3)'
+                            }
+                          },
+                          '& .MuiInputLabel-root': {
+                            position: 'static',
+                            transform: 'none',
+                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            color: '#374151',
+                            marginBottom: '6px',
+                            textAlign: 'right',
+                            direction: 'rtl'
+                          },
+                          '& .MuiFormHelperText-root': {
+                            textAlign: 'right',
+                            direction: 'rtl',
+                            marginTop: '4px',
+                            fontSize: '0.7rem',
+                            fontWeight: 500
+                          },
+                          '& .MuiSelect-icon': {
+                            right: 'auto !important',
+                            left: '8px !important',
+                            color: '#6b7280'
+                          }
+                        }}
                       >
                         <MenuItem value="">בחר תרגיל</MenuItem>
                         {exercises.map(ex => (
@@ -724,18 +969,88 @@ export default function TrainingPrograms() {
                   onClick={addExercise}
                   startIcon={<Add />}
                   variant="outlined"
+                  sx={{
+                    borderRadius: '12px',
+                    padding: '12px 24px',
+                    fontWeight: 600,
+                    textTransform: 'none',
+                    fontSize: '0.875rem',
+                    border: '2px solid #6366f1',
+                    color: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                      borderColor: '#5b5bd6',
+                      color: '#5b5bd6',
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 4px 8px rgba(99, 102, 241, 0.2)'
+                    }
+                  }}
                 >
                   הוסף תרגיל
                 </Button>
               </Box>
             </Box>
           </DialogContent>
-          <DialogActions sx={{ p: 3 }}>
-            <Button onClick={() => setOpenDialog(false)}>ביטול</Button>
+          <DialogActions sx={{ 
+            p: 3, 
+            backgroundColor: 'rgba(248, 250, 252, 0.5)',
+            borderTop: '1px solid rgba(226, 232, 240, 0.8)',
+            direction: 'rtl',
+            justifyContent: 'flex-start',
+            gap: 2
+          }}>
+            <Button 
+              onClick={() => setOpenDialog(false)}
+              variant="outlined"
+              sx={{
+                borderRadius: '12px',
+                padding: '12px 24px',
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '0.875rem',
+                border: '2px solid #e2e8f0',
+                color: '#64748b',
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  borderColor: '#6366f1',
+                  color: '#6366f1',
+                  backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+                }
+              }}
+            >
+              ביטול
+            </Button>
             <Button 
               type="submit" 
               variant="contained" 
               disabled={form.exercises.length === 0}
+              sx={{
+                borderRadius: '12px',
+                padding: '12px 24px',
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '0.875rem',
+                background: 'linear-gradient(135deg, #10b981, #059669)',
+                color: 'white',
+                border: 'none',
+                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #059669, #047857)',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 6px 16px rgba(16, 185, 129, 0.4)'
+                },
+                '&:disabled': {
+                  backgroundColor: '#9ca3af',
+                  color: '#ffffff',
+                  boxShadow: 'none'
+                }
+              }}
             >
               צור תוכנית
             </Button>
@@ -743,12 +1058,11 @@ export default function TrainingPrograms() {
         </form>
       </Dialog>
 
-      {/* Exercise Edit Dialog */}
       <Dialog 
         open={editExerciseDialog} 
         onClose={() => {
           setEditExerciseDialog(false);
-          setError(''); // Clear any error messages when closing dialog
+          setError('');
         }} 
         maxWidth="md" 
         fullWidth
@@ -771,7 +1085,7 @@ export default function TrainingPrograms() {
                 onChange={(e) => setExerciseForm({...exerciseForm, exercise_id: e.target.value})}
                 required
                 fullWidth
-                disabled={editingExercise} // Disable when editing existing exercise
+                disabled={editingExercise}
               >
                 <MenuItem value="">בחר תרגיל</MenuItem>
                 {getAvailableExercises(editingProgramId).map(ex => (
@@ -823,7 +1137,6 @@ export default function TrainingPrograms() {
               {exerciseForm.exercise_id && (
                 <Box sx={{ mt: 1, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
                   {(() => {
-                    // Always use the original exercises list to find the exercise for preview
                     const selectedExercise = exercises.find(ex => ex.id === exerciseForm.exercise_id);
                     return selectedExercise ? (
                       <Typography variant="body2" color="textSecondary">

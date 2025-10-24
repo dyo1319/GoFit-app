@@ -4,7 +4,7 @@ import { Paper, Box, Typography, TextField, InputAdornment, Chip } from "@mui/ma
 import { Search } from "@mui/icons-material";
 import { DataGrid } from "@mui/x-data-grid";
 import { getSubs } from "../../pages/newUser/userApiService";
-import { useDebouncedValue } from "../../pages/subscription/hook";
+import { useDebouncedValue } from "../subscription/hook";
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 

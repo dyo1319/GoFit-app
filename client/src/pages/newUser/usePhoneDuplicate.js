@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export function usePhoneDuplicate(apiBase, phone, onResult, onStart, wait = 600) {
+export function usePhoneDuplicate(authenticatedFetch, phone, onResult, onStart, wait = 600) {
   const cbRef = useRef(onResult);
   const startCbRef = useRef(onStart);
   
@@ -27,7 +27,7 @@ export function usePhoneDuplicate(apiBase, phone, onResult, onStart, wait = 600)
     
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`${apiBase}/U/search?q=${encodeURIComponent(p)}`, { 
+        const res = await authenticatedFetch(`/U/search?q=${encodeURIComponent(p)}`, { 
           signal: controller.signal 
         });
         
@@ -50,5 +50,5 @@ export function usePhoneDuplicate(apiBase, phone, onResult, onStart, wait = 600)
       controller.abort(); 
       clearTimeout(timer); 
     };
-  }, [apiBase, phone, wait]); 
+  }, [authenticatedFetch, phone, wait]); 
 }

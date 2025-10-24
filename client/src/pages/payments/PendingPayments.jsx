@@ -211,22 +211,26 @@ export default function PendingPaymentsPage() {
       <Typography className="pendingPage__title" variant="h5">תשלומים בהמתנה</Typography>
 
       <Box className="pendingFiltersCard">
-        <TextField
-          size="small"
-          value={q}
-          onChange={e => setQ(e.target.value)}
-          label="חיפוש (שם/טלפון)"
-          className="pendingSearch"
-          id="pending-payments-search"
-          name="pending_payments_search"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            ),
-          }}
-        />
+        <Box className="filter-field-container">
+          <Typography className="filter-label" variant="body2">
+            חיפוש (שם/טלפון)
+          </Typography>
+          <TextField
+            size="small"
+            value={q}
+            onChange={e => setQ(e.target.value)}
+            className="pendingSearch"
+            id="pending-payments-search"
+            name="pending_payments_search"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
       </Box>
 
       <Paper className="pendingCard">
@@ -245,6 +249,36 @@ export default function PendingPaymentsPage() {
           onSortModelChange={setSortModel}
           pageSizeOptions={[10, 25, 50]}
           disableRowSelectionOnClick
+          sx={{
+            border: 0,
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: "transparent",
+              background: "linear-gradient(135deg, #f8fafc, #f1f5f9)",
+              borderBottom: "2px solid #e2e8f0",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)"
+            },
+            "& .MuiDataGrid-row:hover": {
+              backgroundColor: "transparent",
+              background: "linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05))",
+              transform: "translateY(-1px)",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+              transition: "all 0.2s ease"
+            },
+            "& .MuiDataGrid-cell": {
+              borderRight: "1px solid rgba(226, 232, 240, 0.5)",
+              fontSize: "0.875rem",
+              fontWeight: 500
+            },
+            "& .MuiDataGrid-columnHeader": {
+              borderRight: "1px solid rgba(226, 232, 240, 0.5)",
+              fontSize: "0.875rem",
+              fontWeight: 700
+            },
+            "& .MuiDataGrid-footerContainer": {
+              backgroundColor: "rgba(248, 250, 252, 0.5)",
+              borderTop: "1px solid #e2e8f0"
+            }
+          }}
         />
       </Paper>
     </div>

@@ -28,8 +28,12 @@ app.use('/U',usr_R);
 const subscription_R = require('./routers/subscription_R.js');
 app.use('/S',subscription_R);
 
-const notificationsRouter = require('./routers/notifications_R');
-app.use('/notifications', notificationsRouter);
+const subscriptionPlans_R = require('./routers/subscriptionPlans_R.js');
+app.use('/subscription-plans', subscriptionPlans_R);
+
+const invoices_R = require('./routers/invoices_R.js');
+app.use('/invoices', invoices_R);
+
 
 const analytics_R = require('./routers/analytics_R');
 app.use('/analytics', analytics_R);
@@ -49,35 +53,16 @@ app.use('/exercises', exercises_R);
 const trainingPrograms_R = require('./routers/trainingPrograms_R');
 app.use('/training-programs', trainingPrograms_R);
 
+
 const workoutHistory_R = require('./routers/workoutHistory_R');
 app.use('/workout-history', workoutHistory_R);
 
-const { notifyUpcomingRenewals, notifyFailedPayments } = require('./jobs/notifications_jobs');
 
-async function runJobs() {
-  try {
-    console.log(`[Jobs] Starting notification jobs at ${new Date().toISOString()}`);
-    const renewalsCount = await notifyUpcomingRenewals(7);
-    const failedPaymentsCount = await notifyFailedPayments();
-    
-    if (renewalsCount > 0 || failedPaymentsCount > 0) {
-      console.log(`[Jobs] Notifications created: renewals=${renewalsCount}, failed_payments=${failedPaymentsCount}`);
-    }
-  } catch (error) {
-    console.error('[Jobs] Error running notification jobs:', error);
-  }
-}
-
-if (process.env.NODE_ENV !== 'test') {
-  setInterval(runJobs, 15 * 60 * 1000);
-  setTimeout(runJobs, 10000); 
-}
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, ts: new Date().toISOString() });
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
 });
 

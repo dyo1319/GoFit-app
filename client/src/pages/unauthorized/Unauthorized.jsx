@@ -12,7 +12,6 @@ function firstAllowedRoute(user, hasPermission) {
     if (hasPermission('view_dashboard')) return '/admin';
     if (hasPermission('view_users')) return '/admin/users';
     if (hasPermission('view_subscriptions')) return '/admin/subscriptions';
-    if (hasPermission('manage_notifications')) return '/admin/notifications';
     return '/app';
   }
 

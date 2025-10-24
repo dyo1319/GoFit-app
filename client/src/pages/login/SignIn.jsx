@@ -63,13 +63,11 @@ const SignIn = () => {
         else if (role === 'trainer') dest = '/admin/users';
         else dest = '/unauthorized';
 
-        console.log('Sign in successful, navigating to:', dest, '(was from:', from, ')');
         navigate(dest, { replace: true });
       } else {
         setErrors({ submit: result.message || 'שגיאה בהתחברות' });
       }
     } catch (error) {
-      console.error('Sign in error:', error);
       setErrors({ submit: 'שגיאת חיבור. בדוק רשת ונסה שוב.' });
     } finally {
       setIsLoading(false);

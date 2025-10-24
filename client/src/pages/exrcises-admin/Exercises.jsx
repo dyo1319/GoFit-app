@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
@@ -28,6 +28,7 @@ export default function Exercises() {
   const [filterCategory, setFilterCategory] = useState('');
   const [form, setForm] = useState(initialExerciseForm);
   const [errors, setErrors] = useState({});
+  const firstInputRef = useRef(null);
 
   const categories = ['כוח', 'קרדיו', 'גמישות', 'יוגה', 'פילאטיס', 'פונקציונלי', 'אחר'];
   const muscleGroups = ['חזה', 'גב', 'רגליים', 'ידיים', 'כתפיים', 'בטן', 'גוף מלא'];
@@ -39,18 +40,15 @@ export default function Exercises() {
 
   const handleFieldChange = makeFieldChange(setForm, setErrors);
 
-  // Helper function to detect if URL is a GIF
   const isGifUrl = (url) => {
     if (!url) return false;
     const gifExtensions = ['.gif', '.GIF'];
     const gifDomains = ['giphy.com', 'tenor.com', 'imgur.com'];
     
-    // Check file extension
     if (gifExtensions.some(ext => url.includes(ext))) {
       return true;
     }
     
-    // Check domain
     if (gifDomains.some(domain => url.includes(domain))) {
       return true;
     }
@@ -142,6 +140,11 @@ export default function Exercises() {
     setEditingExercise(null);
   };
 
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    resetForm();
+  };
+
   const openEditDialog = (exercise) => {
     setEditingExercise(exercise);
     setForm({
@@ -160,6 +163,18 @@ export default function Exercises() {
     resetForm();
     setOpenDialog(true);
   };
+
+  useEffect(() => {
+    if (openDialog) {
+      const timer = setTimeout(() => {
+        if (firstInputRef.current) {
+          firstInputRef.current.focus();
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [openDialog]);
 
   const filteredExercises = exercises.filter(exercise => {
     const matchesSearch = exercise.exercise_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -254,32 +269,13 @@ export default function Exercises() {
             {filteredExercises.map((exercise) => (
               <TableRow key={exercise.id}>
                 <TableCell>
-                  <Typography variant="subtitle2">{exercise.exercise_name}</Typography>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#374151' }}>
+                    {exercise.exercise_name}
+                  </Typography>
                   {exercise.description && (
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography variant="body2" color="textSecondary" sx={{ mt: 0.5 }}>
                       {exercise.description.substring(0, 50)}...
                     </Typography>
-                  )}
-                  {exercise.video_url && isGifUrl(exercise.video_url) && (
-                    <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <img 
-                        src={exercise.video_url} 
-                        alt={exercise.exercise_name}
-                        style={{ 
-                          width: 40, 
-                          height: 40, 
-                          objectFit: 'cover', 
-                          borderRadius: 4,
-                          border: '1px solid #e0e0e0'
-                        }}
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
-                      <Typography variant="caption" color="textSecondary">
-                        GIF
-                      </Typography>
-                    </Box>
                   )}
                 </TableCell>
                 <TableCell>
@@ -335,14 +331,76 @@ export default function Exercises() {
         </Box>
       )}
 
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="md" fullWidth>
-        <DialogTitle>
-          {editingExercise ? 'עריכת תרגיל' : 'תרגיל חדש'}
+      <Dialog 
+        open={openDialog} 
+        onClose={handleCloseDialog} 
+        maxWidth="md" 
+        fullWidth
+        disableEnforceFocus={false}
+        disableAutoFocus={true}
+        disableRestoreFocus={false}
+        disableScrollLock={false}
+        hideBackdrop={false}
+        dir="rtl"
+        PaperProps={{
+          sx: {
+            borderRadius: '12px',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+            background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+            border: '1px solid rgba(226, 232, 240, 0.8)',
+            backdropFilter: 'blur(10px)',
+            maxWidth: '600px',
+            width: '90%',
+            direction: 'rtl',
+            textAlign: 'right'
+          }
+        }}
+        BackdropProps={{
+          sx: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(4px)'
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          padding: '24px 24px 16px',
+          fontSize: '1.5rem',
+          fontWeight: 700,
+          color: 'white',
+          background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+          borderRadius: '12px 12px 0 0',
+          margin: 0,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          direction: 'rtl',
+          textAlign: 'right',
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '3px',
+            background: 'rgba(255, 255, 255, 0.3)',
+            borderRadius: '12px 12px 0 0'
+          }
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexDirection: 'row-reverse' }}>
+            <FitnessCenter sx={{ fontSize: '1.5rem' }} />
+            {editingExercise ? 'עריכת תרגיל' : 'תרגיל חדש'}
+          </Box>
         </DialogTitle>
         <form onSubmit={handleSubmit}>
-          <DialogContent>
+          <DialogContent sx={{ 
+            padding: '24px',
+            backgroundColor: '#ffffff',
+            direction: 'rtl'
+          }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
               <TextField
+                ref={firstInputRef}
                 label="שם התרגיל"
                 value={form.exercise_name}
                 onChange={(e) => handleFieldChange('exercise_name', e.target.value)}
@@ -350,6 +408,49 @@ export default function Exercises() {
                 helperText={errors.exercise_name}
                 required
                 fullWidth
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    display: 'none'
+                  },
+                  '& .MuiInputBase-input': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    padding: '16px 20px',
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                    backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                    borderRadius: '12px',
+                    border: '2px solid transparent',
+                    transition: 'all 0.3s ease',
+                    '&:focus': {
+                      backgroundColor: '#ffffff',
+                      borderColor: '#6366f1',
+                      boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.1)'
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgba(248, 250, 252, 1)',
+                      borderColor: 'rgba(99, 102, 241, 0.3)'
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    position: 'static',
+                    transform: 'none',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: '#374151',
+                    marginBottom: '8px',
+                    textAlign: 'right',
+                    direction: 'rtl'
+                  },
+                  '& .MuiFormHelperText-root': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    marginTop: '4px',
+                    fontSize: '0.75rem',
+                    fontWeight: 500
+                  }
+                }}
               />
               
               <TextField
@@ -361,6 +462,68 @@ export default function Exercises() {
                 helperText={errors.category}
                 required
                 fullWidth
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    display: 'none'
+                  },
+                  '& .MuiSelect-select': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    padding: '16px 20px',
+                    paddingLeft: '40px !important',
+                    paddingRight: '20px !important',
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                    backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                    borderRadius: '12px',
+                    border: '2px solid transparent',
+                    transition: 'all 0.3s ease',
+                    '&:focus': {
+                      backgroundColor: '#ffffff',
+                      borderColor: '#6366f1',
+                      boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.1)'
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgba(248, 250, 252, 1)',
+                      borderColor: 'rgba(99, 102, 241, 0.3)'
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    position: 'static',
+                    transform: 'none',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: '#374151',
+                    marginBottom: '8px',
+                    textAlign: 'right',
+                    direction: 'rtl'
+                  },
+                  '& .MuiFormHelperText-root': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    marginTop: '4px',
+                    fontSize: '0.75rem',
+                    fontWeight: 500
+                  },
+                  '& .MuiSelect-icon': {
+                    right: 'auto !important',
+                    left: '12px !important',
+                    color: '#6b7280'
+                  },
+                  '& .MuiNativeSelect-root .MuiSelect-icon': {
+                    right: 'auto !important',
+                    left: '12px !important'
+                  },
+                  '& .MuiOutlinedInput-root .MuiSelect-icon': {
+                    right: 'auto !important',
+                    left: '12px !important'
+                  },
+                  '& .MuiSelect-nativeInput': {
+                    paddingLeft: '40px !important',
+                    paddingRight: '20px !important'
+                  }
+                }}
               >
                 {categories.map(cat => (
                   <MenuItem key={cat} value={cat}>{cat}</MenuItem>
@@ -376,6 +539,50 @@ export default function Exercises() {
                 multiline
                 rows={3}
                 fullWidth
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    display: 'none'
+                  },
+                  '& .MuiInputBase-input': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    padding: '16px 20px',
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                    backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                    borderRadius: '12px',
+                    border: '2px solid transparent',
+                    transition: 'all 0.3s ease',
+                    resize: 'vertical',
+                    '&:focus': {
+                      backgroundColor: '#ffffff',
+                      borderColor: '#6366f1',
+                      boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.1)'
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgba(248, 250, 252, 1)',
+                      borderColor: 'rgba(99, 102, 241, 0.3)'
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    position: 'static',
+                    transform: 'none',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: '#374151',
+                    marginBottom: '8px',
+                    textAlign: 'right',
+                    direction: 'rtl'
+                  },
+                  '& .MuiFormHelperText-root': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    marginTop: '4px',
+                    fontSize: '0.75rem',
+                    fontWeight: 500
+                  }
+                }}
               />
 
               <TextField
@@ -384,6 +591,68 @@ export default function Exercises() {
                 value={form.muscle_group}
                 onChange={(e) => handleFieldChange('muscle_group', e.target.value)}
                 fullWidth
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    display: 'none'
+                  },
+                  '& .MuiSelect-select': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    padding: '16px 20px',
+                    paddingLeft: '40px !important',
+                    paddingRight: '20px !important',
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                    backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                    borderRadius: '12px',
+                    border: '2px solid transparent',
+                    transition: 'all 0.3s ease',
+                    '&:focus': {
+                      backgroundColor: '#ffffff',
+                      borderColor: '#6366f1',
+                      boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.1)'
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgba(248, 250, 252, 1)',
+                      borderColor: 'rgba(99, 102, 241, 0.3)'
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    position: 'static',
+                    transform: 'none',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: '#374151',
+                    marginBottom: '8px',
+                    textAlign: 'right',
+                    direction: 'rtl'
+                  },
+                  '& .MuiFormHelperText-root': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    marginTop: '4px',
+                    fontSize: '0.75rem',
+                    fontWeight: 500
+                  },
+                  '& .MuiSelect-icon': {
+                    right: 'auto !important',
+                    left: '12px !important',
+                    color: '#6b7280'
+                  },
+                  '& .MuiNativeSelect-root .MuiSelect-icon': {
+                    right: 'auto !important',
+                    left: '12px !important'
+                  },
+                  '& .MuiOutlinedInput-root .MuiSelect-icon': {
+                    right: 'auto !important',
+                    left: '12px !important'
+                  },
+                  '& .MuiSelect-nativeInput': {
+                    paddingLeft: '40px !important',
+                    paddingRight: '20px !important'
+                  }
+                }}
               >
                 <MenuItem value="">בחר קבוצת שרירים</MenuItem>
                 {muscleGroups.map(group => (
@@ -397,6 +666,68 @@ export default function Exercises() {
                 value={form.difficulty}
                 onChange={(e) => handleFieldChange('difficulty', e.target.value)}
                 fullWidth
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    display: 'none'
+                  },
+                  '& .MuiSelect-select': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    padding: '16px 20px',
+                    paddingLeft: '40px !important',
+                    paddingRight: '20px !important',
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                    backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                    borderRadius: '12px',
+                    border: '2px solid transparent',
+                    transition: 'all 0.3s ease',
+                    '&:focus': {
+                      backgroundColor: '#ffffff',
+                      borderColor: '#6366f1',
+                      boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.1)'
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgba(248, 250, 252, 1)',
+                      borderColor: 'rgba(99, 102, 241, 0.3)'
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    position: 'static',
+                    transform: 'none',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: '#374151',
+                    marginBottom: '8px',
+                    textAlign: 'right',
+                    direction: 'rtl'
+                  },
+                  '& .MuiFormHelperText-root': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    marginTop: '4px',
+                    fontSize: '0.75rem',
+                    fontWeight: 500
+                  },
+                  '& .MuiSelect-icon': {
+                    right: 'auto !important',
+                    left: '12px !important',
+                    color: '#6b7280'
+                  },
+                  '& .MuiNativeSelect-root .MuiSelect-icon': {
+                    right: 'auto !important',
+                    left: '12px !important'
+                  },
+                  '& .MuiOutlinedInput-root .MuiSelect-icon': {
+                    right: 'auto !important',
+                    left: '12px !important'
+                  },
+                  '& .MuiSelect-nativeInput': {
+                    paddingLeft: '40px !important',
+                    paddingRight: '20px !important'
+                  }
+                }}
               >
                 <MenuItem value="">בחר רמת קושי</MenuItem>
                 {difficulties.map(diff => (
@@ -409,6 +740,49 @@ export default function Exercises() {
                 value={form.equipment}
                 onChange={(e) => handleFieldChange('equipment', e.target.value)}
                 fullWidth
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    display: 'none'
+                  },
+                  '& .MuiInputBase-input': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    padding: '16px 20px',
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                    backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                    borderRadius: '12px',
+                    border: '2px solid transparent',
+                    transition: 'all 0.3s ease',
+                    '&:focus': {
+                      backgroundColor: '#ffffff',
+                      borderColor: '#6366f1',
+                      boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.1)'
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgba(248, 250, 252, 1)',
+                      borderColor: 'rgba(99, 102, 241, 0.3)'
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    position: 'static',
+                    transform: 'none',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: '#374151',
+                    marginBottom: '8px',
+                    textAlign: 'right',
+                    direction: 'rtl'
+                  },
+                  '& .MuiFormHelperText-root': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    marginTop: '4px',
+                    fontSize: '0.75rem',
+                    fontWeight: 500
+                  }
+                }}
               />
 
               <TextField
@@ -416,14 +790,107 @@ export default function Exercises() {
                 value={form.video_url}
                 onChange={(e) => handleFieldChange('video_url', e.target.value)}
                 error={!!errors.video_url}
-                helperText={errors.video_url || "הכנס קישור ל-GIF של התרגיל"}
+                helperText={errors.video_url}
                 fullWidth
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    display: 'none'
+                  },
+                  '& .MuiInputBase-input': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    padding: '16px 20px',
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                    backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                    borderRadius: '12px',
+                    border: '2px solid transparent',
+                    transition: 'all 0.3s ease',
+                    '&:focus': {
+                      backgroundColor: '#ffffff',
+                      borderColor: '#6366f1',
+                      boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.1)'
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgba(248, 250, 252, 1)',
+                      borderColor: 'rgba(99, 102, 241, 0.3)'
+                    }
+                  },
+                  '& .MuiInputLabel-root': {
+                    position: 'static',
+                    transform: 'none',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: '#374151',
+                    marginBottom: '8px',
+                    textAlign: 'right',
+                    direction: 'rtl'
+                  },
+                  '& .MuiFormHelperText-root': {
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    marginTop: '4px',
+                    fontSize: '0.75rem',
+                    fontWeight: 500
+                  }
+                }}
               />
             </Box>
           </DialogContent>
-          <DialogActions sx={{ p: 3 }}>
-            <Button onClick={() => setOpenDialog(false)}>ביטול</Button>
-            <Button type="submit" variant="contained">
+          <DialogActions sx={{ 
+            p: 3, 
+            backgroundColor: 'rgba(248, 250, 252, 0.5)',
+            borderTop: '1px solid rgba(226, 232, 240, 0.8)',
+            direction: 'rtl',
+            justifyContent: 'flex-start',
+            gap: 2
+          }}>
+            <Button 
+              onClick={handleCloseDialog}
+              variant="outlined"
+              sx={{
+                borderRadius: '12px',
+                padding: '12px 24px',
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '0.875rem',
+                border: '2px solid #e2e8f0',
+                color: '#64748b',
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  borderColor: '#6366f1',
+                  color: '#6366f1',
+                  backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+                }
+              }}
+            >
+              ביטול
+            </Button>
+            <Button 
+              type="submit" 
+              variant="contained"
+              sx={{
+                borderRadius: '12px',
+                padding: '12px 24px',
+                fontWeight: 600,
+                textTransform: 'none',
+                fontSize: '0.875rem',
+                background: 'linear-gradient(135deg, #10b981, #059669)',
+                color: 'white',
+                border: 'none',
+                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #059669, #047857)',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 6px 16px rgba(16, 185, 129, 0.4)'
+                }
+              }}
+            >
               {editingExercise ? 'עדכן' : 'צור'}
             </Button>
           </DialogActions>

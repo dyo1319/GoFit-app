@@ -109,26 +109,36 @@ const RenderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 function AnalyticsFilters({ from, to, onFrom, onTo }) {
   return (
     <Box className="analytics-filters">
-      <TextField 
-        label="מתאריך (חודש)" 
-        type="month" 
-        size="small" 
-        value={from} 
-        onChange={(e) => onFrom(e.target.value)}
-        className="rtlFormControl"
-        id="analytics-from-month"
-        name="analytics_from_month"
-      />
-      <TextField 
-        label="עד תאריך (חודש)" 
-        type="month" 
-        size="small" 
-        value={to} 
-        onChange={(e) => onTo(e.target.value)}
-        className="rtlFormControl"
-        id="analytics-to-month"
-        name="analytics_to_month"
-      />
+      <Box className="filter-field-container">
+        <Typography className="filter-label" variant="body2">
+          מתאריך (חודש)
+        </Typography>
+        <TextField 
+          type="month" 
+          size="small" 
+          value={from} 
+          onChange={(e) => onFrom(e.target.value)}
+          className="rtlFormControl"
+          id="analytics-from-month"
+          name="analytics_from_month"
+          variant="outlined"
+        />
+      </Box>
+      <Box className="filter-field-container">
+        <Typography className="filter-label" variant="body2">
+          עד תאריך (חודש)
+        </Typography>
+        <TextField 
+          type="month" 
+          size="small" 
+          value={to} 
+          onChange={(e) => onTo(e.target.value)}
+          className="rtlFormControl"
+          id="analytics-to-month"
+          name="analytics_to_month"
+          variant="outlined"
+        />
+      </Box>
     </Box>
   );
 }

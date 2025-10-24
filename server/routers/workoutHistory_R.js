@@ -1,9 +1,7 @@
-// workoutHistory_R.js - Backend API endpoint for workout history
 const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middleware/auth_Mid');
 
-// Get user's workout history
 router.get('/user/workout-history', verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -26,18 +24,14 @@ router.get('/user/workout-history', verifyToken, async (req, res) => {
     
     const [rows] = await db.query(query, [userId, limit, offset]);
     
-    // Parse JSON fields and handle potential null values
     const workoutHistory = rows.map(row => {
       let completedExercises = [];
       try {
-        // Handle different possible formats
         const exercisesData = row.completed_exercises;
         if (exercisesData) {
           if (typeof exercisesData === 'string') {
-            // Try to parse as JSON
             completedExercises = JSON.parse(exercisesData);
           } else if (Array.isArray(exercisesData)) {
-            // Already an array
             completedExercises = exercisesData;
           } else {
             console.log('Unexpected completed_exercises format:', typeof exercisesData, exercisesData);
@@ -74,7 +68,6 @@ router.get('/user/workout-history', verifyToken, async (req, res) => {
   }
 });
 
-// Save workout session
 router.post('/user/workout-history', verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -90,12 +83,10 @@ router.post('/user/workout-history', verifyToken, async (req, res) => {
     
     const db = global.db_pool.promise();
     
-    // Calculate duration in minutes and format datetime for MySQL
     const start = new Date(start_time);
     const end = new Date(end_time);
     const duration_minutes = Math.round((end - start) / (1000 * 60));
     
-    // Format datetime for MySQL (YYYY-MM-DD HH:mm:ss)
     const formatDateTime = (date) => {
       return date.toISOString().slice(0, 19).replace('T', ' ');
     };
@@ -137,7 +128,6 @@ router.post('/user/workout-history', verifyToken, async (req, res) => {
   }
 });
 
-// Get workout statistics
 router.get('/user/workout-stats', verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;

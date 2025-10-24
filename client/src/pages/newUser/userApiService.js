@@ -38,12 +38,11 @@ const handlePermissionError = (status, action) => {
   return null;
 };
 
-export async function createUser(API_BASE, payload) {
+export async function createUser(authenticatedFetch, payload) {
   try {
-    const res = await fetch(`${API_BASE}/U/Add`, {
+    const res = await authenticatedFetch(`/U/Add`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
       body: JSON.stringify(payload),
     });
     
@@ -61,17 +60,18 @@ export async function createUser(API_BASE, payload) {
   }
 }
 
-export async function searchUsers(API_BASE, q, signal) {
+export async function searchUsers(authenticatedFetch, q, signal) {
   try {
     const p = new URLSearchParams({ q });
-    const res = await fetch(`${API_BASE}/U/search?${p}`, { 
-      credentials: "include", 
-      signal 
-    });
+    const res = await authenticatedFetch(`/U/search?${p}`, { signal });
     
     if (!res.ok) {
       if (res.status === 403) {
         console.warn("User doesn't have permission to search users");
+        return [];
+      }
+      if (res.status === 401) {
+        console.warn("Authentication required for user search");
         return [];
       }
       return [];
@@ -128,12 +128,11 @@ export async function getSubs(authenticatedFetch, {
   }
 }
 
-export async function updateUser(API_BASE, userId, payload) {
+export async function updateUser(authenticatedFetch, userId, payload) {
   try {
-    const res = await fetch(`${API_BASE}/U/Update/${userId}`, {
+    const res = await authenticatedFetch(`/U/Update/${userId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
       body: JSON.stringify(payload),
     });
     
@@ -151,11 +150,9 @@ export async function updateUser(API_BASE, userId, payload) {
   }
 }
 
-export async function checkUserPermissions(API_BASE) {
+export async function checkUserPermissions(authenticatedFetch) {
   try {
-    const res = await fetch(`${API_BASE}/auth/permissions`, {
-      credentials: "include",
-    });
+    const res = await authenticatedFetch(`/auth/permissions`);
     
     if (!res.ok) {
       return { hasPermissions: false, permissions: [] };

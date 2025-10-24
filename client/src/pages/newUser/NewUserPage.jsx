@@ -55,7 +55,7 @@ const fieldToStep = {
 };
 
 export default function NewUserPage() {
-  const { hasPermission, authLoading } = useAuth();
+  const { hasPermission, authLoading, authenticatedFetch } = useAuth();
   const [form, setForm] = useState(initialUserForm);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState({
@@ -99,7 +99,7 @@ export default function NewUserPage() {
     setLoading(prev => ({ ...prev, duplicateCheck: true }));
   }, []);
 
-  usePhoneDuplicate(API_BASE, form.phone, handlePhoneDup, handlePhoneDupStart);
+  usePhoneDuplicate(authenticatedFetch, form.phone, handlePhoneDup, handlePhoneDupStart);
 
   const onChange = makeFieldChange(setForm, setErrors);
 
@@ -230,7 +230,7 @@ export default function NewUserPage() {
     setLoading(prev => ({ ...prev, submit: true }));
     try {
       const payload = formatUserFormData(form);
-      const { ok, status, json } = await createUser(API_BASE, payload);
+      const { ok, status, json } = await createUser(authenticatedFetch, payload);
 
       if (!ok) {
         setErrors((e) => ({
@@ -248,7 +248,7 @@ export default function NewUserPage() {
         return;
       }
       
-      navigate("/users", { 
+      navigate("/admin/users", { 
         replace: true,
         state: { message: "משתמש נוצר בהצלחה!" }
       });
@@ -268,7 +268,7 @@ export default function NewUserPage() {
     <div className="newUser" dir="rtl">
       <div className="pageHeader">
         <h1 className="pageTitle">הוספת משתמש</h1>
-        <Link to="/users" className="secondary-link">
+        <Link to="/admin/users" className="secondary-link">
           <button type="button" className="primary" disabled={loading.submit}>
             רשימת משתמשים
           </button>

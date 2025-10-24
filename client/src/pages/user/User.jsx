@@ -19,6 +19,7 @@ import {
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from '../../context/AuthContext';
+import { formatToBodyDetailsDate } from '../../utils/dateFormatter';
 import "./user.css";
 
 const ROLE_HE2EN = { "מתאמן": "trainee", "מאמן": "trainer", "מנהל": "admin", "": null };
@@ -28,7 +29,7 @@ const GENDER_EN2HE = { male: "זכר", female: "נקבה", null: "" };
 
 export default function User() {
   const { id } = useParams();
-  const { user, hasPermission, authenticatedFetch, refreshPermissions } = useAuth(); // ADD missing imports
+  const { user, hasPermission, authenticatedFetch, refreshPermissions } = useAuth(); 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -74,7 +75,7 @@ export default function User() {
       setError("");
       setSuccess(""); 
       try {
-        const res = await authenticatedFetch(`/U/users/${id}?expand=1`);
+        const res = await authenticatedFetch(`/U/${id}?expand=1`);
         const json = await res.json().catch(() => ({}));
 
         if (!res.ok || !json?.success) {
@@ -213,7 +214,7 @@ export default function User() {
 
       setSuccess(j.message || "משתמש עודכן בהצלחה");
 
-      const afterRes = await authenticatedFetch(`/U/users/${id}?expand=1`);
+      const afterRes = await authenticatedFetch(`/U/${id}?expand=1`);
       const after = await afterRes.json().catch(() => ({}));
       if (!afterRes.ok || !after?.success) {
         throw new Error(after?.message || `שגיאה ברענון (${afterRes.status})`);
@@ -281,7 +282,7 @@ export default function User() {
         <h1 className="userTitle">עריכת משתמש</h1>
         <div className="userActions">
           {hasPermission('create_users') && (
-            <Link to="/newUser" style={{ textDecoration: 'none' }}>
+            <Link to="/admin/newUser" style={{ textDecoration: 'none' }}>
               <button className="userAddButton">
                 <AccountCircle/> הוספת משתמש
               </button>
@@ -353,7 +354,7 @@ export default function User() {
               </div>
               <div className="userShowInfo">
                 <CalendarToday className="userShowIcon" />
-                <span className="userShowInfoTitle">{userForm.birth_date}</span>
+                <span className="userShowInfoTitle">{formatToBodyDetailsDate(userForm.birth_date) || "—"}</span>
               </div>
               <div className="userShowInfo">
                 <Person className="userShowIcon" />
@@ -381,7 +382,7 @@ export default function User() {
               </div>
               <div className="userShowInfo">
                 <AccessTime className="userShowIcon" />
-                <span className="userShowInfoTitle">תאריך מדידה: {userForm.recorded_at || "—"}</span>
+                <span className="userShowInfoTitle">תאריך מדידה: {formatToBodyDetailsDate(userForm.recorded_at) || "—"}</span>
               </div>
             </div>
 
@@ -397,7 +398,7 @@ export default function User() {
               </div>
               <div className="userShowInfo">
                 <AccessTime className="userShowIcon" />
-                <span className="userShowInfoTitle">עד: {userForm.end_date || "—"}</span>
+                <span className="userShowInfoTitle">עד: {formatToBodyDetailsDate(userForm.end_date) || "—"}</span>
               </div>
             </div>
           </div>

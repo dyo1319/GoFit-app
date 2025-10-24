@@ -2,7 +2,7 @@ import  { useState } from 'react';
 import './ProgressOverview.css';
 
 const ProgressOverview = ({ chartData }) => {
-  const [viewMode, setViewMode] = useState('daily'); // 'daily', 'weekly', 'monthly'
+  const [viewMode, setViewMode] = useState('daily'); 
   const [selectedMetric, setSelectedMetric] = useState('weight');
 
   const groupDataByPeriod = (data, period) => {
@@ -13,7 +13,7 @@ const ProgressOverview = ({ chartData }) => {
     data.forEach(item => {
       let date;
       if (typeof item.date === 'string') {
-        date = new Date(item.date + 'T00:00:00'); // להימנע מבעיות אזור זמן
+        date = new Date(item.date + 'T00:00:00'); 
       } else {
         date = new Date(item.date);
       }
@@ -33,7 +33,7 @@ const ProgressOverview = ({ chartData }) => {
         }
         case 'weekly': {
           const weekStart = new Date(date);
-          weekStart.setDate(date.getDate() - date.getDay()); // תחילת שבוע (א׳/א׳ לפי אזור)
+          weekStart.setDate(date.getDate() - date.getDay()); 
           key = `שבוע של ${weekStart.toLocaleDateString('he-IL', { month: 'short', day: 'numeric' })}`;
           sortKey = weekStart.getTime();
           break;
@@ -121,7 +121,7 @@ const ProgressOverview = ({ chartData }) => {
       return {
         ...item,
         value: value,
-        percentage: Math.max(percentage, value > 0 ? 5 : 0), // מינימום 5% כשיש ערך
+        percentage: Math.max(percentage, value > 0 ? 5 : 0), 
         change: change
       };
     });

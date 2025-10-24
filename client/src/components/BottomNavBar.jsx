@@ -1,10 +1,14 @@
 import './BottomNavBar.css';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const BottomNavBar = ({ activeTab, onTabChange, onLogout }) => {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
+  const navigate = useNavigate();
 
-  const navItems = [
+  const isAdminOrTrainer = user?.role === 'admin' || user?.role === 'trainer';
+
+  const baseNavItems = [
     {
       id: 'dashboard',
       label: 'ראשי',
@@ -49,28 +53,48 @@ const BottomNavBar = ({ activeTab, onTabChange, onLogout }) => {
           <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/>
         </svg>
       )
-    },
-    {
-      id: 'logout',
-      label: 'התנתקות',
-      icon: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" fill="currentColor"/>
-        </svg>
-      )
     }
   ];
+
+  const adminNavItem = {
+    id: 'admin-panel',
+    label: 'לוח ניהול',
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/>
+      </svg>
+    )
+  };
+
+  const logoutNavItem = {
+    id: 'logout',
+    label: 'התנתקות',
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" fill="currentColor"/>
+      </svg>
+    )
+  };
+
+  const navItems = isAdminOrTrainer 
+    ? [...baseNavItems, adminNavItem, logoutNavItem]
+    : [...baseNavItems, logoutNavItem];
 
   const handleClick = (itemId) => {
     if (itemId === 'logout') {
       if (typeof onLogout === 'function') {
         onLogout();
       } else {
-        // ברירת מחדל: יציאה מהמערכת
         signOut();
       }
       return;
     }
+    
+    if (itemId === 'admin-panel') {
+      navigate('/admin');
+      return;
+    }
+    
     onTabChange?.(itemId);
   };
 

@@ -1,8 +1,7 @@
-/* Shared styles for empty pages */
 .page-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  padding-bottom: 80px; /* Space for bottom nav on mobile */
+  padding-bottom: 80px; 
 }
 
 .page-content {
@@ -76,7 +75,6 @@
 
 
 
-/* Desktop sidebar adjustments */
 @media (min-width: 768px) {
   .page-container {
     margin-left: 240px;
@@ -94,7 +92,6 @@
   }
 }
 
-/* Mobile responsive */
 @media (max-width: 768px) {
   .page-content {
     padding: 20px 4%;

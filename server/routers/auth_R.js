@@ -16,7 +16,7 @@ router.put('/change-password', auth_Mid.verifyToken, async (req, res) => {
     await auth_Mid.changePassword(req, res);
   } catch (err) {
     console.error('PUT /auth/change-password error:', err);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: 'שגיאת שרת' });
   }
 });
 

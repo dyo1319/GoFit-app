@@ -17,7 +17,6 @@ router.get('/',
   }
 );
 
-// User endpoint to view exercises (read-only)
 router.get('/library', 
   verifyToken, 
   exercises_Mid.getAllExercises, 

@@ -1,4 +1,3 @@
-/* Sidebar Component - Consistent with App Pages Theme */
 
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
@@ -26,7 +25,6 @@
   flex-direction: column;
 }
 
-/* Sidebar Header with Close Button */
 .sidebar-header {
   display: none;
   justify-content: flex-end;
@@ -63,13 +61,13 @@
 }
 
 .sidebarMenu {
-  margin-bottom: 32px;
+  margin-bottom: 20px;
 }
 
 .sidebarTitle {
   font-size: 14px;
   font-weight: 600;
-  color: #1e293b;
+  color: #dc2626;
   margin-bottom: 16px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -132,7 +130,13 @@
   background-color: #f8fafc;
 }
 
-/* Mobile Backdrop */
+.link.active {
+  background-color: #f0f9ff;
+  color: #1e40af;
+  border-right: 3px solid #3b82f6;
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1);
+}
+
 .mobile-backdrop {
   position: fixed;
   top: 0;
@@ -161,14 +165,12 @@
   }
 }
 
-/* Prevent body scroll when mobile menu is open */
 body.mobile-menu-open {
   overflow: hidden !important;
   position: fixed !important;
   width: 100% !important;
 }
 
-/* Mobile Responsive */
 @media (max-width: 768px) {
   .sidebar {
     position: fixed !important;
@@ -206,13 +208,13 @@ body.mobile-menu-open {
   }
   
   .sidebarMenu {
-    margin-bottom: 24px !important;
+    margin-bottom: 16px !important;
   }
 
   .sidebarTitle {
     font-size: 16px !important;
     margin-bottom: 12px !important;
-    color: #1e293b !important;
+    color: #dc2626 !important;
     font-weight: 700 !important;
     padding-bottom: 8px !important;
     border-bottom: 2px solid #e2e8f0 !important;
@@ -235,9 +237,10 @@ body.mobile-menu-open {
   }
 
   .sidebarListItem .link.active {
-    background-color: #3b82f6 !important;
-    color: white !important;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+    background-color: #f0f9ff !important;
+    color: #1e40af !important;
+    border-right: 3px solid #3b82f6 !important;
+    box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1) !important;
   }
 
   .sidebarIcon {
@@ -246,7 +249,6 @@ body.mobile-menu-open {
   }
 }
 
-/* Tablet */
 @media (max-width: 1024px) and (min-width: 769px) {
   .sidebar {
     max-width: 220px;
@@ -257,11 +259,10 @@ body.mobile-menu-open {
   }
   
   .sidebarMenu {
-    margin-bottom: 28px;
+    margin-bottom: 18px;
   }
 }
 
-/* Desktop */
 @media (min-width: 768px) {
   .sidebar {
     max-width: 240px;
@@ -278,7 +279,7 @@ body.mobile-menu-open {
   }
   
   .sidebarMenu {
-    margin-bottom: 36px;
+    margin-bottom: 22px;
   }
   
   .sidebarTitle {
@@ -292,7 +293,6 @@ body.mobile-menu-open {
   }
 }
 
-/* Large Desktop */
 @media (min-width: 1600px) {
   .sidebar {
     max-width: 280px;
@@ -303,11 +303,10 @@ body.mobile-menu-open {
   }
   
   .sidebarMenu {
-    margin-bottom: 40px;
+    margin-bottom: 24px;
   }
 }
 
-/* Scrollbar Styling */
 .sidebar::-webkit-scrollbar {
   width: 4px;
 }
@@ -325,26 +324,46 @@ body.mobile-menu-open {
   background: #cbd5e1;
 }
 
-/* Logout Button Special Styling */
-.sidebarListItem:last-child {
+.sidebarListItem[data-item="home"] .link,
+.sidebarListItem[data-item="programs"] .link,
+.sidebarListItem[data-item="invoices"] .link,
+.sidebarListItem[data-item="renewals"] .link,
+.sidebarListItem[data-item="monthly-report"] .link {
+  color: #64748b !important;
+}
+
+.sidebarListItem[data-item="home"] .sidebarIcon,
+.sidebarListItem[data-item="programs"] .sidebarIcon,
+.sidebarListItem[data-item="invoices"] .sidebarIcon,
+.sidebarListItem[data-item="renewals"] .sidebarIcon,
+.sidebarListItem[data-item="monthly-report"] .sidebarIcon {
+  color: #64748b !important;
+}
+
+.logout-section {
   margin-top: auto;
   padding-top: 20px;
+  padding-bottom: 40px;
   border-top: 1px solid #e2e8f0;
 }
 
-.sidebarListItem:last-child .link {
+.logout-section .sidebarListItem {
+  margin-bottom: 0;
+}
+
+.logout-section .sidebarListItem .link {
   color: #dc2626;
 }
 
-.sidebarListItem:last-child:hover .link {
+.logout-section .sidebarListItem:hover .link {
   background-color: #fef2f2;
   color: #b91c1c;
 }
 
-.sidebarListItem:last-child .sidebarIcon {
+.logout-section .sidebarListItem .sidebarIcon {
   color: #dc2626;
 }
 
-.sidebarListItem:last-child:hover .sidebarIcon {
+.logout-section .sidebarListItem:hover .sidebarIcon {
   color: #b91c1c;
 }

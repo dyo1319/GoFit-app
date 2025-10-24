@@ -31,7 +31,6 @@ const Dashboard = ({ user, onSignOut }) => {
     return parseFloat((w / (meters * meters)).toFixed(1));
   };
 
-  // מספר ימים פעילים בחודש הנוכחי לפי המנוי
   const getActiveDaysThisMonth = (subs) => {
     if (!Array.isArray(subs) || subs.length === 0) return 0;
 
@@ -81,14 +80,13 @@ const Dashboard = ({ user, onSignOut }) => {
         setIsLoading(true);
         setError(null);
 
-        // /body-details משתמש ב־JWT; /S/user/mine מחזיר היסטוריית מנויים למשתמש
         const [bodyResp, subsResp] = await Promise.all([
           authenticatedFetch(`${API_BASE}/body-details`, { signal: controller.signal }),
           authenticatedFetch(`${API_BASE}/S/user/mine`,   { signal: controller.signal }),
         ]);
 
-        const bodyJson = await bodyResp.json().catch(() => ({ success:false, message:'Invalid JSON from /body-details' }));
-        const subsJson = await subsResp.json().catch(() => ({ success:false, message:'Invalid JSON from /S/user/mine' }));
+        const bodyJson = await bodyResp.json().catch(() => ({ success:false, message:'JSON לא תקין מ-/body-details' }));
+        const subsJson = await subsResp.json().catch(() => ({ success:false, message:'JSON לא תקין מ-/S/user/mine' }));
 
         if (cancelled) return;
 
@@ -140,7 +138,6 @@ const Dashboard = ({ user, onSignOut }) => {
 
   const renderFitnessCards = (latestData, activeDays, bmi) => (
     <div className="fitness-cards" dir="rtl">
-      {/* מדדי גוף */}
       <div className="fitness-card clickable-card" onClick={() => setActiveTab('bodydetails')}>
         <div className="card-header">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -167,7 +164,6 @@ const Dashboard = ({ user, onSignOut }) => {
         </div>
       </div>
 
-      {/* הרכב גוף */}
       <div className="fitness-card">
         <div className="card-header">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -188,7 +184,6 @@ const Dashboard = ({ user, onSignOut }) => {
         </div>
       </div>
 
-      {/* החודש */}
       <div className="fitness-card">
         <div className="card-header">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
@@ -241,14 +236,12 @@ const Dashboard = ({ user, onSignOut }) => {
     return (
       <div className="dashboard" dir="rtl">
         <PageHeader />
-        <main className="dashboard-main">
-          <div className="dashboard-content">
-            {renderWelcomeSection()}
-            {error && renderErrorState()}
-            {renderFitnessDataSection(latestData, activeDaysThisMonth, bmi)}
-            {renderProgressSection()}
-          </div>
-        </main>
+        <div className="dashboard-content">
+          {renderWelcomeSection()}
+          {error && renderErrorState()}
+          {renderFitnessDataSection(latestData, activeDaysThisMonth, bmi)}
+          {renderProgressSection()}
+        </div>
       </div>
     );
   };

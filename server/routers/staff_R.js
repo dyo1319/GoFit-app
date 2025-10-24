@@ -34,7 +34,7 @@ router.get('/', verifyToken, requirePermission('manage_staff_roles'), async (req
     res.json({ items });
   } catch (e) {
     console.error('GET /staff error:', e);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 });
 
@@ -43,7 +43,7 @@ router.get('/me/effective', verifyToken, async (req, res) => {
   try {
     const id = Number(req.user.userId);
     if (!Number.isInteger(id) || id <= 0) {
-      return res.status(400).json({ error: 'Invalid auth context' });
+      return res.status(400).json({ error: 'הקשר אימות לא תקין' });
     }
 
     const [rows] = await db.query(
@@ -53,7 +53,7 @@ router.get('/me/effective', verifyToken, async (req, res) => {
        WHERE id = ?`,
       [id]
     );
-    if (!rows.length) return res.status(404).json({ error: 'User not found' });
+    if (!rows.length) return res.status(404).json({ error: 'משתמש לא נמצא' });
 
     const user = rows[0];
     let effective = [];
@@ -89,7 +89,7 @@ router.get('/me/effective', verifyToken, async (req, res) => {
     });
   } catch (e) {
     console.error('GET /staff/me/effective error:', e);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 });
 
@@ -99,7 +99,7 @@ router.get('/:id/effective', verifyToken, requirePermission('manage_permissions'
   try {
     const id = Number(req.params.id);
     if (!Number.isInteger(id) || id <= 0) {
-      return res.status(400).json({ error: 'Invalid id' });
+      return res.status(400).json({ error: 'מזהה לא תקין' });
     }
 
     const [rows] = await db.query(
@@ -109,7 +109,7 @@ router.get('/:id/effective', verifyToken, requirePermission('manage_permissions'
        WHERE id = ?`,
       [id]
     );
-    if (!rows.length) return res.status(404).json({ error: 'User not found' });
+    if (!rows.length) return res.status(404).json({ error: 'משתמש לא נמצא' });
 
     const user = rows[0];
     const profile = user.access_profile;
@@ -148,7 +148,7 @@ router.get('/:id/effective', verifyToken, requirePermission('manage_permissions'
     });
   } catch (e) {
     console.error('GET /staff/:id/effective error:', e);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 });
 
@@ -163,7 +163,7 @@ router.put('/:id/access', verifyToken, async (req, res, next) => {
     );
     
     if (!userRows.length) {
-      return res.status(403).json({ error: 'User not found' });
+      return res.status(403).json({ error: 'משתמש לא נמצא' });
     }
 
     const user = userRows[0];
@@ -215,14 +215,14 @@ router.put('/:id/access', verifyToken, async (req, res, next) => {
     next();
   } catch (error) {
     console.error('Permission check error:', error);
-    return res.status(500).json({ error: 'Permission check failed' });
+    return res.status(500).json({ error: 'בדיקת הרשאות נכשלה' });
   }
 }, validate(staffUpdateAccessSchema), async (req, res) => {
   const conn = await global.db_pool.promise().getConnection();
   try {
     const id = Number(req.params.id);
     if (!Number.isInteger(id) || id <= 0) {
-      return res.status(400).json({ error: 'Invalid id' });
+      return res.status(400).json({ error: 'מזהה לא תקין' });
     }
 
     const { role, access_profile, permissions_json } = req.body;
@@ -266,7 +266,7 @@ router.put('/:id/access', verifyToken, async (req, res, next) => {
       values
     );
     
-    if (!upd.affectedRows) return res.status(404).json({ error: 'User not found' });
+    if (!upd.affectedRows) return res.status(404).json({ error: 'משתמש לא נמצא' });
 
     const [userRows] = await conn.query(
       `SELECT id, username, phone, role, access_profile,
@@ -279,7 +279,7 @@ router.put('/:id/access', verifyToken, async (req, res, next) => {
     res.json({ ok: true, id, user });
   } catch (e) {
     console.error('PUT /staff/:id/access error:', e);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   } finally {
     conn.release();
   }

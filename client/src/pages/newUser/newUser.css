@@ -254,7 +254,7 @@
 
 @media (max-width: 768px) {
   .newUser {
-    padding: 76px 16px 80px 16px !important; /* Mobile topbar height + padding, bottom nav space */
+    padding: 76px 16px 80px 16px !important;
   }
   
   .formGrid { 
@@ -267,18 +267,17 @@
   }
 }
 
-/* Desktop */
 @media (min-width: 768px) {
   .newUser { 
     margin-right: 240px; 
     padding-bottom: 0; 
-    padding: 80px 20px 0 20px !important; /* Desktop topbar height + padding */
+    padding: 80px 20px 0 20px !important;
   }
 }
 
 @media (min-width: 1200px) {
   .newUser { 
     margin-right: 260px; 
-    padding: 80px 20px 0 20px !important; /* Large desktop topbar height + padding */
+    padding: 80px 20px 0 20px !important; 
   }
 }

@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAuth חייב להיות בשימוש בתוך AuthProvider');
   }
   return context;
 };
@@ -16,10 +16,17 @@ export const AuthProvider = ({ children }) => {
   const [permissions, setPermissions] = useState([]);
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('authToken'));
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  
+  let navigate;
+  try {
+    navigate = useNavigate();
+  } catch (error) {
+    navigate = () => {
+      console.warn('Navigation not available');
+    };
+  }
 
   const signOut = useCallback(() => {
-    console.log('Signing out user...');
     localStorage.removeItem('authToken');
     setAuthToken(null);
     setUser(null);
@@ -32,9 +39,8 @@ export const AuthProvider = ({ children }) => {
       const token = authToken || localStorage.getItem('authToken');
 
       if (!token) {
-        console.error('No authentication token available, redirecting to login');
         signOut();
-        throw new Error('Authentication required. Please sign in again.');
+        throw new Error('נדרשת התחברות. אנא התחבר שוב.');
       }
 
       try {
@@ -53,21 +59,22 @@ export const AuthProvider = ({ children }) => {
         });
 
         if (response.status === 401) {
-          console.warn('Token expired or invalid, signing out');
           signOut();
-          throw new Error('Session expired. Please sign in again.');
+          throw new Error('ההתחברות פגה. אנא התחבר שוב.');
         }
 
         return response;
       } catch (error) {
         if (
-          error.message.includes('Authentication required') ||
-          error.message.includes('Session expired')
+          error.message.includes('נדרשת התחברות') ||
+          error.message.includes('ההתחברות פגה')
         ) {
           throw error;
         }
-        console.error('Network error in authenticatedFetch:', error);
-        throw new Error('Network error. Please check your connection.');
+        if (error.name === 'AbortError') {
+          throw error; // Re-throw AbortError so it can be handled properly
+        }
+        throw new Error('שגיאת רשת. אנא בדוק את החיבור שלך.');
       }
     },
     [authToken, signOut]
@@ -76,7 +83,6 @@ export const AuthProvider = ({ children }) => {
   const fetchUserPermissions = useCallback(
     async (_userId, userRole) => {
       if (!_userId) {
-        console.warn('No user ID provided for permission fetch');
         return;
       }
       if (userRole !== 'admin' && userRole !== 'trainer') {
@@ -95,16 +101,12 @@ export const AuthProvider = ({ children }) => {
             data?.perms ??
             [];
           setPermissions(Array.isArray(perms) ? perms : []);
-          console.log('User permissions fetched:', perms);
         } else if (res.status === 403) {
-          console.log('User does not have staff permissions (403 Forbidden)');
           setPermissions([]);
         } else {
-          console.error('Failed to fetch user permissions, status:', res.status);
           setPermissions([]);
         }
       } catch (error) {
-        console.error('Error fetching user permissions:', error);
         setPermissions([]);
       }
     },
@@ -134,19 +136,15 @@ export const AuthProvider = ({ children }) => {
         setAuthToken(token);
         setUser(userData);
 
-        console.log('User signed in successfully:', userData.username);
-
         await fetchUserPermissions(userData.id, userData.role);
 
         return { success: true, user: userData };
       } else {
-        const errorMsg = data.message || 'Sign in failed';
-        console.error('Sign in error:', errorMsg);
+        const errorMsg = data.message || 'ההתחברות נכשלה';
         return { success: false, message: errorMsg };
       }
     } catch (error) {
-      console.error('Network error during sign in:', error);
-      return { success: false, message: 'Network error. Please try again.' };
+      return { success: false, message: 'שגיאת רשת. אנא נסה שוב.' };
     } finally {
       setLoading(false);
     }
@@ -179,13 +177,10 @@ export const AuthProvider = ({ children }) => {
           setAuthToken(token);
           setUser(userData);
           await fetchUserPermissions(userData.id, userData.role);
-          console.log('User authenticated from stored token');
         } else {
-          console.warn('Stored token invalid, signing out');
           signOut();
         }
       } catch (err) {
-        console.error('Error initializing auth:', err);
         signOut();
       } finally {
         setLoading(false);

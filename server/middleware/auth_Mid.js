@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is required');
+  throw new Error('משתנה הסביבה JWT_SECRET נדרש');
 }
 
 const normalizeDate = (dateStr) => {
@@ -61,7 +61,7 @@ async function signup(req, res) {
       await conn.rollback();
       return res.status(400).json({
         success: false,
-        message: 'A user with this phone number already exists'
+        message: 'משתמש עם מספר טלפון זה כבר קיים'
       });
     }
 
@@ -104,17 +104,16 @@ async function signup(req, res) {
 
     res.status(201).json({
       success: true,
-      message: 'Account created successfully',
+      message: 'החשבון נוצר בהצלחה',
       token,
       user: userResponse
     });
 
   } catch (error) {
     await conn.rollback();
-    console.error('Sign up error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error. Please try again later.'
+      message: 'שגיאת שרת. אנא נסה שוב מאוחר יותר.'
     });
   } finally {
     conn.release();
@@ -137,7 +136,7 @@ async function signin(req, res) {
     if (users.length === 0) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid phone number or password'
+        message: 'מספר טלפון או סיסמה שגויים'
       });
     }
 
@@ -147,7 +146,7 @@ async function signin(req, res) {
     if (enc_pass !== user.password) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid phone number or password'
+        message: 'מספר טלפון או סיסמה שגויים'
       });
     }
 
@@ -179,16 +178,15 @@ async function signin(req, res) {
 
     res.json({
       success: true,
-      message: 'Sign in successful',
+      message: 'ההתחברות הצליחה',
       token,
       user: userResponse
     });
 
   } catch (error) {
-    console.error('Sign in error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error. Please try again later.'
+      message: 'שגיאת שרת. אנא נסה שוב מאוחר יותר.'
     });
   }
 }
@@ -200,7 +198,7 @@ function verifyToken(req, res, next) {
   if (!token) {
     return res.status(401).json({
       success: false,
-      message: 'Access denied. No token provided.'
+      message: 'גישה נדחתה. לא סופק טוקן.'
     });
   }
 
@@ -220,23 +218,21 @@ function verifyToken(req, res, next) {
     
     next();
   } catch (error) {
-    console.error('Token verification error:', error);
-    
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({
         success: false,
-        message: 'Token has expired'
+        message: 'הטוקן פג'
       });
     } else if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({
         success: false,
-        message: 'Invalid token'
+        message: 'טוקן לא תקין'
       });
     }
     
     return res.status(401).json({
       success: false,
-      message: 'Token verification failed'
+      message: 'אימות הטוקן נכשל'
     });
   }
 }
@@ -254,7 +250,7 @@ async function verify(req, res) {
     if (users.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'משתמש לא נמצא'
       });
     }
 
@@ -271,10 +267,9 @@ async function verify(req, res) {
 
     res.json(userResponse);
   } catch (error) {
-    console.error('Token verification error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error during token verification'
+      message: 'שגיאת שרת במהלך אימות הטוקן'
     });
   }
 }
@@ -292,7 +287,7 @@ async function getProfile(req, res) {
     if (users.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'משתמש לא נמצא'
       });
     }
 
@@ -312,10 +307,9 @@ async function getProfile(req, res) {
       user: userResponse
     });
   } catch (error) {
-    console.error('Profile fetch error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'שגיאת שרת'
     });
   }
 }
@@ -349,7 +343,7 @@ async function updateProfile(req, res) {
     if (updates.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'No valid fields to update'
+        message: 'אין שדות תקינים לעדכון'
       });
     }
     
@@ -364,7 +358,7 @@ async function updateProfile(req, res) {
       await conn.rollback();
       return res.status(404).json({
         success: false,
-        message: 'User not found'
+        message: 'משתמש לא נמצא'
       });
     }
     
@@ -372,15 +366,14 @@ async function updateProfile(req, res) {
     
     res.json({
       success: true,
-      message: 'Profile updated successfully'
+      message: 'הפרופיל עודכן בהצלחה'
     });
     
   } catch (error) {
     await conn.rollback();
-    console.error('Profile update error:', error);
     res.status(500).json({
       success: false,
-      message: 'Server error'
+      message: 'שגיאת שרת'
     });
   } finally {
     conn.release();
@@ -395,14 +388,14 @@ async function changePassword(req, res) {
     const userId = req.user && req.user.userId;
     if (!userId) {
       await conn.rollback();
-      return res.status(401).json({ success: false, message: 'Authentication required' });
+      return res.status(401).json({ success: false, message: 'נדרשת התחברות' });
     }
 
     const { old_password, new_password } = req.body || {};
 
     if (!old_password || !new_password) {
       await conn.rollback();
-      return res.status(400).json({ success: false, message: 'old_password and new_password are required' });
+      return res.status(400).json({ success: false, message: 'סיסמה ישנה וסיסמה חדשה נדרשות' });
     }
 
     const [rows] = await conn.query('SELECT password FROM users WHERE id = ?', [userId]);
@@ -430,7 +423,6 @@ async function changePassword(req, res) {
     return res.json({ success: true, message: 'הסיסמה עודכנה בהצלחה' });
   } catch (err) {
     await conn.rollback();
-    console.error('changePassword error:', err);
     return res.status(500).json({ success: false, message: 'שגיאת שרת בעת שינוי סיסמה' });
   } finally {
     conn.release();

@@ -25,13 +25,11 @@ function formatDateDisplay(dateStr) {
   if (!dateStr || dateStr === 'null' || dateStr === 'undefined') return 'לא הוגדר';
   
   try {
-    // Handle YYYY-MM-DD format
     if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(dateStr)) {
       const [year, month, day] = dateStr.split('-');
       return `${day}-${month}-${year}`;
     }
     
-    // Handle other date formats
     const date = new Date(dateStr);
     if (!isNaN(date.getTime())) {
       const day = String(date.getDate()).padStart(2, '0');
@@ -58,7 +56,6 @@ const Profile = ({ user: userProp }) => {
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  // Password modal state
   const [pwModalOpen, setPwModalOpen] = useState(false);
   const [oldPwd, setOldPwd] = useState('');
   const [newPwd, setNewPwd] = useState('');
@@ -67,7 +64,6 @@ const Profile = ({ user: userProp }) => {
   const [pwdSaving, setPwdSaving] = useState(false);
   const [message, setMessage] = useState(null);
 
-  // show/hide toggles
   const [showOld, setShowOld] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);

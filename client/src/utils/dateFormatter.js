@@ -34,7 +34,6 @@ export const formatToHebrewDate = (dateValue, fallback = '') => {
 
     return `${day}/${month}/${year}`;
   } catch (error) {
-    console.error('שגיאה בעיצוב תאריך:', error);
     return fallback;
   }
 };
@@ -63,12 +62,10 @@ export const formatToISODate = (hebrewDate) => {
 
     return null;
   } catch (error) {
-    console.error('שגיאה בהמרת תאריך ל-ISO:', error);
     return null;
   }
 };
 
-// Format time to HH:MM format
 export const formatToTime = (dateValue, fallback = '') => {
   if (!dateValue || dateValue === 'null' || dateValue === 'undefined') {
     return fallback;
@@ -95,12 +92,10 @@ export const formatToTime = (dateValue, fallback = '') => {
 
     return `${hours}:${minutes}`;
   } catch (error) {
-    console.error('שגיאה בעיצוב שעה:', error);
     return fallback;
   }
 };
 
-// Format date to MM/DD/YYYY format for workout history
 export const formatToWorkoutDate = (dateValue, fallback = '') => {
   if (!dateValue || dateValue === 'null' || dateValue === 'undefined') {
     return fallback;
@@ -128,12 +123,10 @@ export const formatToWorkoutDate = (dateValue, fallback = '') => {
 
     return `${month}/${day}/${year}`;
   } catch (error) {
-    console.error('שגיאה בעיצוב תאריך אימון:', error);
     return fallback;
   }
 };
 
-// Format date to DD-MM-YYYY format for body details
 export const formatToBodyDetailsDate = (dateValue, fallback = '') => {
   if (!dateValue || dateValue === 'null' || dateValue === 'undefined') {
     return fallback;
@@ -166,12 +159,10 @@ export const formatToBodyDetailsDate = (dateValue, fallback = '') => {
 
     return `${day}-${month}-${year}`;
   } catch (error) {
-    console.error('שגיאה בעיצוב תאריך מדדי גוף:', error);
     return fallback;
   }
 };
 
-// Format date and time for workout history with detailed information
 export const formatToWorkoutDateTime = (dateValue, fallback = '') => {
   if (!dateValue || dateValue === 'null' || dateValue === 'undefined') {
     return fallback;
@@ -201,12 +192,10 @@ export const formatToWorkoutDateTime = (dateValue, fallback = '') => {
 
     return `${day}/${month}/${year} ${hours}:${minutes}`;
   } catch (error) {
-    console.error('שגיאה בעיצוב תאריך ושעה לאימון:', error);
     return fallback;
   }
 };
 
-// Calculate duration between two dates in minutes
 export const calculateDuration = (startTime, endTime) => {
   if (!startTime || !endTime) return null;
   
@@ -221,7 +210,6 @@ export const calculateDuration = (startTime, endTime) => {
     
     return diffMinutes;
   } catch (error) {
-    console.error('שגיאה בחישוב משך זמן:', error);
     return null;
   }
 };

@@ -178,7 +178,7 @@ export default function DataTable() {
           <Button 
             variant="contained" 
             className="userAddButton"
-            onClick={() => navigate('/newUser')}
+            onClick={() => navigate('/admin/newUser')}
           >
             הוסף משתמש
           </Button>

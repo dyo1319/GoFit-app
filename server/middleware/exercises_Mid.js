@@ -137,7 +137,7 @@ async function updateExercise(req, res, next) {
       await conn.rollback();
       return res.status(404).json({ 
         success: false, 
-        message: 'Exercise not found' 
+        message: 'התרגיל לא נמצא' 
       });
     }
 
@@ -186,7 +186,7 @@ async function deleteExercise(req, res, next) {
       await conn.rollback();
       return res.status(404).json({ 
         success: false, 
-        message: 'Exercise not found' 
+        message: 'התרגיל לא נמצא' 
       });
     }
 
@@ -219,7 +219,7 @@ async function getExerciseById(req, res, next) {
     if (rows.length === 0) {
       return res.status(404).json({ 
         success: false, 
-        message: 'Exercise not found' 
+        message: 'התרגיל לא נמצא' 
       });
     }
 

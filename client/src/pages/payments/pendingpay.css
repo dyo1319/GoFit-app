@@ -1,22 +1,23 @@
-/* Pending Payments Admin Page Styles - Consistent with App Pages Theme */
-
-@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root{
-  --page-bg:#f8fafc;
-  --card-bg:#fff;
-  --card-shadow:0 6px 18px rgba(0,0,0,.06);
-  --card-border:#e2e8f0;
-  --header-bg:#f5f5f5;
-  --row-alt:#fafafa;
-  --row-hover:#f9f9f9;
-  --radius:12px;
-  --gap-sm:8px;
-  --gap-md:16px;
-  --gap-lg:24px;
+  --page-bg: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  --card-bg: #ffffff;
+  --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  --card-border: rgba(226, 232, 240, 0.8);
+  --header-bg: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  --row-alt: rgba(248, 250, 252, 0.5);
+  --row-hover: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+  --radius: 16px;
+  --gap-sm: 12px;
+  --gap-md: 20px;
+  --gap-lg: 32px;
+  --primary-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --success-gradient: linear-gradient(135deg, #10b981, #059669);
+  --error-gradient: linear-gradient(135deg, #ef4444, #dc2626);
+  --warning-gradient: linear-gradient(135deg, #f59e0b, #d97706);
 }
 
-/* Page Header Styles */
 .dashboard-header {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
@@ -60,145 +61,323 @@
   font-weight: 600;
 }
 
-/* ===== Page ===== */
 .pendingPage{
-  min-height: 100vh;
-  background-color: var(--page-bg);
+  background: var(--page-bg);
   direction: rtl;
   width: 100%;
   box-sizing: border-box;
   margin: 0;
   flex: 1;
   padding: 60px 20px 20px 20px !important;
-}
-.pendingPage__title{
-  margin: 0 0 12px 0;
-  font-weight: 800;
-  letter-spacing: .2px;
-  color: #1e293b;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
 }
 
-/* ===== Filters card ===== */
+.pendingPage__title{
+  margin: 0 0 24px 0;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: #1e293b;
+  font-size: 2rem;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-align: center;
+  position: relative;
+}
+
+.pendingPage__title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: var(--primary-gradient);
+  border-radius: 2px;
+}
+
 .pendingFiltersCard{
-  display:flex;
-  align-items:center;
-  gap:16px;
-  flex-wrap:wrap;
-  margin:0 0 16px 0;
-  padding:16px;
-  background:var(--card-bg);
-  border-radius:var(--radius);
-  box-shadow:0 2px 12px rgba(0,0,0,.08);
-  border:1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+  flex-wrap: wrap;
+  margin: 0 0 24px 0;
+  padding: 16px 20px;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 150px;
+  box-sizing: border-box;
+}
+
+.pendingFiltersCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary-gradient);
+  opacity: 0.8;
+}
+
+.pendingFiltersCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
 }
 .pendingFiltersCard .pendingSearch{
-  min-width: 220px;
-  flex: 0 1 320px;     /* חיפוש לא תופס את כל הרוחב */
-  max-width: 340px;
+  min-width: 200px;
+  flex: 1;
+  max-width: 400px;
 }
 
-/* === TextField RTL fix (האייקון משמאל, הטקסט מימין, בלי חפיפה) === */
 .pendingFiltersCard .MuiTextField-root{
   direction: rtl;
   text-align: right;
 }
-.pendingFiltersCard .MuiInputBase-root.MuiInputBase-adornedStart{
-  flex-direction: row-reverse;     /* מזיז את האייקון להתחלה (שמאל) בלי לשבור RTL */
-}
-.pendingFiltersCard .MuiInputAdornment-root{ direction: ltr; }
-.pendingFiltersCard .MuiInputAdornment-positionStart{
-  margin-right: 0;
-  margin-left: 8px;                /* ריווח בין האייקון לטקסט */
-}
-/* כאן התיקון העיקרי: הטקסט לא יתנגש באייקון */
-.pendingFiltersCard .MuiOutlinedInput-input{
-  padding-right: 14px !important;  /* הטקסט מתחיל מימין בנוחות */
-  padding-left: 36px !important;   /* מקום לאייקון משמאל */
-  text-align: right;
-  direction: rtl;
-}
-/* לייבל ממוקם נכון ב-RTL (לא חתוך) */
-.pendingFiltersCard .MuiFormLabel-root,
-.pendingFiltersCard .MuiInputLabel-root{
-  right: 12px;
-  left: auto;
-  transform-origin: top right;
-  text-align: right;
-}
-.pendingFiltersCard .MuiInputLabel-root.MuiInputLabel-shrink{
-  right: 10px;
-  transform: translate(0, -7px) scale(0.75);
+
+.pendingFiltersCard .MuiOutlinedInput-root {
+  border-radius: 12px;
+  background-color: rgba(248, 250, 252, 0.5);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  height: 50px;
 }
 
-/* ===== Data card + Grid ===== */
+.pendingFiltersCard .MuiOutlinedInput-root:hover {
+  background-color: rgba(248, 250, 252, 0.8);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.pendingFiltersCard .MuiOutlinedInput-root.Mui-focused {
+  background-color: #ffffff;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.pendingFiltersCard .MuiOutlinedInput-input {
+  padding: 14px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  height: 100px;
+}
+
+.pendingFiltersCard .MuiInputAdornment-root {
+  color: #6b7280;
+}
+
+.pendingFiltersCard .MuiInputAdornment-positionStart {
+  margin-right: 0;
+  margin-left: 12px;
+}
+
+.pendingFiltersCard .MuiInputLabel-root {
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.pendingFiltersCard .MuiInputLabel-root.MuiInputLabel-shrink {
+  color: #6366f1;
+  font-weight: 700;
+}
+
 .pendingCard{
-  padding:16px;
-  border-radius:var(--radius);
-  background:var(--card-bg);
-  box-shadow:var(--card-shadow);
-  width:100%;
-  box-sizing:border-box;
-  display:flex;
-  flex-direction:column;
-  min-height:540px;
+  padding: 24px;
+  border-radius: var(--radius);
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 600px;
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.pendingCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary-gradient);
+  opacity: 0.8;
+}
+
+.pendingCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
 }
 
 .pendingGrid{
-  border:0;
-  border-radius:var(--radius);
-  overflow:hidden;
-  flex:1;
+  border: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  flex: 1;
   direction: rtl;
-  font-family:'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: transparent;
 }
+
 .pendingGrid .MuiDataGrid-columnHeaders{
-  background:var(--header-bg);
-  position:sticky;
-  top:0;
-  z-index:2;
-  border-bottom:1px solid #e6e6e6;
-  box-shadow:0 2px 4px rgba(0,0,0,.08);
+  background: var(--header-bg);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  border-bottom: 2px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 12px 12px 0 0;
 }
-.pendingGrid .MuiDataGrid-columnHeaderTitle{ font-weight:700; text-align:center; }
+
+.pendingGrid .MuiDataGrid-columnHeaderTitle{ 
+  font-weight: 700; 
+  text-align: center; 
+  font-size: 0.875rem;
+  color: #374151;
+  letter-spacing: -0.025em;
+}
+
 .pendingGrid .MuiDataGrid-columnHeader,
 .pendingGrid .MuiDataGrid-cell{
-  text-align:center;
-  padding-inline:8px;
+  text-align: center;
+  padding-inline: 12px;
+  border-right: 1px solid rgba(226, 232, 240, 0.5);
 }
-.pendingGrid .MuiDataGrid-row:nth-of-type(odd){ background:var(--row-alt); }
+
+.pendingGrid .MuiDataGrid-columnHeader:last-child,
+.pendingGrid .MuiDataGrid-cell:last-child {
+  border-right: none;
+}
+
+.pendingGrid .MuiDataGrid-row:nth-of-type(odd){ 
+  background: var(--row-alt); 
+}
+
 .pendingGrid .MuiDataGrid-row:hover{
-  background:var(--row-hover);
-  transition: background-color .2s ease;
+  background: var(--row-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
 }
+
 .pendingGrid .MuiDataGrid-footerContainer,
 .pendingGrid .MuiTablePagination-root{
   direction: rtl;
   justify-content: flex-start;
+  background: rgba(248, 250, 252, 0.5);
+  border-top: 1px solid #e2e8f0;
+  border-radius: 0 0 12px 12px;
 }
-.pendingGrid .MuiDataGrid-overlay{ background-color: rgba(255,255,255,.8); }
 
-/* ===== Cells / actions ===== */
+.pendingGrid .MuiDataGrid-overlay{ 
+  background-color: rgba(255,255,255,0.9); 
+  backdrop-filter: blur(5px);
+}
+
 .phone-number{
-  direction:ltr;
-  text-align:center;
-  font-family: monospace;
-  display:block;
-  width:100%;
+  direction: ltr;
+  text-align: center;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  display: block;
+  width: 100%;
+  font-weight: 600;
+  color: #374151;
+  background: rgba(99, 102, 241, 0.05);
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(99, 102, 241, 0.1);
 }
-.actions-container{
-  display:flex;
-  gap: var(--gap-sm);
-  justify-content:center;
-  align-items:center;
-  direction: rtl;
-  width:100%;
-}
-.pendingPage .MuiButton-startIcon{ margin-right:0; margin-left:8px; }
 
-/* Mobile Responsive */
+.actions-container{
+  display: flex;
+  gap: var(--gap-sm);
+  justify-content: center;
+  align-items: center;
+  direction: rtl;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.pendingPage .MuiButton-root {
+  border-radius: 10px;
+  font-weight: 600;
+  text-transform: none;
+  font-size: 0.75rem;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pendingPage .MuiButton-contained {
+  background: var(--success-gradient);
+  color: white;
+  border: none;
+}
+
+.pendingPage .MuiButton-contained:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.pendingPage .MuiButton-outlined {
+  border: 2px solid #ef4444;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.pendingPage .MuiButton-outlined:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #dc2626;
+  color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+.pendingPage .MuiButton-startIcon { 
+  margin-right: 0; 
+  margin-left: 6px; 
+}
+
+.pendingPage .MuiChip-root {
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  height: 28px;
+}
+
+.pendingPage .MuiChip-colorWarning {
+  background: var(--warning-gradient);
+  color: white;
+  border: none;
+}
+
+.pendingPage .MuiChip-colorDefault {
+  background: rgba(156, 163, 175, 0.1);
+  color: #6b7280;
+  border: 1px solid rgba(156, 163, 175, 0.3);
+}
+
+
 @media (max-width: 768px) {
   .pendingPage {
-    padding: 56px 16px 80px 16px !important; /* Mobile topbar height + padding, bottom nav space */
+    padding: 56px 16px 80px 16px !important; 
   }
   
   .dashboard-nav {
@@ -215,10 +394,21 @@
   }
   
   .pendingFiltersCard{
-    flex-direction:column;
-    align-items:stretch;
-    gap: var(--gap-sm);
-    padding: 16px;
+    height: 60px;
+    padding: 12px 16px;
+    gap: 8px;
+  }
+  
+  .filter-field-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    height: auto;
+  }
+  
+  .filter-label {
+    font-size: 0.75rem;
+    margin-bottom: 2px;
   }
   
   .pendingFiltersCard .pendingSearch{
@@ -228,7 +418,6 @@
   }
 }
 
-/* Extra Small Mobile */
 @media (max-width: 480px) {
   .pendingPage{ 
     padding: 8px; 
@@ -238,19 +427,17 @@
   }
 }
 
-/* Tablet */
 @media (max-width: 1024px) and (min-width: 769px) {
   .dashboard-nav {
     padding: 12px 4%;
   }
 }
 
-/* Desktop */
 @media (min-width: 768px) {
   .pendingPage { 
     margin-right: 240px; 
     padding-bottom: 0; 
-    padding: 60px 20px 0 20px !important; /* Desktop topbar height + padding */
+    padding: 60px 20px 0 20px !important; 
   }
   .dashboard-nav {
     padding: 12px 5%;
@@ -260,11 +447,10 @@
 @media (min-width: 1200px) {
   .pendingPage { 
     margin-right: 260px; 
-    padding: 60px 20px 0 20px !important; /* Large desktop topbar height + padding */
+    padding: 60px 20px 0 20px !important; 
   }
 }
 
-/* Large Desktop */
 @media (min-width: 1600px) {
   .pendingPage{ 
     padding: 28px 32px; 
@@ -276,4 +462,81 @@
     gap: 32px; 
     padding: 32px; 
   }
+}
+
+.filter-field-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  min-width: 100%;
+  position: relative;
+  height: 100%;
+}
+
+.filter-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: right;
+  direction: rtl;
+  margin-bottom: 0;
+  letter-spacing: -0.025em;
+  position: relative;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.filter-label::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  right: 0;
+  width: 20px;
+  height: 2px;
+  background: var(--primary-gradient);
+  border-radius: 1px;
+  opacity: 0.6;
+}
+
+.pendingPage .MuiAlert-root {
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.pendingPage .MuiAlert-standardError {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95));
+  color: white;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.pendingPage .MuiAlert-standardError .MuiAlert-icon {
+  color: white;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pendingPage {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.pendingFiltersCard {
+  animation: fadeInUp 0.2s ease-out;
+}
+
+.pendingCard {
+  animation: fadeInUp 0.3s ease-out;
 }

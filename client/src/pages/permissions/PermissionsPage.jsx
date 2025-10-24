@@ -279,15 +279,83 @@ export default function PermissionsPage() {
         maxWidth="md" 
         dir="rtl"
         disableEnforceFocus={false}
-        disableAutoFocus={false}
+        disableAutoFocus={true}
         disableRestoreFocus={false}
+        disableScrollLock={false}
+        hideBackdrop={false}
+        PaperProps={{
+          sx: {
+            borderRadius: '12px',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+            background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+            border: '1px solid rgba(226, 232, 240, 0.8)',
+            backdropFilter: 'blur(10px)',
+            maxWidth: '700px',
+            width: '90%',
+            direction: 'rtl',
+            textAlign: 'right'
+          }
+        }}
+        BackdropProps={{
+          sx: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(4px)'
+          }
+        }}
       >
-        <DialogTitle>עריכת גישה – {selected?.username}</DialogTitle>
-        <DialogContent dividers className="perm-dialog">
-          <Stack spacing={2}>
-            <Stack direction="row" spacing={2} className="perm-form-row">
-              <FormControl className="perm-field">
-                <InputLabel id="role-label">תפקיד</InputLabel>
+        <DialogTitle sx={{
+          padding: '24px 24px 16px',
+          fontSize: '1.5rem',
+          fontWeight: 700,
+          color: 'white',
+          background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+          borderRadius: '12px 12px 0 0',
+          margin: 0,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          direction: 'rtl',
+          textAlign: 'right',
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '3px',
+            background: 'rgba(255, 255, 255, 0.3)',
+            borderRadius: '12px 12px 0 0'
+          }
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexDirection: 'row-reverse' }}>
+            <EditIcon sx={{ fontSize: '1.5rem' }} />
+            עריכת גישה – {selected?.username}
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{
+          padding: '24px',
+          backgroundColor: '#ffffff',
+          direction: 'rtl'
+        }}>
+          <Stack spacing={3}>
+            <Stack direction="row" spacing={3} className="perm-form-row">
+              <FormControl className="perm-field" sx={{ flex: 1 }}>
+                <InputLabel 
+                  id="role-label"
+                  sx={{
+                    position: 'static',
+                    transform: 'none',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: '#374151',
+                    marginBottom: '8px',
+                    textAlign: 'right',
+                    direction: 'rtl'
+                  }}
+                >
+                  תפקיד
+                </InputLabel>
                 <Select
                   labelId="role-label"
                   id="staff-role-select"
@@ -299,14 +367,58 @@ export default function PermissionsPage() {
                     setRole(newRole);
                     await ensurePresetsLoaded(newRole);
                   }}
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      display: 'none'
+                    },
+                    '& .MuiSelect-select': {
+                      textAlign: 'right',
+                      direction: 'rtl',
+                      padding: '16px 20px',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                      borderRadius: '12px',
+                      border: '2px solid transparent',
+                      transition: 'all 0.3s ease',
+                      '&:focus': {
+                        backgroundColor: '#ffffff',
+                        borderColor: '#6366f1',
+                        boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.1)'
+                      },
+                      '&:hover': {
+                        backgroundColor: 'rgba(248, 250, 252, 1)',
+                        borderColor: 'rgba(99, 102, 241, 0.3)'
+                      }
+                    },
+                    '& .MuiSelect-icon': {
+                      right: 'auto !important',
+                      left: '12px !important',
+                      color: '#6366f1'
+                    }
+                  }}
                 >
                   <MenuItem value="admin">{ROLE_LABEL.admin}</MenuItem>
                   <MenuItem value="trainer">{ROLE_LABEL.trainer}</MenuItem>
                 </Select>
               </FormControl>
 
-              <FormControl className="perm-field">
-                <InputLabel id="profile-label">פרופיל גישה</InputLabel>
+              <FormControl className="perm-field" sx={{ flex: 1 }}>
+                <InputLabel 
+                  id="profile-label"
+                  sx={{
+                    position: 'static',
+                    transform: 'none',
+                    fontSize: '0.875rem',
+                    fontWeight: 600,
+                    color: '#374151',
+                    marginBottom: '8px',
+                    textAlign: 'right',
+                    direction: 'rtl'
+                  }}
+                >
+                  פרופיל גישה
+                </InputLabel>
                 <Select
                   labelId="profile-label"
                   id="access-profile-select"
@@ -314,6 +426,36 @@ export default function PermissionsPage() {
                   value={profile}
                   label="פרופיל גישה"
                   onChange={(e) => setProfile(e.target.value)}
+                  sx={{
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      display: 'none'
+                    },
+                    '& .MuiSelect-select': {
+                      textAlign: 'right',
+                      direction: 'rtl',
+                      padding: '16px 20px',
+                      fontSize: '1rem',
+                      fontWeight: 500,
+                      backgroundColor: 'rgba(248, 250, 252, 0.8)',
+                      borderRadius: '12px',
+                      border: '2px solid transparent',
+                      transition: 'all 0.3s ease',
+                      '&:focus': {
+                        backgroundColor: '#ffffff',
+                        borderColor: '#6366f1',
+                        boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.1)'
+                      },
+                      '&:hover': {
+                        backgroundColor: 'rgba(248, 250, 252, 1)',
+                        borderColor: 'rgba(99, 102, 241, 0.3)'
+                      }
+                    },
+                    '& .MuiSelect-icon': {
+                      right: 'auto !important',
+                      left: '12px !important',
+                      color: '#6366f1'
+                    }
+                  }}
                 >
                   <MenuItem value="default">{PROFILE_LABEL.default}</MenuItem>
                   <MenuItem value="readonly">{PROFILE_LABEL.readonly}</MenuItem>
@@ -323,7 +465,27 @@ export default function PermissionsPage() {
             </Stack>
 
             {profile === "custom" && (
-              <Box className="perm-custom-box">
+              <Box sx={{
+                border: '2px solid #e2e8f0',
+                borderRadius: '12px',
+                padding: '20px',
+                background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  borderColor: '#6366f1',
+                  boxShadow: '0 8px 20px rgba(99, 102, 241, 0.1)'
+                }
+              }}>
+                <Typography variant="h6" sx={{ 
+                  mb: 2, 
+                  fontWeight: 600, 
+                  color: '#374151',
+                  textAlign: 'right',
+                  direction: 'rtl'
+                }}>
+                  הרשאות מותאמות אישית
+                </Typography>
                 <PermissionsChecklist
                   selected={customPerms}
                   onChange={handlePermissionsChange}
@@ -333,27 +495,145 @@ export default function PermissionsPage() {
               </Box>
             )}
 
-            <Divider />
+            <Divider sx={{ 
+              borderColor: '#e2e8f0',
+              borderWidth: '1px',
+              margin: '16px 0'
+            }} />
 
-            <Box className="perm-effective">
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+            <Box sx={{
+              border: '2px dashed #d1d5db',
+              borderRadius: '12px',
+              padding: '20px',
+              background: 'linear-gradient(135deg, #f9fafb 0%, #ffffff 100%)',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                borderColor: '#9ca3af',
+                background: 'linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%)'
+              }
+            }}>
+              <Typography variant="h6" sx={{ 
+                mb: 2, 
+                fontWeight: 600, 
+                color: '#374151',
+                textAlign: 'right',
+                direction: 'rtl',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                flexDirection: 'row-reverse'
+              }}>
+                <Box sx={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  backgroundColor: '#10b981',
+                  boxShadow: '0 0 0 2px rgba(16, 185, 129, 0.2)'
+                }} />
                 הרשאות אפקטיביות – {ROLE_LABEL[role]} / {PROFILE_LABEL[profile]}
               </Typography>
               {effective.length === 0 ? (
-                <Typography color="text.secondary">אין הרשאות מוצגות.</Typography>
+                <Typography 
+                  color="text.secondary" 
+                  sx={{ 
+                    textAlign: 'right',
+                    direction: 'rtl',
+                    fontStyle: 'italic'
+                  }}
+                >
+                  אין הרשאות מוצגות.
+                </Typography>
               ) : (
-                <Box className="perm-chips-wrap">
+                <Box sx={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                  maxHeight: '200px',
+                  overflow: 'auto',
+                  padding: '8px',
+                  borderRadius: '8px',
+                  background: 'rgba(248, 250, 252, 0.5)'
+                }}>
                   {effective.map((k) => (
-                    <Chip key={k} label={k} size="small" className="perm-chip" />
+                    <Chip 
+                      key={k} 
+                      label={k} 
+                      size="small" 
+                      sx={{
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        color: '#6366f1',
+                        border: '1px solid rgba(99, 102, 241, 0.2)',
+                        fontWeight: 500,
+                        fontSize: '0.75rem',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                          transform: 'translateY(-1px)',
+                          boxShadow: '0 2px 4px rgba(99, 102, 241, 0.3)'
+                        }
+                      }}
+                    />
                   ))}
                 </Box>
               )}
             </Box>
           </Stack>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>ביטול</Button>
-          <Button variant="contained" onClick={onSave}>שמור</Button>
+        <DialogActions sx={{
+          p: 3,
+          backgroundColor: 'rgba(248, 250, 252, 0.5)',
+          borderTop: '1px solid rgba(226, 232, 240, 0.8)',
+          direction: 'rtl',
+          justifyContent: 'flex-start',
+          gap: 2
+        }}>
+          <Button
+            onClick={handleClose}
+            variant="outlined"
+            sx={{
+              borderRadius: '12px',
+              padding: '12px 24px',
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '0.875rem',
+              border: '2px solid #e2e8f0',
+              color: '#64748b',
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                borderColor: '#6366f1',
+                color: '#6366f1',
+                backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                transform: 'translateY(-1px)',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+              }
+            }}
+          >
+            ביטול
+          </Button>
+          <Button
+            variant="contained"
+            onClick={onSave}
+            sx={{
+              borderRadius: '12px',
+              padding: '12px 24px',
+              fontWeight: 600,
+              textTransform: 'none',
+              fontSize: '0.875rem',
+              background: 'linear-gradient(135deg, #10b981, #059669)',
+              color: 'white',
+              border: 'none',
+              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #059669, #047857)',
+                transform: 'translateY(-1px)',
+                boxShadow: '0 6px 16px rgba(16, 185, 129, 0.4)'
+              }
+            }}
+          >
+            שמור
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

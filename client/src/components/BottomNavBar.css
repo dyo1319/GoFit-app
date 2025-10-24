@@ -71,7 +71,6 @@
   letter-spacing: 0.3px;
 }
 
-/* Desktop Sidebar */
 @media (min-width: 768px) {
   .bottom-nav {
     position: fixed;
@@ -128,7 +127,6 @@
   }
 }
 
-/* Large desktop adjustments */
 @media (min-width: 1200px) {
   .bottom-nav {
     width: 260px;

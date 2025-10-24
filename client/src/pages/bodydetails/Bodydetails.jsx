@@ -13,7 +13,6 @@ const BodyDetailsPage = () => {
   const [recentData, setRecentData] = useState([]);
   const [stats, setStats] = useState(null);
 
-  // Form state
   const [formData, setFormData] = useState({
     weight: '',
     height: '',
@@ -25,7 +24,6 @@ const BodyDetailsPage = () => {
 
   const [editingRecord, setEditingRecord] = useState(null);
 
-  // Fetch recent data and stats when component mounts
   useEffect(() => {
     if (user?.id) {
       fetchRecentData();
@@ -33,7 +31,6 @@ const BodyDetailsPage = () => {
     }
   }, [user]);
 
-  // Calculate BMI
   const calculateBMI = (weight, height) => {
     if (!weight || !height) return null;
     const heightInMeters = height / 100;
@@ -78,13 +75,11 @@ const BodyDetailsPage = () => {
   const validateForm = () => {
     const { weight, height, body_fat, muscle_mass, circumference } = formData;
     
-    // Check if at least one field is filled
     if (!weight && !height && !body_fat && !muscle_mass && !circumference) {
       setError('אנא מלא לפחות שדה מדידה אחד');
       return false;
     }
 
-    // Validate numeric values
     const numericFields = { weight, height, body_fat, muscle_mass, circumference };
     for (const [field, value] of Object.entries(numericFields)) {
       if (value && (isNaN(value) || parseFloat(value) <= 0)) {
@@ -93,7 +88,6 @@ const BodyDetailsPage = () => {
       }
     }
 
-    // Validate reasonable ranges
     if (weight && (parseFloat(weight) < 30 || parseFloat(weight) > 300)) {
       setError('המשקל חייב להיות בין 30-300 ק״ג');
       return false;
@@ -145,14 +139,12 @@ const BodyDetailsPage = () => {
 
       let response;
       if (editingRecord) {
-        // Update existing record
         response = await authenticatedFetch(`/body-details/${editingRecord.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(submitData)
         });
       } else {
-        // Create new record
         response = await authenticatedFetch('/body-details', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -165,7 +157,6 @@ const BodyDetailsPage = () => {
       if (result.success) {
         setSuccess(editingRecord ? 'מדדי הגוף עודכנו בהצלחה!' : 'מדדי הגוף נוספו בהצלחה!');
         
-        // Reset form
         setFormData({
           weight: '',
           height: '',
@@ -176,11 +167,9 @@ const BodyDetailsPage = () => {
         });
         setEditingRecord(null);
         
-        // Refresh data
         await fetchRecentData();
         await fetchStats();
         
-        // Switch to history tab to see the new record
         setTimeout(() => {
           setActiveTab('history');
         }, 1000);
@@ -263,7 +252,6 @@ const BodyDetailsPage = () => {
       </div>
 
         <div className="bodydetails-container">
-          {/* Tabs */}
           <div className="bodydetails-tabs">
             <button 
               className={`tab-button ${activeTab === 'add' ? 'active' : ''}`}
@@ -286,7 +274,6 @@ const BodyDetailsPage = () => {
           </div>
 
           <div className="bodydetails-content-area">
-            {/* Add/Edit Tab */}
             {activeTab === 'add' && (
               <div className="tab-content">
                 <form onSubmit={handleSubmit} className="body-details-form">
@@ -371,7 +358,6 @@ const BodyDetailsPage = () => {
                     </div>
                   </div>
 
-                  {/* BMI Preview */}
                   {formData.weight && formData.height && (
                     <div className="bmi-preview">
                       <span>תצוגה מקדימה BMI: {calculateBMI(formData.weight, formData.height)}</span>
@@ -395,7 +381,6 @@ const BodyDetailsPage = () => {
               </div>
             )}
 
-            {/* History Tab */}
             {activeTab === 'history' && (
               <div className="tab-content">
                 <h3>30 הימים האחרונים ({recentData.length} רשומות)</h3>
@@ -440,7 +425,6 @@ const BodyDetailsPage = () => {
               </div>
             )}
 
-            {/* Progress Tab */}
             {activeTab === 'progress' && (
               <div className="tab-content">
                 <h3>השוואת התקדמות של 30 יום</h3>
@@ -540,7 +524,6 @@ const BodyDetailsPage = () => {
                       )}
                     </div>
 
-                    {/* Progress Changes */}
                     {stats.old && stats.changes && (
                       <div className="progress-changes">
                         <h4>שינויים במהלך 30 יום</h4>

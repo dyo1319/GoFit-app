@@ -133,7 +133,7 @@ export default function UserFormPersonal({
               <PermissionsChecklist
                 selected={form.permissions_json || []}
                 onChange={(permissions) => onChange("permissions_json", permissions)}
-                disabled={disabled || !canSetCustomPermissions} // 🔐 משתמש בהרשאה manage_permissions
+                disabled={disabled || !canSetCustomPermissions} 
                 compact={true}
               />
             </div>

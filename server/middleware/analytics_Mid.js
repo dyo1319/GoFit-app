@@ -98,7 +98,7 @@ async function getMonthlySubscriptions(req, res) {
     });
   } catch (error) {
     console.error('Analytics monthly subscriptions error:', error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "שגיאת שרת" });
   }
 }
 
@@ -146,7 +146,7 @@ async function getMonthlyPayments(req, res) {
     });
   } catch (error) {
     console.error('Analytics monthly payments error:', error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "שגיאת שרת" });
   }
 }
 
@@ -195,7 +195,7 @@ async function getDashboardStats(req, res) {
     });
   } catch (error) {
     console.error('Analytics dashboard stats error:', error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "שגיאת שרת" });
   }
 }
 
@@ -244,7 +244,7 @@ async function getSubscriptionTrends(req, res) {
     });
   } catch (error) {
     console.error('Analytics subscription trends error:', error);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "שגיאת שרת" });
   }
 }
 

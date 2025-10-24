@@ -1,5 +1,3 @@
-/* Home Admin Page Styles - Consistent with App Pages Theme */
-
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
 .home {
@@ -13,7 +11,6 @@
   padding: 60px 20px 20px 20px !important;
 }
 
-/* Page Header Styles */
 .dashboard-header {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
@@ -257,7 +254,6 @@
   flex: 1;
 }
 
-/* Tab Navigation Styles */
 .home .MuiTabs-root {
   margin-bottom: 24px;
   border-bottom: 1px solid #e0e0e0;
@@ -288,7 +284,6 @@
   border-radius: 3px 3px 0 0;
 }
 
-/* Analytics Tab - Full Width Layout */
 .home .analytics-tab {
   width: 100%;
   display: flex;
@@ -308,25 +303,46 @@
   border: 1px solid #f0f0f0;
 }
 
+.filter-field-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+}
+
+.filter-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: right;
+  direction: rtl;
+  margin-bottom: 4px;
+}
+
 .home .analytics-filters .MuiTextField-root {
   min-width: 200px;
+  direction: rtl;
 }
 
 .home .analytics-filters .MuiInputLabel-root {
   color: #6b7280;
   font-size: 0.875rem;
+  text-align: right;
+  direction: rtl;
 }
 
 .home .analytics-filters .MuiOutlinedInput-root {
   border-radius: 8px;
+  direction: rtl;
 }
 
 .home .analytics-filters .MuiOutlinedInput-input {
   padding: 10px 14px;
   font-size: 0.875rem;
+  text-align: right;
+  direction: rtl;
 }
 
-/* Analytics Charts Grid */
 .home .analytics-charts-grid {
   display: flex;
   flex-direction: column;
@@ -381,7 +397,6 @@
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
-/* Bar Chart Specific Styles */
 .home .recharts-bar-rectangle {
   rx: 4px;
   ry: 4px;
@@ -426,7 +441,6 @@
   color: #111827 !important;
 }
 
-/* Loading States */
 .home .loading-container {
   display: flex;
   justify-content: center;
@@ -455,7 +469,6 @@
   }
 }
 
-/* Error States */
 .home .error-card {
   background: #fff;
   padding: 20px;
@@ -476,10 +489,10 @@
   font-size: 0.875rem;
 }
 
-/* Mobile Responsive */
+
 @media (max-width: 768px) {
   .home {
-    padding: 56px 16px 80px 16px !important; /* Mobile topbar height + padding, bottom nav space */
+    padding: 56px 16px 80px 16px !important; 
   }
   
   .dashboard-nav {
@@ -510,12 +523,15 @@
     padding: 16px;
   }
   
+  .filter-field-container {
+    min-width: 100%;
+  }
+  
   .home .analytics-filters .MuiTextField-root {
     min-width: 100%;
   }
 }
 
-/* Extra Small Mobile */
 @media (max-width: 480px) {
   .home .header-container {
     margin-bottom: 16px;
@@ -526,7 +542,6 @@
   }
 }
 
-/* Tablet */
 @media (max-width: 1024px) and (min-width: 769px) {
   .dashboard-nav {
     padding: 12px 4%;
@@ -551,17 +566,20 @@
     padding: 24px;
   }
   
+  .filter-field-container {
+    min-width: 220px;
+  }
+  
   .home .analytics-chart-container {
     height: 450px;
   }
 }
 
-/* Desktop */
 @media (min-width: 768px) {
   .home { 
     margin-right: 240px; 
     padding-bottom: 0; 
-    padding: 60px 20px 0 20px !important; /* Desktop topbar height + padding */
+    padding: 60px 20px 0 20px !important; 
   }
   .dashboard-nav {
     padding: 12px 5%;
@@ -588,11 +606,11 @@
 @media (min-width: 1200px) {
   .home { 
     margin-right: 260px; 
-    padding: 60px 20px 0 20px !important; /* Large desktop topbar height + padding */
+    padding: 60px 20px 0 20px !important; 
   }
 }
 
-/* Large Desktop */
+
 @media (min-width: 1600px) {
   .home__cards-grid {
     gap: 20px;
@@ -616,27 +634,78 @@
     padding: 32px;
   }
   
+  .filter-field-container {
+    min-width: 240px;
+  }
+  
   .home .analytics-chart-card {
     padding: 32px;
   }
 }
 
-/* RTL Support for Form Controls */
 .rtlFormControl .MuiInputBase-root {
   text-align: right;
+  direction: rtl;
 }
 
 .rtlFormControl .MuiInputLabel-root {
   right: 0;
   left: auto;
   transform-origin: right;
+  text-align: right;
+  direction: rtl;
 }
 
 .rtlFormControl .MuiOutlinedInput-notchedOutline {
   text-align: right;
+  direction: rtl;
 }
 
-/* Custom Scrollbar for Charts */
+.rtlFormControl .MuiInputLabel-root.MuiInputLabel-shrink {
+  transform: translate(14px, -9px) scale(0.75);
+  transform-origin: right;
+}
+
+.rtlFormControl .MuiOutlinedInput-notchedOutline {
+  text-align: right;
+  direction: rtl;
+}
+
+.rtlFormControl .MuiOutlinedInput-notchedOutline legend {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: auto;
+  transform: translateY(-50%);
+  padding: 0 4px;
+  background: white;
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1;
+  white-space: nowrap;
+  text-align: right;
+  direction: rtl;
+  max-width: none;
+  width: auto;
+}
+
+.rtlFormControl .MuiOutlinedInput-notchedOutline legend span {
+  padding: 0 4px;
+  background: white;
+  font-size: 0.75rem;
+  color: #6b7280;
+  display: inline-block;
+  white-space: nowrap;
+  text-align: right;
+  direction: rtl;
+}
+
+.rtlFormControl .MuiInputBase-input {
+  text-align: right;
+  direction: rtl;
+  padding: 10px 14px;
+}
+
 .home ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -656,7 +725,6 @@
   background: #a8a8a8;
 }
 
-/* Print Styles */
 @media print {
   .home {
     background: white;
@@ -674,7 +742,6 @@
   }
 }
 
-/* High Contrast Mode Support */
 @media (prefers-contrast: high) {
   .home .stat-card,
   .home .chart-card,
@@ -687,7 +754,6 @@
   }
 }
 
-/* Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
   .home .stat-card,
   .home .analytics-chart-card {

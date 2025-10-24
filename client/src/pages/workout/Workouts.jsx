@@ -38,18 +38,15 @@ export default function Workouts() {
 
   const categories = ['כוח', 'קרדיו', 'גמישות', 'יוגה', 'פילאטיס', 'פונקציונלי', 'אחר'];
 
-  // Helper function to detect if URL is a GIF
   const isGifUrl = (url) => {
     if (!url) return false;
     const gifExtensions = ['.gif', '.GIF'];
     const gifDomains = ['giphy.com', 'tenor.com', 'imgur.com'];
     
-    // Check file extension
     if (gifExtensions.some(ext => url.includes(ext))) {
       return true;
     }
     
-    // Check domain
     if (gifDomains.some(domain => url.includes(domain))) {
       return true;
     }
@@ -86,7 +83,6 @@ export default function Workouts() {
         setExerciseLibrary(response.data);
       }
     } catch (err) {
-      console.error('Error loading exercise library:', err);
     }
   };
 
@@ -100,11 +96,9 @@ export default function Workouts() {
         }
       } else {
         const errorData = await response.json();
-        console.error('Error fetching workout history:', errorData);
         setWorkoutHistory([]);
       }
     } catch (err) {
-      console.error('Error loading workout history:', err);
       setWorkoutHistory([]);
     }
   };
@@ -116,7 +110,7 @@ export default function Workouts() {
       completedExercises: [],
       currentExerciseIndex: 0
     });
-    setTabValue(2); // Switch to workout tab
+    setTabValue(2); 
   };
 
   const completeExercise = (exerciseIndex) => {
@@ -156,7 +150,6 @@ export default function Workouts() {
   const finishWorkout = async () => {
     if (!currentWorkout) return;
     
-    // Prevent multiple rapid clicks
     if (isFinishingWorkout) return;
     setIsFinishingWorkout(true);
     
@@ -170,7 +163,6 @@ export default function Workouts() {
     };
     
     try {
-      // Save workout to database
       const response = await authenticatedFetch('/workout-history/user/workout-history', {
         method: 'POST',
         headers: {
@@ -189,18 +181,14 @@ export default function Workouts() {
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          // Refresh workout history
           await fetchWorkoutHistory();
         }
       } else {
         const errorData = await response.json();
-        console.error('Error saving workout:', errorData);
       }
     } catch (error) {
-      console.error('Error saving workout:', error);
     }
     
-    // Clear current workout and switch to history tab
     setCurrentWorkout(null);
     setTabValue(0);
     setIsFinishingWorkout(false);
@@ -276,7 +264,6 @@ export default function Workouts() {
           </Tabs>
         </div>
 
-        {/* My Programs Tab */}
         <div className="workout-tab-panel" role="tabpanel" hidden={tabValue !== 0}>
           {tabValue === 0 && (
             <div>
@@ -324,7 +311,6 @@ export default function Workouts() {
           )}
         </div>
 
-        {/* Exercise Library Tab */}
         <div className="workout-tab-panel" role="tabpanel" hidden={tabValue !== 1}>
           {tabValue === 1 && (
             <div>
@@ -401,7 +387,6 @@ export default function Workouts() {
           )}
         </div>
 
-        {/* Active Workout Tab */}
         <div className="workout-tab-panel" role="tabpanel" hidden={tabValue !== 2}>
           {tabValue === 2 && (
             <div>
@@ -421,7 +406,10 @@ export default function Workouts() {
                         </button>
                         <button
                           className="workout-btn outlined"
-                          onClick={() => setCurrentWorkout(null)}
+                          onClick={() => {
+                            setCurrentWorkout(null);
+                            setTabValue(0);
+                          }}
                         >
                           בטל אימון
                         </button>
@@ -541,7 +529,6 @@ export default function Workouts() {
           )}
         </div>
 
-        {/* Workout History Tab */}
         <div className="workout-tab-panel" role="tabpanel" hidden={tabValue !== 3}>
           {tabValue === 3 && (
             <div>
@@ -554,7 +541,6 @@ export default function Workouts() {
               ) : (
                 <div className="history-list">
                   {workoutHistory.map((workout, index) => {
-                    // Handle both database records and local records
                     const programName = workout.program_name || workout.programName;
                     const startTime = workout.start_time || workout.startTime;
                     const endTime = workout.end_time || workout.endTime;
@@ -607,7 +593,6 @@ export default function Workouts() {
           )}
         </div>
 
-        {/* Program Details Dialog */}
         <Dialog 
           open={openProgramDialog} 
           onClose={() => setOpenProgramDialog(false)} 

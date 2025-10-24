@@ -1,4 +1,3 @@
-
 const PageHeader = () => {
   return (
     <header className="dashboard-header" dir="rtl">

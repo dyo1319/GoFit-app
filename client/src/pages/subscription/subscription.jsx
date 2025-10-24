@@ -298,8 +298,47 @@ export default function SubscriptionPage() {
         autoHideDuration={6000}
         onClose={closeSnack}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        sx={{
+          '& .MuiSnackbar-root': {
+            bottom: '24px',
+            right: '24px'
+          }
+        }}
       >
-        <Alert onClose={closeSnack} severity={snackbar.severity} sx={{ width: "100%" }}>
+        <Alert 
+          onClose={closeSnack} 
+          severity={snackbar.severity} 
+          sx={{ 
+            width: "100%",
+            borderRadius: '12px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            backdropFilter: 'blur(10px)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            padding: '12px 16px',
+            minWidth: '300px',
+            maxWidth: '400px',
+            '& .MuiAlert-message': {
+              padding: 0,
+              fontWeight: 600,
+              fontSize: '0.875rem'
+            },
+            '& .MuiAlert-action': {
+              padding: 0,
+              marginLeft: '8px'
+            },
+            '& .MuiIconButton-root': {
+              padding: '4px',
+              borderRadius: '8px',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                transform: 'scale(1.05)'
+              }
+            }
+          }}
+        >
           {snackbar.message}
         </Alert>
       </Snackbar>

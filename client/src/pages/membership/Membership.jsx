@@ -169,7 +169,6 @@ const Membership = ({ user: userProp }) => {
               </div>
             </div>
 
-            {/* תקציר/סטטיסטיקות */}
             <div className="monthly-stats">
               <div className="stats-header">
                 <span className="material-icons">fact_check</span>
@@ -199,13 +198,18 @@ const Membership = ({ user: userProp }) => {
           </div>
         )}
 
-        {/* היסטוריה */}
         {subscriptions.length > 0 && (
           <div className="subscription-history">
             <div className="history-header">
               <span className="material-icons">history</span>
               <h3>היסטוריית מנויים</h3>
             </div>
+            {subscriptions.length > 3 && (
+              <div className="history-scroll-hint">
+                <span className="material-icons">keyboard_arrow_down</span>
+                <span>גלול לראות עוד</span>
+              </div>
+            )}
             <div className="history-list">
               {subscriptions.map((s) => {
                 const isActive = currentSubscription?.id === s.id;

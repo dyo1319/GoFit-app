@@ -80,7 +80,6 @@ router.delete('/:id',
   }
 );
 
-// Add exercise to existing program
 router.post('/:id/exercises', 
   verifyToken, 
   requirePermission('manage_plans'), 
@@ -95,7 +94,6 @@ router.post('/:id/exercises',
   }
 );
 
-// Update exercise in program
 router.put('/:id/exercises/:exerciseId', 
   verifyToken, 
   requirePermission('manage_plans'), 
@@ -110,7 +108,6 @@ router.put('/:id/exercises/:exerciseId',
   }
 );
 
-// Delete exercise from program
 router.delete('/:id/exercises/:exerciseId', 
   verifyToken, 
   requirePermission('manage_plans'), 

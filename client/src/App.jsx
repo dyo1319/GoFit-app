@@ -9,7 +9,7 @@ import NewUserPage from "./pages/newUser/NewUserPage";
 import Subscriptions from "./pages/subscription/subscription";
 import UpcomingRenewalsPage from "./pages/renewals/upcomingrenewals";
 import PendingPayments from "./pages/payments/PendingPayments";
-import NotificationsPage from "./pages/notifications/NotificationsPage";
+import InvoicesPage from "./pages/invoices/InvoicesPage";
 import PermissionsPage from "./pages/permissions/PermissionsPage";
 import SignIn from "./pages/login/SignIn";
 import Unauthorized from "./pages/unauthorized/Unauthorized";
@@ -150,6 +150,7 @@ function AppContent() {
         }
       />
 
+
       <Route
         path="/admin"
         element={
@@ -242,17 +243,18 @@ function AppContent() {
       />
 
       <Route
-        path="/admin/notifications"
+        path="/admin/invoices"
         element={
           <ProtectedRoute>
             <StaffRoute>
               <AdminLayout>
-                <NotificationsPage />
+                <InvoicesPage />
               </AdminLayout>
             </StaffRoute>
           </ProtectedRoute>
         }
       />
+
 
       <Route
         path="/admin/permissions"
@@ -281,6 +283,7 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
+
 
       <Route
         path="/admin/exercises"

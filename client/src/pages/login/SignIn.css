@@ -277,7 +277,6 @@ body, html {
   text-decoration: underline;
 }
 
-/* Mobile Responsive */
 @media (max-width: 480px) {
   .signin-container {
     padding: 16px;
@@ -308,7 +307,6 @@ body, html {
   }
 }
 
-/* Tablet */
 @media (max-width: 768px) and (min-width: 481px) {
   .signin-card {
     padding: 40px 32px;

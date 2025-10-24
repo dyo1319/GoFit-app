@@ -5,6 +5,8 @@ const SORT_FIELDS = {
   start_date:     's.start_date',
   username:       'u.username',
   payment_status: 's.payment_status',
+  price:          's.price',
+  plan_name:      's.plan_name',
   id:             's.id',
 };
 
@@ -113,7 +115,7 @@ async function list(req, res) {
         s.id, s.user_id, u.username, u.phone,
         DATE_FORMAT(s.start_date, '%Y-%m-%d') AS start_date,
         DATE_FORMAT(s.end_date,   '%Y-%m-%d') AS end_date,
-        s.payment_status, s.cancelled_at,
+        s.payment_status, s.cancelled_at, s.price, s.plan_type, s.plan_name,
         ${STATUS_CASE_SQL}, ${DAYS_LEFT_SQL}
        FROM subscriptions s
        JOIN users u ON u.id = s.user_id
@@ -126,7 +128,7 @@ async function list(req, res) {
     res.json({ data: rows, total, page: pageNum, pageSize: pageSizeNum });
   } catch (err) {
     console.error('subscriptions.list error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 
@@ -140,7 +142,7 @@ async function getOne(req, res) {
         s.id, s.user_id, u.username, u.phone,
         DATE_FORMAT(s.start_date, '%Y-%m-%d') AS start_date,
         DATE_FORMAT(s.end_date,   '%Y-%m-%d') AS end_date,
-        s.payment_status, s.cancelled_at,
+        s.payment_status, s.cancelled_at, s.price, s.plan_type, s.plan_name,
         ${STATUS_CASE_SQL}, ${DAYS_LEFT_SQL}
        FROM subscriptions s JOIN users u ON u.id = s.user_id
        WHERE s.id = ?`,
@@ -151,14 +153,23 @@ async function getOne(req, res) {
     res.json({ data: rows[0] });
   } catch (err) {
     console.error('subscriptions.getOne error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 
 async function create(req, res) {
   try {
     const db = global.db_pool.promise();
-    const { user_id, start_date, end_date, payment_status = 'pending' } = req.body;
+    const { 
+      user_id, 
+      start_date, 
+      end_date, 
+      payment_status = 'pending',
+      price = 0,
+      plan_type = 'monthly',
+      plan_name = 'מנוי חודשי',
+      plan_id = null
+    } = req.body;
 
     const [userExists] = await db.query('SELECT id FROM users WHERE id = ?', [user_id]);
     if (!userExists.length) {
@@ -177,14 +188,15 @@ async function create(req, res) {
     }
 
     const [ins] = await db.query(
-      `INSERT INTO subscriptions (user_id, start_date, end_date, payment_status) VALUES (?,?,?,?)`,
-      [user_id, start_date, end_date, payment_status]
+      `INSERT INTO subscriptions (user_id, start_date, end_date, payment_status, price, plan_type, plan_name, plan_id) 
+       VALUES (?,?,?,?,?,?,?,?)`,
+      [user_id, start_date, end_date, payment_status, price, plan_type, plan_name, plan_id]
     );
 
     res.status(201).json({ id: ins.insertId });
   } catch (err) {
     console.error('subscriptions.create error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 
@@ -246,7 +258,7 @@ async function update(req, res) {
     res.json({ affected: upd.affectedRows });
   } catch (err) {
     console.error('subscriptions.update error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 
@@ -264,7 +276,7 @@ async function cancel(req, res) {
     res.json({ affected: upd.affectedRows });
   } catch (err) {
     console.error('subscriptions.cancel error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 
@@ -282,7 +294,7 @@ async function restore(req, res) {
     res.json({ affected: upd.affectedRows });
   } catch (err) {
     console.error('subscriptions.restore error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 
@@ -304,7 +316,7 @@ async function pause(req, res) {
     res.json({ affected: upd.affectedRows });
   } catch (err) {
     console.error('subscriptions.pause error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 
@@ -332,7 +344,7 @@ async function resume(req, res) {
     res.json({ affected: upd.affectedRows, added_days: addDays });
   } catch (err) {
     console.error('subscriptions.resume error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 
@@ -347,7 +359,7 @@ async function deletesub(req, res) {
     res.json({ affected: del.affectedRows });
   } catch (err) {
     console.error('subscriptions.hardDelete error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 
@@ -413,7 +425,7 @@ async function count(req, res) {
     res.json({ count: cntRows[0]?.count || 0 });
   } catch (err) {
     console.error('subscriptions.count error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 
@@ -435,7 +447,7 @@ async function updatePaymentStatus(req, res) {
     res.json({ ok: true });
   } catch (err) {
     console.error('subscriptions.updatePaymentStatus error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 
@@ -486,7 +498,7 @@ async function getDashboardStats(req, res) {
     });
   } catch (err) {
     console.error('Dashboard stats error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 
@@ -517,7 +529,7 @@ async function getUserSubscriptions(req, res) {
     });
   } catch (err) {
     console.error('subscriptions.getUserSubscriptions error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 
@@ -559,7 +571,7 @@ async function getCurrentSubscription(req, res) {
     });
   } catch (err) {
     console.error('subscriptions.getCurrentSubscription error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 
@@ -612,7 +624,7 @@ async function getUserSubscriptionStats(req, res) {
     });
   } catch (err) {
     console.error('subscriptions.getUserSubscriptionStats error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 
@@ -660,7 +672,7 @@ async function createUserSubscription(req, res) {
     });
   } catch (err) {
     console.error('subscriptions.createUserSubscription error:', err);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'שגיאת שרת' });
   }
 }
 

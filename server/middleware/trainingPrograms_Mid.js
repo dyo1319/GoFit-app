@@ -35,10 +35,9 @@ async function createTrainingProgram(req, res, next) {
     next();
   } catch (error) {
     await conn.rollback();
-    console.error('trainingPrograms_Mid.createTrainingProgram error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Failed to create training program' 
+      message: 'יצירת תוכנית האימון נכשלה' 
     });
   } finally {
     conn.release();
@@ -73,10 +72,9 @@ async function getUserTrainingPrograms(req, res, next) {
     req.training_programs_data = programs;
     next();
   } catch (error) {
-    console.error('trainingPrograms_Mid.getUserTrainingPrograms error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Failed to fetch training programs' 
+      message: 'טעינת תוכניות האימון נכשלה' 
     });
   }
 }
@@ -104,10 +102,9 @@ async function getAllTraineesWithPrograms(req, res, next) {
     req.trainees_data = trainees;
     next();
   } catch (error) {
-    console.error('trainingPrograms_Mid.getAllTraineesWithPrograms error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Failed to fetch trainees' 
+      message: 'טעינת המתאמנים נכשלה' 
     });
   }
 }
@@ -128,7 +125,7 @@ async function getTrainingProgramById(req, res, next) {
     if (programs.length === 0) {
       return res.status(404).json({ 
         success: false, 
-        message: 'Training program not found' 
+        message: 'תוכנית האימון לא נמצאה' 
       });
     }
 
@@ -146,10 +143,9 @@ async function getTrainingProgramById(req, res, next) {
     req.training_program_data = program;
     next();
   } catch (error) {
-    console.error('trainingPrograms_Mid.getTrainingProgramById error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Failed to fetch training program' 
+      message: 'טעינת תוכנית האימון נכשלה' 
     });
   }
 }
@@ -175,7 +171,7 @@ async function deleteTrainingProgram(req, res, next) {
       await conn.rollback();
       return res.status(404).json({ 
         success: false, 
-        message: 'Training program not found' 
+        message: 'תוכנית האימון לא נמצאה' 
       });
     }
 
@@ -183,10 +179,9 @@ async function deleteTrainingProgram(req, res, next) {
     next();
   } catch (error) {
     await conn.rollback();
-    console.error('trainingPrograms_Mid.deleteTrainingProgram error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Failed to delete training program' 
+      message: 'מחיקת תוכנית האימון נכשלה' 
     });
   } finally {
     conn.release();
@@ -200,16 +195,14 @@ async function addExerciseToProgram(req, res, next) {
 
     const db = global.db_pool.promise();
     
-    // Check if program exists
     const [programs] = await db.query('SELECT id FROM trainingprogram WHERE id = ?', [programId]);
     if (programs.length === 0) {
       return res.status(404).json({ 
         success: false, 
-        message: 'Training program not found' 
+        message: 'תוכנית האימון לא נמצאה' 
       });
     }
 
-    // Check if exercise already exists in this program
     const [existingExercises] = await db.query(
       'SELECT id FROM trainingprogram_exercises WHERE training_program_id = ? AND exercise_id = ?',
       [programId, exercise_id]
@@ -222,15 +215,12 @@ async function addExerciseToProgram(req, res, next) {
       });
     }
 
-    // Ensure all parameters are properly handled
     const safeParams = {
       exercise_id: exercise_id || null,
       sets: sets || null,
       reps: reps || null,
       duration: duration || 0
     };
-
-    // Add exercise to program
     await db.execute(
       `INSERT INTO trainingprogram_exercises 
        (training_program_id, exercise_id, sets, reps, duration) 
@@ -240,22 +230,20 @@ async function addExerciseToProgram(req, res, next) {
 
     next();
   } catch (error) {
-    console.error('trainingPrograms_Mid.addExerciseToProgram error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Failed to add exercise to program' 
+      message: 'הוספת התרגיל לתוכנית נכשלה' 
     });
   }
 }
 
 async function updateExerciseInProgram(req, res, next) {
   try {
-    const trainingExerciseId = req.params.exerciseId; // This is now the training_exercise_id
+    const trainingExerciseId = req.params.exerciseId;
     const { sets, reps, duration } = req.body;
 
     const db = global.db_pool.promise();
     
-    // First, check if the training exercise exists
     const [existingExercises] = await db.query(
       'SELECT * FROM trainingprogram_exercises WHERE id = ?',
       [trainingExerciseId]
@@ -264,19 +252,16 @@ async function updateExerciseInProgram(req, res, next) {
     if (existingExercises.length === 0) {
       return res.status(404).json({ 
         success: false, 
-        message: 'Exercise not found in program' 
+        message: 'התרגיל לא נמצא בתוכנית' 
       });
     }
 
-    // Ensure all parameters are properly handled
     const safeParams = {
       sets: sets || null,
       reps: reps || null,
       duration: duration || 0,
       trainingExerciseId: trainingExerciseId
     };
-    
-    // Update exercise in program using the training_exercise_id
     const [result] = await db.execute(
       `UPDATE trainingprogram_exercises 
        SET sets = ?, reps = ?, duration = ?
@@ -292,27 +277,24 @@ async function updateExerciseInProgram(req, res, next) {
     if (result.affectedRows === 0) {
       return res.status(404).json({ 
         success: false, 
-        message: 'Exercise not found in program' 
+        message: 'התרגיל לא נמצא בתוכנית' 
       });
     }
 
     next();
   } catch (error) {
-    console.error('trainingPrograms_Mid.updateExerciseInProgram error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Failed to update exercise in program' 
+      message: 'עדכון התרגיל בתוכנית נכשל' 
     });
   }
 }
 
 async function deleteExerciseFromProgram(req, res, next) {
   try {
-    const trainingExerciseId = req.params.exerciseId; // This is now the training_exercise_id
+    const trainingExerciseId = req.params.exerciseId;
 
     const db = global.db_pool.promise();
-    
-    // Delete exercise from program using the training_exercise_id
     const [result] = await db.execute(
       'DELETE FROM trainingprogram_exercises WHERE id = ?',
       [trainingExerciseId]
@@ -321,16 +303,15 @@ async function deleteExerciseFromProgram(req, res, next) {
     if (result.affectedRows === 0) {
       return res.status(404).json({ 
         success: false, 
-        message: 'Exercise not found in program' 
+        message: 'התרגיל לא נמצא בתוכנית' 
       });
     }
 
     next();
   } catch (error) {
-    console.error('trainingPrograms_Mid.deleteExerciseFromProgram error:', error);
     res.status(500).json({ 
       success: false, 
-      message: 'Failed to delete exercise from program' 
+      message: 'מחיקת התרגיל מהתוכנית נכשלה' 
     });
   }
 }

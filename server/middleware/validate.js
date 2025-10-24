@@ -31,7 +31,11 @@ const subscriptionCreateSchema = Joi.object({
   user_id: Joi.number().integer().min(1).required(),
   start_date: DateValidator.required(),
   end_date: Joi.date().min(Joi.ref('start_date')).required(),
-  payment_status: Joi.string().valid('pending','paid','failed','refunded').default('pending')
+  payment_status: Joi.string().valid('pending','paid','failed','refunded').default('pending'),
+  price: Joi.number().min(0).default(0),
+  plan_type: Joi.string().valid('monthly','quarterly','yearly','custom').default('monthly'),
+  plan_name: Joi.string().max(100).default('מנוי חודשי'),
+  plan_id: Joi.number().integer().min(1).allow(null)
 });
 
 const subscriptionUpdateSchema = Joi.object({
@@ -41,7 +45,11 @@ const subscriptionUpdateSchema = Joi.object({
     then: Joi.date().min(Joi.ref('start_date')),  
     otherwise: Joi.date()                   
   }),
-  payment_status: Joi.string().valid('pending','paid','failed','refunded').optional()
+  payment_status: Joi.string().valid('pending','paid','failed','refunded').optional(),
+  price: Joi.number().min(0).optional(),
+  plan_type: Joi.string().valid('monthly','quarterly','yearly','custom').optional(),
+  plan_name: Joi.string().max(100).optional(),
+  plan_id: Joi.number().integer().min(1).allow(null).optional()
 }).min(1);
 
 const paymentStatusSchema = Joi.object({
@@ -81,6 +89,10 @@ const userCreateSchema = Joi.object({
   start_date: DateValidator.allow(null),
   end_date: Joi.date().min(Joi.ref('start_date')).allow(null),
   payment_status: Joi.string().valid('pending','paid','failed','refunded').default('pending'),
+  price: Joi.number().min(0).default(0),
+  plan_type: Joi.string().valid('monthly','quarterly','yearly','custom').default('monthly'),
+  plan_name: Joi.string().max(100).default('מנוי חודשי'),
+  plan_id: Joi.number().integer().min(1).allow(null),
   access_profile: Joi.string().valid('default','readonly','custom').default('default'),
   permissions_json: Joi.alternatives().conditional('access_profile', {
     is: 'custom',
@@ -108,6 +120,10 @@ const userUpdateSchema = Joi.object({
     otherwise: Joi.date().optional()
   }).allow(null).optional(),
   payment_status: Joi.string().valid('pending','paid','failed','refunded').optional(),
+  price: Joi.number().min(0).optional(),
+  plan_type: Joi.string().valid('monthly','quarterly','yearly','custom').optional(),
+  plan_name: Joi.string().max(100).optional(),
+  plan_id: Joi.number().integer().min(1).allow(null).optional(),
   access_profile: Joi.string().valid('default','readonly','custom').optional(),
   permissions_json: Joi.alternatives().conditional('access_profile', {
     is: 'custom',
@@ -143,7 +159,6 @@ const analyticsDateRangeSchema = Joi.object({
   from: Joi.string().pattern(/^\d{4}-\d{2}$/).optional(),
   to: Joi.string().pattern(/^\d{4}-\d{2}$/).optional()
 });
-
 
 const roleParamSchema = Joi.object({
   role: Joi.string().valid('trainee','trainer','admin').required()
@@ -230,6 +245,7 @@ const trainingProgramExerciseUpdateSchema = Joi.object({
 });
 
 
+
 module.exports = {
   validate,
   subscriptionListQuerySchema,
@@ -255,5 +271,5 @@ module.exports = {
   exerciseUpdateSchema,
   trainingProgramCreateSchema,
   trainingProgramExerciseSchema,
-  trainingProgramExerciseUpdateSchema
+  trainingProgramExerciseUpdateSchema,
 };
