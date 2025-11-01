@@ -57,6 +57,13 @@ app.use('/training-programs', trainingPrograms_R);
 const workoutHistory_R = require('./routers/workoutHistory_R');
 app.use('/workout-history', workoutHistory_R);
 
+const notifications_R = require('./routers/notifications_R');
+app.use('/notifications', notifications_R);
+
+const { startCleanupScheduler } = require('./services/notificationCleanup');
+const db = global.db_pool.promise();
+startCleanupScheduler(db);
+
 
 
 app.get('/api/health', (req, res) => {

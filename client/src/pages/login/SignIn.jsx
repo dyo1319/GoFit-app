@@ -16,7 +16,7 @@ const SignIn = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || '/admin';
+  const from = location.state?.from?.pathname || '/app';
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -58,10 +58,10 @@ const SignIn = () => {
       
       if (result.success) {
         const role = result.user.role;
-        let dest = '/admin';
+        let dest = '/app'; // Default to /app for all users
         if (role === 'admin') dest = '/admin/permissions';
         else if (role === 'trainer') dest = '/admin/users';
-        else dest = '/unauthorized';
+        // Trainees go to /app (already set as default)
 
         navigate(dest, { replace: true });
       } else {

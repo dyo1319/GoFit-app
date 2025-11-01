@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./components/sidebar/Sidebar";
 import Topbar from "./components/topbar/Topbar";
 import "./App.css";
@@ -19,7 +19,10 @@ import Membership from "./pages/membership/Membership";
 import Profile from "./pages/profile/Profile";
 import Exercises from "./pages/exrcises-admin/Exercises";
 import TrainingPrograms from "./pages/TrainingProgram-admin/TrainingPrograms";
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import NotificationsPage from "./pages/notifications/NotificationsPage";
+import NotificationSettings from "./pages/notifications/NotificationSettings";
+import AdminNotifications from "./pages/notifications/AdminNotifications";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
 const ProtectedRoute = ({ children }) => {
@@ -53,7 +56,7 @@ const PermissionRoute = ({ perm, children }) => {
   return <Navigate to="/unauthorized" replace />;
 };
 
-const AdminLayout = ({ children }) => {
+function AdminLayout({ children }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleMenuToggle = () => {
@@ -76,7 +79,7 @@ const AdminLayout = ({ children }) => {
       </div>
     </React.Fragment>
   );
-};
+}
 
 const AppLayout = ({ children }) => {
   return <div className="app-layout">{children}</div>;
@@ -84,6 +87,20 @@ const AppLayout = ({ children }) => {
 
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'NAVIGATE_TO_NOTIFICATION') {
+          const url = event.data.url;
+          if (url) {
+            navigate(url);
+          }
+        }
+      });
+    }
+  }, [navigate]);
 
   if (isLoading) {
     return (
@@ -145,6 +162,26 @@ function AppContent() {
           <ProtectedRoute>
             <AppLayout>
               <Profile />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/app/notifications"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <NotificationsPage />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/app/notifications/settings"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <NotificationSettings />
             </AppLayout>
           </ProtectedRoute>
         }
@@ -308,6 +345,21 @@ function AppContent() {
               <AdminLayout>
                 <PermissionRoute perm="manage_plans">
                   <TrainingPrograms />
+                </PermissionRoute>
+              </AdminLayout>
+            </StaffRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/notifications"
+        element={
+          <ProtectedRoute>
+            <StaffRoute>
+              <AdminLayout>
+                <PermissionRoute perm="manage_notifications">
+                  <AdminNotifications />
                 </PermissionRoute>
               </AdminLayout>
             </StaffRoute>

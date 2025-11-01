@@ -1,0 +1,500 @@
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+.admin-notifications-page {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  direction: rtl;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  flex: 1;
+  padding: 60px 20px 20px 20px !important;
+}
+
+.admin-notifications-page .page-container {
+  direction: rtl;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.admin-notifications-page .page-header {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid #e2e8f0;
+}
+
+.admin-notifications-page .page-header h1 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-notifications-page .page-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 16px;
+}
+
+.admin-notifications-content {
+  margin-top: 0;
+}
+
+.notification-form-paper {
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  border: 1px solid #f0f0f0;
+  background: #fff;
+  transition: all 0.2s ease;
+  width: 100%;
+  max-width: 100%;
+}
+
+.notification-form-paper:hover {
+  box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+}
+
+.notification-form-paper .MuiTypography-h6 {
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 16px;
+}
+
+
+.admin-notifications-page .MuiFormControl-root {
+  margin-bottom: 0;
+}
+
+.admin-notifications-page .MuiTextField-root {
+  direction: rtl;
+  margin-bottom: 0;
+}
+
+.admin-notifications-page .MuiInputLabel-root {
+  right: 14px;
+  left: auto;
+  transform-origin: top right;
+  text-align: right;
+  direction: rtl;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.admin-notifications-page .MuiInputLabel-shrink {
+  transform: translate(0, -9px) scale(0.75);
+  transform-origin: top right;
+}
+
+.admin-notifications-page .MuiOutlinedInput-root {
+  border-radius: 8px;
+  direction: rtl;
+  text-align: right;
+}
+
+.admin-notifications-page .MuiOutlinedInput-input {
+  text-align: right;
+  direction: rtl;
+  padding: 12px 14px;
+  padding-right: 20px;
+}
+
+.admin-notifications-page .MuiOutlinedInput-notchedOutline {
+  text-align: right;
+  direction: rtl;
+}
+
+.admin-notifications-page .MuiOutlinedInput-notchedOutline legend {
+  text-align: right;
+  margin-right: 8px;
+}
+
+.admin-notifications-page .MuiSelect-select {
+  text-align: right;
+  direction: rtl;
+  padding-right: 20px !important;
+}
+
+.admin-notifications-page .MuiSelect-icon {
+  right: auto;
+  left: 8px;
+}
+
+.admin-notifications-page .MuiInputBase-root .MuiOutlinedInput-notchedOutline {
+  text-align: right;
+}
+
+.admin-notifications-page .MuiInputBase-root .MuiOutlinedInput-notchedOutline legend {
+  text-align: right;
+  float: right;
+}
+
+.admin-notifications-page .MuiRadioGroup-root {
+  direction: rtl;
+  display: flex;
+  align-items: flex-start;
+}
+
+.admin-notifications-page .MuiFormControlLabel-root {
+  margin-right: 0;
+  margin-left: 0;
+  flex-direction: row-reverse;
+  direction: rtl;
+  justify-content: flex-start;
+}
+
+.admin-notifications-page .MuiFormControlLabel-label {
+  margin-right: 8px;
+  margin-left: 0;
+  direction: rtl;
+  text-align: right;
+}
+
+.admin-notifications-page .MuiRadio-root {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.admin-notifications-page .MuiButton-root {
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 600;
+  text-transform: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.admin-notifications-page .MuiButton-contained {
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+}
+
+.admin-notifications-page .MuiButton-contained:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+}
+
+.admin-notifications-page .MuiButton-outlined {
+  border-width: 2px;
+}
+
+.admin-notifications-page .MuiButton-outlined:hover {
+  border-width: 2px;
+  transform: translateY(-1px);
+}
+
+.admin-notifications-page .MuiChip-root {
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.admin-notifications-page .MuiAlert-root {
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid;
+}
+
+.admin-notifications-page .MuiAlert-standardError {
+  background-color: #ffebee;
+  color: #d32f2f;
+  border-color: #f5c6cb;
+}
+
+.admin-notifications-page .MuiAlert-standardSuccess {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+  border-color: #c8e6c9;
+}
+
+.admin-notifications-page .MuiAlert-standardInfo {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border-color: #bbdefb;
+}
+
+.admin-notifications-page .MuiCard-root {
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  border: 1px solid #f0f0f0;
+  transition: all 0.2s ease;
+  background: #fff;
+}
+
+.admin-notifications-page .MuiCard-root:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.admin-notifications-page .MuiCardContent-root {
+  padding: 16px;
+}
+
+.admin-notifications-page .MuiDialog-paper {
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  max-width: 600px;
+}
+
+.admin-notifications-page .MuiDialogTitle-root {
+  padding: 24px 24px 16px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.admin-notifications-page .MuiDialogContent-root {
+  padding: 24px;
+  direction: rtl;
+}
+
+.admin-notifications-page .MuiDialogActions-root {
+  padding: 16px 24px 24px;
+  gap: 12px;
+  direction: rtl;
+  justify-content: flex-start;
+}
+
+.admin-notifications-page .MuiIconButton-root {
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.admin-notifications-page .MuiIconButton-root:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  transform: scale(1.05);
+}
+
+.tips-paper {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e3f2fd 100%);
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  border: 1px solid #e2e8f0;
+}
+
+.tips-paper .MuiTypography-h6 {
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 16px;
+}
+
+.tips-paper .MuiList-root {
+  padding: 0;
+}
+
+.tips-paper .MuiListItem-root {
+  padding: 8px 0;
+  align-items: flex-start;
+}
+
+.tips-paper .MuiListItemText-primary {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 14px;
+  direction: rtl;
+  text-align: right;
+}
+
+.tips-paper .MuiListItemText-secondary {
+  color: #64748b;
+  font-size: 13px;
+  direction: rtl;
+  text-align: right;
+}
+
+.notification-preview {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+
+/* Autocomplete RTL */
+.admin-notifications-page .MuiAutocomplete-root {
+  direction: rtl;
+}
+
+.admin-notifications-page .MuiAutocomplete-inputRoot {
+  flex-direction: row-reverse;
+  direction: rtl;
+}
+
+.admin-notifications-page .MuiAutocomplete-input {
+  text-align: right;
+  direction: rtl;
+}
+
+.admin-notifications-page .MuiAutocomplete-endAdornment {
+  right: auto;
+  left: 9px;
+}
+
+.admin-notifications-page .MuiAutocomplete-tag {
+  margin: 3px 0 3px 3px;
+}
+
+.admin-notifications-page .MuiAutocomplete-option {
+  direction: rtl;
+  text-align: right;
+}
+
+.admin-notifications-page .MuiMenuItem-root {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .admin-notifications-page {
+    padding: 56px 16px 80px 16px !important; 
+  }
+  
+  .admin-notifications-page .page-header {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .admin-notifications-page .page-header h1 {
+    font-size: 24px;
+  }
+  
+  .admin-notifications-page .page-header p {
+    font-size: 14px;
+  }
+  
+  .notification-form-paper {
+    padding: 16px;
+  }
+  
+  .tips-paper {
+    padding: 16px;
+  }
+  
+  .admin-notifications-page .MuiDialogContent-root {
+    padding: 16px;
+  }
+  
+  .admin-notifications-page .MuiDialogActions-root {
+    padding: 12px 16px 16px;
+    flex-direction: column;
+  }
+  
+  .admin-notifications-page .MuiDialogActions-root .MuiButton-root {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-notifications-page .page-header h1 {
+    font-size: 20px;
+  }
+  
+  .admin-notifications-page .page-header p {
+    font-size: 13px;
+  }
+  
+  .notification-form-paper {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .admin-notifications-page {
+    padding: 60px 20px 20px 20px !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .admin-notifications-page { 
+    margin-right: 240px; 
+    padding-bottom: 0; 
+    padding: 60px 20px 0 20px !important; 
+  }
+}
+
+@media (min-width: 1200px) {
+  .admin-notifications-page { 
+    margin-right: 260px; 
+    padding: 60px 20px 0 20px !important; 
+  }
+}
+
+@media (min-width: 1600px) {
+  .admin-notifications-page .page-header {
+    padding: 32px;
+  }
+  
+  .notification-form-paper {
+    padding: 40px;
+  }
+  
+  .tips-paper {
+    padding: 32px;
+  }
+}
+
+/* Scrollbar styling */
+.admin-notifications-page ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.admin-notifications-page ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.admin-notifications-page ::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.admin-notifications-page ::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Print styles */
+@media print {
+  .admin-notifications-page {
+    background: white;
+    padding: 0;
+  }
+  
+  .admin-notifications-page .MuiButton-root {
+    display: none;
+  }
+  
+  .notification-form-paper,
+  .tips-paper {
+    box-shadow: none;
+    border: 1px solid #e0e0e0;
+    break-inside: avoid;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .notification-form-paper,
+  .tips-paper {
+    border: 2px solid #000;
+    box-shadow: none;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .notification-form-paper,
+  .admin-notifications-page .MuiCard-root {
+    transition: none;
+  }
+}

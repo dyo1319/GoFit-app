@@ -148,6 +148,10 @@ export default function SubscriptionPage() {
       payment_status: row.payment_status ?? "pending",
       start_date_original: row.start_date ?? "",
       end_date_original: row.end_date ?? "",
+      plan_id: row.plan_id || null,
+      plan_type: row.plan_type || "",
+      plan_name: row.plan_name || "",
+      price: (row.price !== undefined && row.price !== null) ? row.price : (row.price === 0 ? 0 : ""),
     });
     setEditError("");
     setEditOpen(true);
@@ -157,14 +161,43 @@ export default function SubscriptionPage() {
     if (!editing) return;
     setEditError("");
     try {
+      const updateBody = {
+        start_date: editing.start_date_original,
+        end_date: editing.end_date_original,
+        payment_status: editing.payment_status,
+      };
+
+      // Always send plan fields to preserve them
+      // Send plan_type and plan_name if they exist
+      if (editing.plan_type && editing.plan_type.trim() !== '') {
+        updateBody.plan_type = editing.plan_type;
+      }
+      if (editing.plan_name && editing.plan_name.trim() !== '') {
+        updateBody.plan_name = editing.plan_name;
+      }
+      // Always send price if it was provided (even if 0 or empty)
+      // Check if price was explicitly set (not undefined)
+      if (editing.price !== undefined && editing.price !== null && editing.price !== '') {
+        const priceNum = parseFloat(editing.price);
+        if (!isNaN(priceNum)) {
+          updateBody.price = priceNum;
+        }
+      } else if (editing.price === 0 || editing.price === '0') {
+        // Explicitly send 0 if price is explicitly 0
+        updateBody.price = 0;
+      }
+      // Send plan_id only if it's a valid number (not 'current' or empty)
+      if (editing.plan_id && editing.plan_id !== 'current' && editing.plan_id !== null && editing.plan_id !== '') {
+        const planIdNum = parseInt(editing.plan_id);
+        if (!isNaN(planIdNum)) {
+          updateBody.plan_id = planIdNum;
+        }
+      }
+
       const res = await authenticatedFetch(`/S/${editing.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          start_date: editing.start_date_original,
-          end_date: editing.end_date_original,
-          payment_status: editing.payment_status,
-        }),
+        body: JSON.stringify(updateBody),
       });
       if (res.ok) {
         setEditOpen(false);

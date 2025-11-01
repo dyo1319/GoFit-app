@@ -138,6 +138,33 @@ async function createInvoice(req, res) {
       }
     }
 
+    try {
+      const pushNotificationService = require('../services/pushNotificationService');
+      const { NOTIFICATION_TYPES, getNotificationContent, getNotificationUrl } = require('../services/notificationTypes');
+      
+      const content = getNotificationContent(NOTIFICATION_TYPES.INVOICE_CREATED, {
+        amount: totalAmount,
+        due_date: due_date
+      });
+      
+      await pushNotificationService.sendAndSaveNotification(
+        db,
+        user_id,
+        content.title,
+        content.body,
+        NOTIFICATION_TYPES.INVOICE_CREATED,
+        {
+          invoice_id: invoiceId,
+          invoice_number: invoiceNumber,
+          amount: totalAmount,
+          due_date: due_date,
+          url: getNotificationUrl(NOTIFICATION_TYPES.INVOICE_CREATED)
+        }
+      );
+    } catch (notifError) {
+      console.error('Error sending invoice creation notification:', notifError);
+    }
+
     res.status(201).json({ 
       success: true,
       message: 'חשבונית נוצרה בהצלחה',
@@ -159,6 +186,15 @@ async function updateInvoiceStatus(req, res) {
       return res.status(400).json({ error: 'סטטוס לא תקין' });
     }
 
+    const [invoice] = await db.query(
+      `SELECT user_id, invoice_number, total_amount FROM invoices WHERE id = ?`,
+      [id]
+    );
+    
+    if (!invoice.length) {
+      return res.status(404).json({ error: 'חשבונית לא נמצאה' });
+    }
+
     const updateData = { status };
     if (status === 'paid') {
       updateData.paid_at = new Date();
@@ -171,6 +207,34 @@ async function updateInvoiceStatus(req, res) {
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'חשבונית לא נמצאה' });
+    }
+
+    if (status === 'paid') {
+      try {
+        const pushNotificationService = require('../services/pushNotificationService');
+        const { NOTIFICATION_TYPES, getNotificationContent, getNotificationUrl } = require('../services/notificationTypes');
+        
+        const content = getNotificationContent(NOTIFICATION_TYPES.INVOICE_PAID, {
+          invoice_number: invoice[0].invoice_number,
+          amount: invoice[0].total_amount
+        });
+        
+        await pushNotificationService.sendAndSaveNotification(
+          db,
+          invoice[0].user_id,
+          content.title,
+          content.body,
+          NOTIFICATION_TYPES.INVOICE_PAID,
+          {
+            invoice_id: id,
+            invoice_number: invoice[0].invoice_number,
+            amount: invoice[0].total_amount,
+            url: getNotificationUrl(NOTIFICATION_TYPES.INVOICE_PAID)
+          }
+        );
+      } catch (notifError) {
+        console.error('Error sending invoice paid notification:', notifError);
+      }
     }
 
     res.json({ 
@@ -218,6 +282,34 @@ async function generateInvoiceFromSubscription(req, res) {
        VALUES (?,?,?,?,?)`,
       [invoiceId, subscription.plan_name, 1, subscription.price, subscription.price]
     );
+
+    try {
+      const pushNotificationService = require('../services/pushNotificationService');
+      const { NOTIFICATION_TYPES, getNotificationContent, getNotificationUrl } = require('../services/notificationTypes');
+      
+      const dueDateStr = dueDate.toISOString().split('T')[0];
+      const content = getNotificationContent(NOTIFICATION_TYPES.INVOICE_CREATED, {
+        amount: subscription.price,
+        due_date: dueDateStr
+      });
+      
+      await pushNotificationService.sendAndSaveNotification(
+        db,
+        subscription.user_id,
+        content.title,
+        content.body,
+        NOTIFICATION_TYPES.INVOICE_CREATED,
+        {
+          invoice_id: invoiceId,
+          invoice_number: invoiceNumber,
+          amount: subscription.price,
+          due_date: dueDateStr,
+          url: getNotificationUrl(NOTIFICATION_TYPES.INVOICE_CREATED)
+        }
+      );
+    } catch (notifError) {
+      console.error('Error sending invoice creation notification:', notifError);
+    }
 
     res.status(201).json({ 
       success: true,

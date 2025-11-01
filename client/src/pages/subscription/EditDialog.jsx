@@ -230,6 +230,10 @@ export default function EditDialog({ open, onClose, editing, setEditing, onUpdat
                 fullWidth
                 disabled={!canEditSubscriptions || plansLoading}
                 sx={{
+                  '& .MuiSelect-select': {
+                    display: 'flex',
+                    alignItems: 'center'
+                  },
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '12px',
                     backgroundColor: 'rgba(248, 250, 252, 0.5)',
@@ -255,13 +259,89 @@ export default function EditDialog({ open, onClose, editing, setEditing, onUpdat
               >
                 <InputLabel>סוג מנוי</InputLabel>
                 <Select
-                  value={editing.plan_id || ""}
-                  onChange={(e) => handlePlanChange(e.target.value)}
+                  value={
+                    // If plan_id exists in subscriptionPlans, use it
+                    editing.plan_id && subscriptionPlans.find(p => p.id === parseInt(editing.plan_id)) 
+                      ? editing.plan_id 
+                      // Otherwise, if plan_type and plan_name exist, show "current"
+                      : (editing.plan_type && editing.plan_name ? "current" : "")
+                  }
+                  onChange={(e) => {
+                    if (e.target.value === "") {
+                      // Reset plan_id but keep current plan_type, plan_name, price
+                      setEditing(prev => ({
+                        ...prev,
+                        plan_id: null
+                      }));
+                    } else if (e.target.value === "current") {
+                      // Keep current values - no change needed
+                    } else {
+                      // User selected a new plan
+                      handlePlanChange(e.target.value);
+                    }
+                  }}
                   label="סוג מנוי"
+                  renderValue={(value) => {
+                    if (value === "current" && editing.plan_name) {
+                      return (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="body2">{editing.plan_name}</Typography>
+                          {editing.price !== undefined && editing.price !== null && editing.price !== '' && editing.price !== 0 && (
+                            <Chip label={`${editing.price}₪`} size="small" color="primary" variant="outlined" />
+                          )}
+                          {editing.plan_type && (
+                            <Chip 
+                              label={editing.plan_type === 'monthly' ? 'חודשי' : 
+                                    editing.plan_type === 'quarterly' ? 'רבעוני' :
+                                    editing.plan_type === 'yearly' ? 'שנתי' : 'מותאם'} 
+                              size="small" 
+                              color="secondary" 
+                              variant="outlined"
+                            />
+                          )}
+                        </Box>
+                      );
+                    }
+                    const selectedPlan = subscriptionPlans.find(p => p.id === parseInt(value));
+                    if (selectedPlan) {
+                      return (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="body2">{selectedPlan.plan_name}</Typography>
+                          <Chip label={`${selectedPlan.price}₪`} size="small" color="primary" variant="outlined" />
+                        </Box>
+                      );
+                    }
+                    return "בחר סוג מנוי";
+                  }}
                 >
+                  {editing.plan_type && editing.plan_name && (
+                    <MenuItem value="current">
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
+                        <Typography variant="body2" sx={{ flex: 1 }}>
+                          {editing.plan_name} (נוכחי)
+                        </Typography>
+                        {editing.price && (
+                          <Chip 
+                            label={`${editing.price}₪`} 
+                            size="small" 
+                            color="primary" 
+                            variant="outlined"
+                          />
+                        )}
+                        <Chip 
+                          label={editing.plan_type === 'monthly' ? 'חודשי' : 
+                                editing.plan_type === 'quarterly' ? 'רבעוני' :
+                                editing.plan_type === 'yearly' ? 'שנתי' : 'מותאם'} 
+                          size="small" 
+                          color="secondary" 
+                          variant="outlined"
+                        />
+                      </Box>
+                    </MenuItem>
+                  )}
                   <MenuItem value="">
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="body2">בחר סוג מנוי</Typography>
+                      <Typography variant="body2">בחר סוג מנוי חדש</Typography>
                     </Box>
                   </MenuItem>
                   {subscriptionPlans.map(plan => (
@@ -297,10 +377,14 @@ export default function EditDialog({ open, onClose, editing, setEditing, onUpdat
                 type="number"
                 id="edit-dialog-price"
                 name="price"
-                value={editing.price || ""}
-                onChange={(e) => setEditing({ ...editing, price: e.target.value })}
+                value={(editing.price !== undefined && editing.price !== null && editing.price !== '') ? editing.price : ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setEditing({ ...editing, price: val === '' ? '' : (val !== '' ? parseFloat(val) || val : '') });
+                }}
                 InputLabelProps={{ shrink: true }}
                 disabled={!canEditSubscriptions}
+                placeholder={editing.price !== undefined && editing.price !== null && editing.price !== '' && editing.price !== 0 ? `נוכחי: ${editing.price}₪` : ""}
                 inputProps={{ min: 0, step: 0.01 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {

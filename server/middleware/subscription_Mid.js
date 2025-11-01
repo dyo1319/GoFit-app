@@ -115,7 +115,7 @@ async function list(req, res) {
         s.id, s.user_id, u.username, u.phone,
         DATE_FORMAT(s.start_date, '%Y-%m-%d') AS start_date,
         DATE_FORMAT(s.end_date,   '%Y-%m-%d') AS end_date,
-        s.payment_status, s.cancelled_at, s.price, s.plan_type, s.plan_name,
+        s.payment_status, s.cancelled_at, s.price, s.plan_type, s.plan_name, s.plan_id,
         ${STATUS_CASE_SQL}, ${DAYS_LEFT_SQL}
        FROM subscriptions s
        JOIN users u ON u.id = s.user_id
@@ -142,7 +142,7 @@ async function getOne(req, res) {
         s.id, s.user_id, u.username, u.phone,
         DATE_FORMAT(s.start_date, '%Y-%m-%d') AS start_date,
         DATE_FORMAT(s.end_date,   '%Y-%m-%d') AS end_date,
-        s.payment_status, s.cancelled_at, s.price, s.plan_type, s.plan_name,
+        s.payment_status, s.cancelled_at, s.price, s.plan_type, s.plan_name, s.plan_id,
         ${STATUS_CASE_SQL}, ${DAYS_LEFT_SQL}
        FROM subscriptions s JOIN users u ON u.id = s.user_id
        WHERE s.id = ?`,
@@ -193,6 +193,35 @@ async function create(req, res) {
       [user_id, start_date, end_date, payment_status, price, plan_type, plan_name, plan_id]
     );
 
+    // Send notification about subscription creation
+    try {
+      const pushNotificationService = require('../services/pushNotificationService');
+      const { NOTIFICATION_TYPES, getNotificationContent, getNotificationUrl } = require('../services/notificationTypes');
+      
+      const content = getNotificationContent(NOTIFICATION_TYPES.SUBSCRIPTION_CREATED, {
+        start_date: start_date,
+        end_date: end_date,
+        plan_name: plan_name
+      });
+      
+      await pushNotificationService.sendAndSaveNotification(
+        db,
+        user_id,
+        content.title,
+        content.body,
+        NOTIFICATION_TYPES.SUBSCRIPTION_CREATED,
+        {
+          subscription_id: ins.insertId,
+          start_date: start_date,
+          end_date: end_date,
+          plan_name: plan_name,
+          url: getNotificationUrl(NOTIFICATION_TYPES.SUBSCRIPTION_CREATED)
+        }
+      );
+    } catch (notifError) {
+      console.error('Error sending subscription creation notification:', notifError);
+    }
+
     res.status(201).json({ id: ins.insertId });
   } catch (err) {
     console.error('subscriptions.create error:', err);
@@ -206,7 +235,7 @@ async function update(req, res) {
     const id = req.params.id;
 
     const [currentSub] = await db.query(
-      'SELECT user_id, start_date, end_date FROM subscriptions WHERE id = ?',
+      'SELECT user_id, start_date, end_date, plan_name, plan_type, price FROM subscriptions WHERE id = ?',
       [id]
     );
     if (!currentSub.length) {
@@ -227,6 +256,22 @@ async function update(req, res) {
     if ('payment_status' in req.body) {
       updates.push('payment_status = ?'); 
       params.push(req.body.payment_status);
+    }
+    if ('plan_type' in req.body) {
+      updates.push('plan_type = ?'); 
+      params.push(req.body.plan_type);
+    }
+    if ('plan_name' in req.body) {
+      updates.push('plan_name = ?'); 
+      params.push(req.body.plan_name);
+    }
+    if ('price' in req.body && req.body.price !== undefined && req.body.price !== null) {
+      updates.push('price = ?'); 
+      params.push(req.body.price);
+    }
+    if ('plan_id' in req.body && req.body.plan_id !== undefined && req.body.plan_id !== null) {
+      updates.push('plan_id = ?'); 
+      params.push(req.body.plan_id);
     }
 
     if (!updates.length) return res.status(400).json({ error: 'אין שדות לעדכון' });
@@ -255,6 +300,113 @@ async function update(req, res) {
     
     if (!upd.affectedRows) return res.status(404).json({ error: 'לא נמצא מנוי לעדכון' });
 
+    // Send notification about subscription update
+    try {
+      const pushNotificationService = require('../services/pushNotificationService');
+      const { NOTIFICATION_TYPES, getNotificationContent, getNotificationUrl } = require('../services/notificationTypes');
+      
+      // Get updated values from database after update
+      const [updatedSub] = await db.query(
+        'SELECT plan_type, plan_name, plan_id, price, start_date, end_date FROM subscriptions WHERE id = ?',
+        [id]
+      );
+      
+      const oldPlanType = currentSub[0].plan_type;
+      const oldPlanName = currentSub[0].plan_name;
+      const oldStartDate = currentSub[0].start_date;
+      const oldEndDate = currentSub[0].end_date;
+      
+      const newPlanType = updatedSub[0]?.plan_type || req.body.plan_type || oldPlanType;
+      const newPlanName = updatedSub[0]?.plan_name || req.body.plan_name || oldPlanName;
+      const newStartDate = req.body.start_date || oldStartDate;
+      const newEndDate = req.body.end_date || oldEndDate;
+      
+      // Helper function to convert plan_type to Hebrew
+      const getPlanTypeHebrew = (planType) => {
+        const typeMap = {
+          'monthly': 'חודשי',
+          'quarterly': 'רבעוני',
+          'yearly': 'שנתי',
+          'custom': 'מותאם'
+        };
+        return typeMap[planType?.toLowerCase()] || planType;
+      };
+      
+      // Build changes description
+      const changes = [];
+      
+      // Check if plan type/name changed
+      // If both plan_type and plan_name changed, prefer showing plan_name change
+      // (since plan_name is more descriptive)
+      if ('plan_name' in req.body && req.body.plan_name !== oldPlanName) {
+        changes.push(`שם המנוי עודכן מ-${oldPlanName} ל-${newPlanName}`);
+      } else if ('plan_type' in req.body && req.body.plan_type !== oldPlanType) {
+        // Only show plan_type change if plan_name didn't change
+        const oldPlanTypeHebrew = getPlanTypeHebrew(oldPlanType);
+        const newPlanTypeHebrew = getPlanTypeHebrew(newPlanType);
+        changes.push(`סוג המנוי עודכן מ-${oldPlanTypeHebrew} ל-${newPlanTypeHebrew}`);
+      }
+      
+      // Check if dates changed
+      const datesChanged = ('start_date' in req.body || 'end_date' in req.body) &&
+                           (newStartDate !== oldStartDate || newEndDate !== oldEndDate);
+      
+      if (datesChanged && changes.length === 0) {
+        // Only dates changed - send date-specific notification
+        const startDateStr = new Date(newStartDate).toLocaleDateString('he-IL');
+        const endDateStr = new Date(newEndDate).toLocaleDateString('he-IL');
+        
+        await pushNotificationService.sendAndSaveNotification(
+          db,
+          currentSub[0].user_id,
+          'תאריכי המנוי עודכנו',
+          `תאריכי המנוי ${newPlanName} עודכנו. תקופת המנוי: ${startDateStr} - ${endDateStr}.`,
+          NOTIFICATION_TYPES.SUBSCRIPTION_UPDATED,
+          {
+            subscription_id: id,
+            start_date: newStartDate,
+            end_date: newEndDate,
+            plan_name: newPlanName,
+            changes: `תאריכי המנוי עודכנו. תקופת המנוי: ${startDateStr} - ${endDateStr}.`,
+            url: getNotificationUrl(NOTIFICATION_TYPES.SUBSCRIPTION_UPDATED, { subscription_id: id })
+          }
+        );
+      } else {
+        // Plan or other fields changed - send detailed notification
+        let changesText = changes.join('. ');
+        if (datesChanged) {
+          const startDateStr = new Date(newStartDate).toLocaleDateString('he-IL');
+          const endDateStr = new Date(newEndDate).toLocaleDateString('he-IL');
+          if (changesText) changesText += '. ';
+          changesText += `תאריכי המנוי עודכונו ל: ${startDateStr} - ${endDateStr}`;
+        }
+        
+        const content = getNotificationContent(NOTIFICATION_TYPES.SUBSCRIPTION_UPDATED, {
+          plan_name: newPlanName,
+          changes: changesText || `המנוי ${newPlanName} עודכן בהצלחה.`
+        });
+        
+        await pushNotificationService.sendAndSaveNotification(
+          db,
+          currentSub[0].user_id,
+          content.title,
+          content.body,
+          NOTIFICATION_TYPES.SUBSCRIPTION_UPDATED,
+          {
+            subscription_id: id,
+            start_date: newStartDate,
+            end_date: newEndDate,
+            plan_name: newPlanName,
+            plan_type: newPlanType,
+            changes: changesText,
+            url: getNotificationUrl(NOTIFICATION_TYPES.SUBSCRIPTION_UPDATED, { subscription_id: id })
+          }
+        );
+      }
+    } catch (notifError) {
+      console.error('Error sending subscription update notification:', notifError);
+    }
+
     res.json({ affected: upd.affectedRows });
   } catch (err) {
     console.error('subscriptions.update error:', err);
@@ -267,11 +419,44 @@ async function cancel(req, res) {
     const db = global.db_pool.promise();
     const id = req.params.id;
 
+    // Get subscription details before cancelling
+    const [sub] = await db.query(
+      `SELECT user_id, plan_name FROM subscriptions WHERE id = ?`,
+      [id]
+    );
+    
+    if (!sub.length) return res.status(404).json({ error: 'לא נמצא מנוי לביטול' });
+
     const [upd] = await db.query(
       `UPDATE subscriptions SET cancelled_at = NOW(), updated_at=CURRENT_TIMESTAMP WHERE id=?`,
       [id]
     );
     if (!upd.affectedRows) return res.status(404).json({ error: 'לא נמצא מנוי לביטול' });
+
+    // Send notification about subscription cancellation
+    try {
+      const pushNotificationService = require('../services/pushNotificationService');
+      const { NOTIFICATION_TYPES, getNotificationContent, getNotificationUrl } = require('../services/notificationTypes');
+      
+      const content = getNotificationContent(NOTIFICATION_TYPES.SUBSCRIPTION_CANCELLED, {
+        plan_name: sub[0].plan_name
+      });
+      
+      await pushNotificationService.sendAndSaveNotification(
+        db,
+        sub[0].user_id,
+        content.title,
+        content.body,
+        NOTIFICATION_TYPES.SUBSCRIPTION_CANCELLED,
+        {
+          subscription_id: id,
+          plan_name: sub[0].plan_name,
+          url: getNotificationUrl(NOTIFICATION_TYPES.SUBSCRIPTION_CANCELLED)
+        }
+      );
+    } catch (notifError) {
+      console.error('Error sending subscription cancellation notification:', notifError);
+    }
 
     res.json({ affected: upd.affectedRows });
   } catch (err) {
@@ -285,11 +470,42 @@ async function restore(req, res) {
     const db = global.db_pool.promise();
     const id = req.params.id;
 
+    const [sub] = await db.query(
+      `SELECT user_id, plan_name FROM subscriptions WHERE id = ?`,
+      [id]
+    );
+    
+    if (!sub.length) return res.status(404).json({ error: 'לא נמצא מנוי לשחזור' });
+
     const [upd] = await db.query(
       `UPDATE subscriptions SET cancelled_at = NULL, updated_at=CURRENT_TIMESTAMP WHERE id=?`,
       [id]
     );
     if (!upd.affectedRows) return res.status(404).json({ error: 'לא נמצא מנוי לשחזור' });
+
+    try {
+      const pushNotificationService = require('../services/pushNotificationService');
+      const { NOTIFICATION_TYPES, getNotificationContent, getNotificationUrl } = require('../services/notificationTypes');
+      
+      const content = getNotificationContent(NOTIFICATION_TYPES.SUBSCRIPTION_RESTORED, {
+        plan_name: sub[0].plan_name
+      });
+      
+      await pushNotificationService.sendAndSaveNotification(
+        db,
+        sub[0].user_id,
+        content.title,
+        content.body,
+        NOTIFICATION_TYPES.SUBSCRIPTION_RESTORED,
+        {
+          subscription_id: id,
+          plan_name: sub[0].plan_name,
+          url: getNotificationUrl(NOTIFICATION_TYPES.SUBSCRIPTION_RESTORED, { subscription_id: id })
+        }
+      );
+    } catch (notifError) {
+      console.error('Error sending subscription restoration notification:', notifError);
+    }
 
     res.json({ affected: upd.affectedRows });
   } catch (err) {
@@ -303,15 +519,43 @@ async function pause(req, res) {
     const db = global.db_pool.promise();
     const id = req.params.id;
 
-    const [cur] = await db.query(`SELECT paused_at FROM subscriptions WHERE id=?`, [id]);
-    if (!cur.length) return res.status(404).json({ error: 'לא נמצא מנוי' });
-    if (cur[0].paused_at) return res.status(409).json({ error: 'המנוי כבר מוקפא' });
+    const [sub] = await db.query(
+      `SELECT user_id, plan_name, paused_at FROM subscriptions WHERE id = ?`,
+      [id]
+    );
+    
+    if (!sub.length) return res.status(404).json({ error: 'לא נמצא מנוי' });
+    if (sub[0].paused_at) return res.status(409).json({ error: 'המנוי כבר מוקפא' });
 
     const [upd] = await db.query(
       `UPDATE subscriptions SET paused_at = CURDATE(), updated_at=CURRENT_TIMESTAMP WHERE id=? AND cancelled_at IS NULL`,
       [id]
     );
     if (!upd.affectedRows) return res.status(409).json({ error: 'לא ניתן להקפיא מנוי מבוטל' });
+
+    try {
+      const pushNotificationService = require('../services/pushNotificationService');
+      const { NOTIFICATION_TYPES, getNotificationContent, getNotificationUrl } = require('../services/notificationTypes');
+      
+      const content = getNotificationContent(NOTIFICATION_TYPES.SUBSCRIPTION_PAUSED, {
+        plan_name: sub[0].plan_name
+      });
+      
+      await pushNotificationService.sendAndSaveNotification(
+        db,
+        sub[0].user_id,
+        content.title,
+        content.body,
+        NOTIFICATION_TYPES.SUBSCRIPTION_PAUSED,
+        {
+          subscription_id: id,
+          plan_name: sub[0].plan_name,
+          url: getNotificationUrl(NOTIFICATION_TYPES.SUBSCRIPTION_PAUSED, { subscription_id: id })
+        }
+      );
+    } catch (notifError) {
+      console.error('Error sending subscription pause notification:', notifError);
+    }
 
     res.json({ affected: upd.affectedRows });
   } catch (err) {
@@ -435,6 +679,15 @@ async function updatePaymentStatus(req, res) {
     const id = req.params.id;
     const status = req.body.status;
 
+    const [sub] = await db.query(
+      `SELECT user_id, plan_name, price FROM subscriptions WHERE id = ?`,
+      [id]
+    );
+    
+    if (!sub.length) {
+      return res.status(404).json({ error: 'לא נמצא מנוי' });
+    }
+
     const [upd] = await db.query(
       `UPDATE subscriptions SET payment_status=?, updated_at=CURRENT_TIMESTAMP
        WHERE id=? AND payment_status='pending'`,
@@ -442,6 +695,34 @@ async function updatePaymentStatus(req, res) {
     );
     if (!upd.affectedRows) {
       return res.status(404).json({ error: 'לא נמצא/לא במצב pending' });
+    }
+
+    if (status === 'paid') {
+      try {
+        const pushNotificationService = require('../services/pushNotificationService');
+        const { NOTIFICATION_TYPES, getNotificationContent, getNotificationUrl } = require('../services/notificationTypes');
+        
+        const content = getNotificationContent(NOTIFICATION_TYPES.PAYMENT_RECEIVED, {
+          amount: sub[0].price,
+          plan_name: sub[0].plan_name
+        });
+        
+        await pushNotificationService.sendAndSaveNotification(
+          db,
+          sub[0].user_id,
+          content.title,
+          content.body,
+          NOTIFICATION_TYPES.PAYMENT_RECEIVED,
+          {
+            subscription_id: id,
+            amount: sub[0].price,
+            plan_name: sub[0].plan_name,
+            url: getNotificationUrl(NOTIFICATION_TYPES.PAYMENT_RECEIVED)
+          }
+        );
+      } catch (notifError) {
+        console.error('Error sending payment received notification:', notifError);
+      }
     }
 
     res.json({ ok: true });

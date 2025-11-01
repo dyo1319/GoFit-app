@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { subscribeToPushNotifications, isPushNotificationSupported, checkNotificationPermission } from '../services/pushNotificationService';
 
 const AuthContext = createContext(null);
 
@@ -138,6 +139,21 @@ export const AuthProvider = ({ children }) => {
 
         await fetchUserPermissions(userData.id, userData.role);
 
+        // Subscribe to push notifications if supported and permission already granted
+        // We don't request permission here to avoid interrupting the login flow
+        // Users can enable push notifications from the settings page
+        if (isPushNotificationSupported()) {
+          const permission = await checkNotificationPermission();
+          if (permission === 'granted') {
+            try {
+              await subscribeToPushNotifications(token);
+            } catch (error) {
+              console.warn('Failed to subscribe to push notifications:', error);
+              // Don't fail login if push subscription fails
+            }
+          }
+        }
+
         return { success: true, user: userData };
       } else {
         const errorMsg = data.message || 'ההתחברות נכשלה';
@@ -178,9 +194,12 @@ export const AuthProvider = ({ children }) => {
           setUser(userData);
           await fetchUserPermissions(userData.id, userData.role);
         } else {
+          // Token is invalid or expired - clear it silently
           signOut();
         }
       } catch (err) {
+        // Network error or invalid token - clear it silently
+        console.debug('Token verification failed (expected on first load with no token):', err);
         signOut();
       } finally {
         setLoading(false);

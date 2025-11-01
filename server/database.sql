@@ -159,6 +159,78 @@ INSERT INTO `invoices` VALUES (1,14,10,'INV-1761244082-14',150.00,0.00,150.00,'c
 /*!40000 ALTER TABLE `invoices` ENABLE KEYS */;
 UNLOCK TABLES;
 
+
+
+USE `gofit_db`;
+
+-- Table for storing browser push subscriptions
+DROP TABLE IF EXISTS `push_subscriptions`;
+CREATE TABLE `push_subscriptions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `endpoint` varchar(512) NOT NULL,
+  `p256dh` varchar(255) NOT NULL,
+  `auth` varchar(255) NOT NULL,
+  `browser` varchar(50) DEFAULT NULL,
+  `device_info` varchar(255) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_endpoint` (`endpoint`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_is_active` (`is_active`),
+  KEY `idx_updated_at` (`updated_at`),
+  KEY `idx_active_user` (`user_id`, `is_active`),
+  CONSTRAINT `fk_push_subscriptions_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Table for storing notification history
+DROP TABLE IF EXISTS `notifications`;
+CREATE TABLE `notifications` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `body` text NOT NULL,
+  `data` json DEFAULT NULL,
+  `type` varchar(50) NOT NULL,
+  `status` enum('pending','sent','failed') DEFAULT 'pending',
+  `read_at` datetime DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `sent_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_type` (`type`),
+  KEY `idx_status` (`status`),
+  KEY `idx_created_at` (`created_at`),
+  KEY `idx_read_at` (`read_at`),
+  KEY `idx_user_read` (`user_id`, `read_at`),
+  KEY `idx_user_created` (`user_id`, `created_at`),
+  KEY `idx_cleanup_read` (`read_at`, `created_at`),
+  CONSTRAINT `fk_notifications_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Table for user notification preferences
+DROP TABLE IF EXISTS `notification_preferences`;
+CREATE TABLE `notification_preferences` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `preference_type` varchar(50) NOT NULL,
+  `enabled` tinyint(1) DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_user_preference` (`user_id`, `preference_type`),
+  KEY `idx_user_id` (`user_id`),
+  CONSTRAINT `fk_notification_preferences_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+
+
+
+
 --
 -- Table structure for table `permissions_catalog`
 --

@@ -95,7 +95,21 @@ const BottomNavBar = ({ activeTab, onTabChange, onLogout }) => {
       return;
     }
     
-    onTabChange?.(itemId);
+    if (onTabChange) {
+      onTabChange(itemId);
+    } else {
+      const routeMap = {
+        'dashboard': '/app',
+        'workouts': '/app/workouts',
+        'membership': '/app/membership',
+        'bodydetails': '/app/bodydetails',
+        'profile': '/app/profile'
+      };
+      const route = routeMap[itemId];
+      if (route) {
+        navigate(route);
+      }
+    }
   };
 
   return (

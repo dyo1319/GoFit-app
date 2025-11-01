@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import PageHeader from '../../components/PageHeader';
+import BottomNavBar from '../../components/BottomNavBar';
 import {
   Box, Typography, Card, CardContent, CardActions, Button,
   Chip, Alert, Tab, Tabs, Grid, Dialog, DialogTitle, DialogContent,
@@ -23,6 +25,8 @@ import './workout.css';
 
 export default function Workouts() {
   const { authenticatedFetch } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [tabValue, setTabValue] = useState(0);
   const [myPrograms, setMyPrograms] = useState([]);
   const [exerciseLibrary, setExerciseLibrary] = useState([]);
@@ -59,6 +63,20 @@ export default function Workouts() {
     fetchExerciseLibrary();
     fetchWorkoutHistory();
   }, []);
+
+  // Handle program_id from query parameter (from notification click)
+  useEffect(() => {
+    const programId = searchParams.get('program_id');
+    if (programId && myPrograms.length > 0) {
+      const program = myPrograms.find(p => p.id === parseInt(programId));
+      if (program) {
+        setSelectedProgram(program);
+        setOpenProgramDialog(true);
+        // Remove the query parameter after opening
+        setSearchParams({}, { replace: true });
+      }
+    }
+  }, [searchParams, myPrograms, setSearchParams]);
 
   const fetchMyPrograms = async () => {
     try {
@@ -682,6 +700,22 @@ export default function Workouts() {
           </DialogActions>
         </Dialog>
       </div>
+      <BottomNavBar 
+        activeTab="workouts" 
+        onTabChange={(tab) => {
+          const navMap = {
+            'dashboard': '/app',
+            'workouts': '/app/workouts',
+            'membership': '/app/membership',
+            'bodydetails': '/app/bodydetails',
+            'profile': '/app/profile'
+          };
+          const path = navMap[tab];
+          if (path) {
+            navigate(path);
+          }
+        }}
+      />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { Menu } from "@mui/icons-material";
 import { 
   IconButton
 } from "@mui/material";
+import NotificationCenter from "../NotificationCenter";
 
 export default function Topbar({ onMenuToggle }) {
   return (
@@ -13,6 +14,7 @@ export default function Topbar({ onMenuToggle }) {
           <span className="logo">GoFit</span>
         </div>
         <div className="topRight">
+          <NotificationCenter />
           <IconButton 
             color="inherit" 
             onClick={onMenuToggle}

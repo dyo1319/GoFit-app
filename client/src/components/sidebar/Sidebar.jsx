@@ -5,7 +5,7 @@ import {
   LineStyle,  TrendingUp, PermIdentity,
   AttachMoney, WorkOutline, 
   CreditCard, ReceiptLong, FitnessCenter,
-  Assessment,  Logout, Close
+  Assessment,  Logout, Close, Notifications
 } from "@mui/icons-material";
 import { useAuth } from "../../context/AuthContext";
 
@@ -127,6 +127,12 @@ export default function Sidebar({ isMobileMenuOpen, onCloseMobileMenu }) {
               <NavLink to="/admin/permissions" className={linkCls} onClick={handleNavClick}>
                 <WorkOutline className="sidebarIcon" />
                 צוות/הרשאות
+              </NavLink>
+            </li>
+            <li className="sidebarListItem">
+              <NavLink to="/admin/notifications" className={linkCls} onClick={handleNavClick}>
+                <Notifications className="sidebarIcon" />
+                שליחת התראות
               </NavLink>
             </li>
           </ul>

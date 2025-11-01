@@ -1,0 +1,98 @@
+.notification-icon {
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.notification-icon:hover {
+  color: #6366f1;
+  transform: scale(1.1);
+}
+
+.notification-popover .MuiPopover-paper {
+  direction: rtl;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+  width: 360px;
+  max-height: 500px;
+}
+
+.notification-popover-content {
+  display: flex;
+  flex-direction: column;
+  max-height: 500px;
+}
+
+.notification-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.notification-header h6 {
+  margin: 0;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.notification-header .MuiIconButton-root {
+  transition: all 0.2s ease;
+}
+
+.notification-header .MuiIconButton-root:hover {
+  background-color: rgba(99, 102, 241, 0.08);
+  color: #6366f1;
+}
+
+.notification-loading,
+.notification-empty {
+  padding: 24px;
+  text-align: center;
+}
+
+.notification-list {
+  padding: 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  padding: 12px 16px;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.notification-item:hover {
+  background-color: rgba(99, 102, 241, 0.05);
+}
+
+.notification-item.unread {
+  background-color: rgba(99, 102, 241, 0.08);
+  font-weight: 500;
+}
+
+.notification-item.unread:hover {
+  background-color: rgba(99, 102, 241, 0.12);
+}
+
+.notification-item .MuiListItemText-primary {
+  margin-bottom: 4px;
+}
+
+.notification-item .MuiListItemText-secondary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+@media (max-width: 768px) {
+  .notification-popover .MuiPopover-paper {
+    width: 90vw;
+    max-width: 400px;
+  }
+}
+

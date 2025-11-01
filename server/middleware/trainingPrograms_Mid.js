@@ -32,6 +32,32 @@ async function createTrainingProgram(req, res, next) {
 
     await conn.commit();
     req.created_program_id = programId;
+    
+    try {
+      const pushNotificationService = require('../services/pushNotificationService');
+      const { NOTIFICATION_TYPES, getNotificationContent, getNotificationUrl } = require('../services/notificationTypes');
+      
+      const content = getNotificationContent(NOTIFICATION_TYPES.TRAINING_PROGRAM_ASSIGNED, {
+        program_name: program_name
+      });
+      
+      const db_pool = global.db_pool.promise();
+      await pushNotificationService.sendAndSaveNotification(
+        db_pool,
+        user_id,
+        content.title,
+        content.body,
+        NOTIFICATION_TYPES.TRAINING_PROGRAM_ASSIGNED,
+        {
+          program_id: programId,
+          program_name: program_name,
+          url: getNotificationUrl(NOTIFICATION_TYPES.TRAINING_PROGRAM_ASSIGNED)
+        }
+      );
+    } catch (notifError) {
+      console.error('Error sending training program notification:', notifError);
+    }
+    
     next();
   } catch (error) {
     await conn.rollback();
