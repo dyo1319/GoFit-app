@@ -30,7 +30,10 @@ router.get('/latest', verifyToken, bodyDetails_Mid.getLatestBodyDetail);
 router.get('/stats', verifyToken, bodyDetails_Mid.getBodyStats);
 router.get('/user/:userId', verifyToken, bodyDetails_Mid.getUserBodyDetailsByAdmin);
 router.post('/', verifyToken, validate(bodyDetailCreateSchema), bodyDetails_Mid.createBodyDetail);
+router.post('/user/:userId', verifyToken, validate(bodyDetailCreateSchema), bodyDetails_Mid.createBodyDetailForUser);
 router.put('/:id', verifyToken, validate(idParamSchema, 'params'), validate(bodyDetailUpdateSchema), bodyDetails_Mid.updateBodyDetail);
+router.put('/admin/:id', verifyToken, validate(idParamSchema, 'params'), validate(bodyDetailUpdateSchema), bodyDetails_Mid.updateBodyDetailForUser);
 router.delete('/:id', verifyToken, validate(idParamSchema, 'params'), bodyDetails_Mid.deleteBodyDetail);
+router.delete('/admin/:id', verifyToken, validate(idParamSchema, 'params'), bodyDetails_Mid.deleteBodyDetailForUser);
 
 module.exports = router;

@@ -82,6 +82,12 @@ export default function Sidebar({ isMobileMenuOpen, onCloseMobileMenu }) {
                 חידושים קרובים
               </NavLink>
             </li>
+            <li className="sidebarListItem">
+              <NavLink to="/admin/body-details" className={linkCls} onClick={handleNavClick}>
+                <FitnessCenter className="sidebarIcon" />
+                מדדי גוף
+              </NavLink>
+            </li>
           </ul>
         </div>
 

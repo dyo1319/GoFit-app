@@ -375,6 +375,207 @@ async function getBodyStats(req, res) {
   }
 }
 
+async function createBodyDetailForUser(req, res) {
+  try {
+    const db = global.db_pool.promise();
+    const targetUserId = req.params.userId;
+    const adminUserId = req.user.userId;
+    const { weight, height, body_fat, muscle_mass, circumference, recorded_at } = req.body;
+
+    // Verify that the requester is admin or trainer
+    const [userRows] = await db.query(
+      `SELECT role FROM users WHERE id = ?`,
+      [adminUserId]
+    );
+
+    if (!userRows.length || (userRows[0].role !== 'admin' && userRows[0].role !== 'trainer')) {
+      return res.status(403).json({
+        success: false,
+        message: 'אין הרשאה להוסיף מדדי גוף למשתמשים אחרים'
+      });
+    }
+
+    if (!recorded_at) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'תאריך הרשומה נדרש' 
+      });
+    }
+
+    if (!weight && !height && !body_fat && !muscle_mass && !circumference) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'נדרש לפחות מדד גוף אחד' 
+      });
+    }
+
+    const [checkResult] = await db.query(
+      'SELECT id FROM bodydetails WHERE user_id = ? AND recorded_at = ?',
+      [targetUserId, normalizeDate(recorded_at)]
+    );
+
+    if (checkResult.length > 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'קיימת כבר רשומה עבור תאריך זה. אנא עדכן את הרשומה הקיימת במקום זאת.' 
+      });
+    }
+
+    const [result] = await db.query(
+      `INSERT INTO bodydetails (user_id, weight, height, body_fat, muscle_mass, circumference, recorded_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [
+        targetUserId,
+        weight || null,
+        height || null, 
+        body_fat || null,
+        muscle_mass || null,
+        circumference || null,
+        normalizeDate(recorded_at)
+      ]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'מדדי הגוף נשמרו בהצלחה',
+      data: {
+        id: result.insertId,
+        user_id: targetUserId,
+        weight,
+        height,
+        body_fat,
+        muscle_mass,
+        circumference,
+        recorded_at: normalizeDate(recorded_at)
+      }
+    });
+  } catch (error) {
+    console.error('bodyDetails.createBodyDetailForUser error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'שגיאה בשמירת מדדי הגוף' 
+    });
+  }
+}
+
+async function updateBodyDetailForUser(req, res) {
+  try {
+    const db = global.db_pool.promise();
+    const recordId = req.params.id;
+    const adminUserId = req.user.userId;
+    const { weight, height, body_fat, muscle_mass, circumference, recorded_at } = req.body;
+
+    // Verify that the requester is admin or trainer
+    const [userRows] = await db.query(
+      `SELECT role FROM users WHERE id = ?`,
+      [adminUserId]
+    );
+
+    if (!userRows.length || (userRows[0].role !== 'admin' && userRows[0].role !== 'trainer')) {
+      return res.status(403).json({
+        success: false,
+        message: 'אין הרשאה לערוך מדדי גוף של משתמשים אחרים'
+      });
+    }
+
+    if (!weight && !height && !body_fat && !muscle_mass && !circumference) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'נדרש לפחות מדד גוף אחד' 
+      });
+    }
+
+    const [checkResult] = await db.query(
+      'SELECT user_id FROM bodydetails WHERE id = ?',
+      [recordId]
+    );
+
+    if (checkResult.length === 0) {
+      return res.status(404).json({ success: false, message: 'הרשומה לא נמצאה' });
+    }
+
+    const [updateResult] = await db.query(
+      `UPDATE bodydetails 
+       SET weight = ?, height = ?, body_fat = ?, muscle_mass = ?, circumference = ?, recorded_at = ?
+       WHERE id = ?`,
+      [
+        weight || null,
+        height || null,
+        body_fat || null,
+        muscle_mass || null,
+        circumference || null,
+        normalizeDate(recorded_at),
+        recordId
+      ]
+    );
+
+    if (updateResult.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'הרשומה לא נמצאה' });
+    }
+
+    res.json({
+      success: true,
+      message: 'מדדי הגוף עודכנו בהצלחה'
+    });
+  } catch (error) {
+    console.error('bodyDetails.updateBodyDetailForUser error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'שגיאה בעדכון מדדי הגוף' 
+    });
+  }
+}
+
+async function deleteBodyDetailForUser(req, res) {
+  try {
+    const db = global.db_pool.promise();
+    const recordId = req.params.id;
+    const adminUserId = req.user.userId;
+
+    // Verify that the requester is admin or trainer
+    const [userRows] = await db.query(
+      `SELECT role FROM users WHERE id = ?`,
+      [adminUserId]
+    );
+
+    if (!userRows.length || (userRows[0].role !== 'admin' && userRows[0].role !== 'trainer')) {
+      return res.status(403).json({
+        success: false,
+        message: 'אין הרשאה למחוק מדדי גוף של משתמשים אחרים'
+      });
+    }
+
+    const [checkResult] = await db.query(
+      'SELECT user_id FROM bodydetails WHERE id = ?',
+      [recordId]
+    );
+
+    if (checkResult.length === 0) {
+      return res.status(404).json({ success: false, message: 'הרשומה לא נמצאה' });
+    }
+
+    const [deleteResult] = await db.query(
+      'DELETE FROM bodydetails WHERE id = ?',
+      [recordId]
+    );
+
+    if (deleteResult.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'הרשומה לא נמצאה' });
+    }
+
+    res.json({
+      success: true,
+      message: 'מדדי הגוף נמחקו בהצלחה'
+    });
+  } catch (error) {
+    console.error('bodyDetails.deleteBodyDetailForUser error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'שגיאה במחיקת מדדי הגוף' 
+    });
+  }
+}
+
 module.exports = {
   getUserBodyDetails,
   getRecentBodyDetails,
@@ -383,5 +584,8 @@ module.exports = {
   deleteBodyDetail,
   getLatestBodyDetail,
   getBodyStats,
-  getUserBodyDetailsByAdmin
+  getUserBodyDetailsByAdmin,
+  createBodyDetailForUser,
+  updateBodyDetailForUser,
+  deleteBodyDetailForUser
 };
