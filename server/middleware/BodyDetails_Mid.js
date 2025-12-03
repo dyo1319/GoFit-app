@@ -276,6 +276,48 @@ async function getLatestBodyDetail(req, res) {
   }
 }
 
+async function getUserBodyDetailsByAdmin(req, res) {
+  try {
+    const db = global.db_pool.promise();
+    const targetUserId = req.params.userId;
+    const adminUserId = req.user.userId;
+
+    // Verify that the requester is admin or trainer
+    const [userRows] = await db.query(
+      `SELECT role FROM users WHERE id = ?`,
+      [adminUserId]
+    );
+
+    if (!userRows.length || (userRows[0].role !== 'admin' && userRows[0].role !== 'trainer')) {
+      return res.status(403).json({
+        success: false,
+        message: 'אין הרשאה לצפות במדדי גוף של משתמשים אחרים'
+      });
+    }
+
+    const [rows] = await db.query(
+      `SELECT id, user_id, weight, height, body_fat, muscle_mass, circumference, 
+              DATE_FORMAT(recorded_at, '%Y-%m-%d') AS recorded_at
+       FROM bodydetails 
+       WHERE user_id = ? 
+       ORDER BY recorded_at DESC`,
+      [targetUserId]
+    );
+
+    res.json({
+      success: true,
+      data: rows,
+      count: rows.length
+    });
+  } catch (error) {
+    console.error('bodyDetails.getUserBodyDetailsByAdmin error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'שגיאה במסד הנתונים' 
+    });
+  }
+}
+
 async function getBodyStats(req, res) {
   try {
     const db = global.db_pool.promise();
@@ -340,5 +382,6 @@ module.exports = {
   updateBodyDetail,
   deleteBodyDetail,
   getLatestBodyDetail,
-  getBodyStats
+  getBodyStats,
+  getUserBodyDetailsByAdmin
 };

@@ -363,7 +363,33 @@ export default function User() {
             </div>
 
             <div className="userShowSection">
-              <span className="userShowTitle">מדדי גוף</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <span className="userShowTitle">מדדי גוף</span>
+                <Link 
+                  to={`/admin/user/${id}/body-details`}
+                  className="view-history-link"
+                  style={{
+                    fontSize: '14px',
+                    color: '#6366f1',
+                    textDecoration: 'none',
+                    fontWeight: '500',
+                    padding: '6px 12px',
+                    borderRadius: '6px',
+                    border: '1px solid #6366f1',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = '#6366f1';
+                    e.target.style.color = 'white';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = 'transparent';
+                    e.target.style.color = '#6366f1';
+                  }}
+                >
+                  צפה בהיסטוריה המלאה
+                </Link>
+              </div>
               <div className="userShowInfo">
                 <Height className="userShowIcon" />
                 <span className="userShowInfoTitle">גובה: {userForm.height} ס"מ</span>

@@ -5,6 +5,7 @@ import "./App.css";
 import Home from "./pages/home/Home";
 import UserList from "./pages/userList/UserList";
 import User from "./pages/user/User";
+import AdminUserBodyDetails from "./pages/user/AdminUserBodyDetails";
 import NewUserPage from "./pages/newUser/NewUserPage";
 import Subscriptions from "./pages/subscription/subscription";
 import UpcomingRenewalsPage from "./pages/renewals/upcomingrenewals";
@@ -221,6 +222,19 @@ function AppContent() {
             <StaffRoute>
               <AdminLayout>
                 <User />
+              </AdminLayout>
+            </StaffRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/user/:id/body-details"
+        element={
+          <ProtectedRoute>
+            <StaffRoute>
+              <AdminLayout>
+                <AdminUserBodyDetails />
               </AdminLayout>
             </StaffRoute>
           </ProtectedRoute>
