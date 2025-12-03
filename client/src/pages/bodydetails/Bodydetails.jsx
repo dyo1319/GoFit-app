@@ -12,10 +12,11 @@ const BodyDetailsPage = () => {
   const [success, setSuccess] = useState('');
   const [recentData, setRecentData] = useState([]);
   const [stats, setStats] = useState(null);
+  const [historyViewMode, setHistoryViewMode] = useState('recent'); // 'recent' or 'all'
+  const [lastHeight, setLastHeight] = useState(null); // הגובה האחרון מהמסד נתונים
 
   const [formData, setFormData] = useState({
     weight: '',
-    height: '',
     body_fat: '',
     muscle_mass: '',
     circumference: '',
@@ -24,22 +25,17 @@ const BodyDetailsPage = () => {
 
   const [editingRecord, setEditingRecord] = useState(null);
 
-  useEffect(() => {
-    if (user?.id) {
-      fetchRecentData();
-      fetchStats();
-    }
-  }, [user]);
-
   const calculateBMI = (weight, height) => {
-    if (!weight || !height) return null;
-    const heightInMeters = height / 100;
+    const heightToUse = height || lastHeight;
+    if (!weight || !heightToUse) return null;
+    const heightInMeters = heightToUse / 100;
     return (weight / (heightInMeters * heightInMeters)).toFixed(1);
   };
 
   const fetchRecentData = async () => {
     try {
-      const response = await authenticatedFetch(`/body-details/recent`);
+      const endpoint = historyViewMode === 'all' ? '/body-details' : '/body-details/recent';
+      const response = await authenticatedFetch(endpoint);
       const data = await response.json();
       
       if (data.success) {
@@ -49,6 +45,20 @@ const BodyDetailsPage = () => {
       console.error('Error fetching recent data:', err);
     }
   };
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchStats();
+      fetchLastHeight();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.id && activeTab === 'history') {
+      fetchRecentData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [historyViewMode, activeTab, user]);
 
   const fetchStats = async () => {
     try {
@@ -63,6 +73,19 @@ const BodyDetailsPage = () => {
     }
   };
 
+  const fetchLastHeight = async () => {
+    try {
+      const response = await authenticatedFetch(`/body-details/latest`);
+      const data = await response.json();
+      
+      if (data.success && data.data && data.data.height) {
+        setLastHeight(data.data.height);
+      }
+    } catch (err) {
+      console.error('Error fetching last height:', err);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -73,14 +96,14 @@ const BodyDetailsPage = () => {
   };
 
   const validateForm = () => {
-    const { weight, height, body_fat, muscle_mass, circumference } = formData;
+    const { weight, body_fat, muscle_mass, circumference } = formData;
     
-    if (!weight && !height && !body_fat && !muscle_mass && !circumference) {
+    if (!weight && !body_fat && !muscle_mass && !circumference) {
       setError('אנא מלא לפחות שדה מדידה אחד');
       return false;
     }
 
-    const numericFields = { weight, height, body_fat, muscle_mass, circumference };
+    const numericFields = { weight, body_fat, muscle_mass, circumference };
     for (const [field, value] of Object.entries(numericFields)) {
       if (value && (isNaN(value) || parseFloat(value) <= 0)) {
         setError(`${field.replace('_', ' ')} חייב להיות מספר חיובי`);
@@ -90,11 +113,6 @@ const BodyDetailsPage = () => {
 
     if (weight && (parseFloat(weight) < 30 || parseFloat(weight) > 300)) {
       setError('המשקל חייב להיות בין 30-300 ק״ג');
-      return false;
-    }
-    
-    if (height && (parseFloat(height) < 100 || parseFloat(height) > 250)) {
-      setError('הגובה חייב להיות בין 100-250 ס״מ');
       return false;
     }
 
@@ -128,7 +146,7 @@ const BodyDetailsPage = () => {
     try {
       const submitData = {
         weight: formData.weight ? parseFloat(formData.weight) : null,
-        height: formData.height ? parseFloat(formData.height) : null,
+        height: editingRecord?.originalHeight || lastHeight || null, // שימוש בגובה מהרשומה הקיימת או מהמדידה האחרונה
         body_fat: formData.body_fat ? parseFloat(formData.body_fat) : null,
         muscle_mass: formData.muscle_mass ? parseFloat(formData.muscle_mass) : null,
         circumference: formData.circumference ? parseFloat(formData.circumference) : null,
@@ -159,7 +177,6 @@ const BodyDetailsPage = () => {
         
         setFormData({
           weight: '',
-          height: '',
           body_fat: '',
           muscle_mass: '',
           circumference: '',
@@ -188,13 +205,20 @@ const BodyDetailsPage = () => {
   const handleEdit = (record) => {
     setFormData({
       weight: record.weight || '',
-      height: record.height || '',
       body_fat: record.body_fat || '',
       muscle_mass: record.muscle_mass || '',
       circumference: record.circumference || '',
       recorded_at: record.recorded_at
     });
-    setEditingRecord(record);
+    // עדכון הגובה האחרון אם יש במדידה זו
+    if (record.height) {
+      setLastHeight(record.height);
+    }
+    // שמירת הגובה המקורי מהרשומה לעריכה
+    setEditingRecord({
+      ...record,
+      originalHeight: record.height
+    });
     setActiveTab('add');
     setError('');
     setSuccess('');
@@ -230,7 +254,6 @@ const BodyDetailsPage = () => {
     setEditingRecord(null);
     setFormData({
       weight: '',
-      height: '',
       body_fat: '',
       muscle_mass: '',
       circumference: '',
@@ -290,18 +313,15 @@ const BodyDetailsPage = () => {
                         placeholder="לדוגמה: 70.5"
                       />
                     </div>
-                    <div className="form-group">
-                      <label htmlFor="body_height">גובה (ס״מ)</label>
-                      <input
-                        id="body_height"
-                        type="number"
-                        name="height"
-                        value={formData.height}
-                        onChange={handleInputChange}
-                        step="0.1"
-                        placeholder="לדוגמה: 175"
-                      />
-                    </div>
+                    {lastHeight && (
+                      <div className="form-group">
+                        <label>גובה (ס״מ)</label>
+                        <div className="height-info">
+                          <span className="height-value">{lastHeight} ס״מ</span>
+                          <span className="height-note">(נטען אוטומטית מהמדידה האחרונה)</span>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="form-row">
@@ -358,9 +378,9 @@ const BodyDetailsPage = () => {
                     </div>
                   </div>
 
-                  {formData.weight && formData.height && (
+                  {formData.weight && (lastHeight || formData.height) && (
                     <div className="bmi-preview">
-                      <span>תצוגה מקדימה BMI: {calculateBMI(formData.weight, formData.height)}</span>
+                      <span>תצוגה מקדימה BMI: {calculateBMI(formData.weight, formData.height || lastHeight)}</span>
                     </div>
                   )}
 
@@ -383,7 +403,28 @@ const BodyDetailsPage = () => {
 
             {activeTab === 'history' && (
               <div className="tab-content">
-                <h3>30 הימים האחרונים ({recentData.length} רשומות)</h3>
+                <div className="history-header">
+                  <h3>
+                    {historyViewMode === 'recent' 
+                      ? `30 הימים האחרונים (${recentData.length} רשומות)`
+                      : `כל המדידות (${recentData.length} רשומות)`
+                    }
+                  </h3>
+                  <div className="history-view-toggle">
+                    <button
+                      className={`view-toggle-btn ${historyViewMode === 'recent' ? 'active' : ''}`}
+                      onClick={() => setHistoryViewMode('recent')}
+                    >
+                      30 יום אחרונים
+                    </button>
+                    <button
+                      className={`view-toggle-btn ${historyViewMode === 'all' ? 'active' : ''}`}
+                      onClick={() => setHistoryViewMode('all')}
+                    >
+                      כל המדידות
+                    </button>
+                  </div>
+                </div>
                 {recentData.length > 0 ? (
                   <div className="history-list">
                     {recentData.map((record) => (
@@ -416,7 +457,12 @@ const BodyDetailsPage = () => {
                   </div>
                 ) : (
                   <div className="no-data">
-                    <p>לא נרשמו מדדים ב-30 הימים האחרונים.</p>
+                    <p>
+                      {historyViewMode === 'recent' 
+                        ? 'לא נרשמו מדדים ב-30 הימים האחרונים.'
+                        : 'לא נרשמו מדדים עדיין.'
+                      }
+                    </p>
                     <button onClick={() => setActiveTab('add')} className="btn-primary">
                       הוסף את המדידה הראשונה שלך
                     </button>
